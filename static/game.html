@@ -3,11 +3,10 @@
 
 
 				<div  style="float:right; padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 5px;">
-								<button class="btn btn-warning" ng-show="game.activePlayer.cardSumSelected > 0 && game.activePlayer.cardSumSelected < 11" ng-click="playerMarketTrade()" >Trade {{game.activePlayer.cardSumSelected}} item points?</button>    														
-								<button class="btn btn-warning" ng-click="playerFish()" ng-disabled="!game.activePlayer.actionsRemaining>0"> Fish</button>    
-								<button class="btn btn-warning" ng-click="playerDiscard()" ng-disabled="!game.activePlayer.actionsRemaining > '0' && !game.activePlayer.maxHand > 'game.activePlayer.cards.cardsInStack.length'" >Discard</button>    
-								<button class="btn btn-warning" ng-click="playerBuyAction()" >Buy Action</button>    
-								<button class="btn btn-warning"  ng-click="playerPass()" >Pass</button>
+								<button class="btn btn-warning" ng-show="game.activePlayer.cardSumSelected > 0 && game.activePlayer.cardSumSelected < 11" ng-click="playerMarketTrade(1)" >Trade {{game.activePlayer.cardSumSelected}} item points?</button>    														
+								<button class="btn btn-warning" ng-click="playerBuyAction(1)" >Buy Action</button>    
+								<button class="btn btn-warning" ng-click="playerPass()" >Pass</button>
+								<button class="btn btn-warning" ng-click="endGame()">Quit</button>
 				</div>
 
 			</div>
@@ -26,7 +25,9 @@
 								<th><big>{{player.name}}</big></th>
 								<th><big>Actions Remaining {{player.actionsRemaining}}</big></th>
 								<th><big>VP: {{player.vp}}</big></th>
+								<th><big>Bonus: {{player.bonus}}</big></th>
 								<th><big>Gold: {{player.gold}}</big></th>								
+								<th><big>Total: {{player.gold + player.vp + player.bonus}}</big></th>								
 								<th><big>Turns: {{player.turns}}</big></th>
 							</tr>
 						
@@ -38,59 +39,87 @@
 		<br></br>
 		<div class="container-fluid">
 			<div class="row">
-<!--ng-show="cart.contains != Nothing"-->
 
-			<div class="col-sm-3" ng-repeat="cart in player.carts" >
-						<button ng-disabled="player.nextCartId < cart.id" ng-if="!cart.active" class="btn btn-warning" ng-click="playerBuyCart(cart.id)" >Buy {{cart.name}} with {{cart.purchaseWith}}</button>   
-						<!--<p>Contains: {{cart.contains()}}</p>-->
-						<img ng-if="cart.active" style="border:3px solid {{cart.borderColor}}" width = {{cart.width}} height = {{cart.height}} ng-src="{{cart.image}}" ng-click="userClickedCartImage(cart.id)"></img>
-							<button ng-if="cart.selected && player.cardSumSelected > 0 && cart.size - cart.cards.playingCards.length > 0" class="btn btn-warning" ng-click="moveItemsToCart(cart.id)" > Move To Cart?</button>   
-							<div  class="col-sm-1" ng-repeat="card in cart.cards.playingCards" >
+			<div class="col-sm-3" ng-repeat="cart in player.carts track by $index" >
+						<div ng-disabled="player.nextCartId < cart.id" ng-if="!cart.active"><b>Gold Cost:</b> {{cart.goldCost}}<span style="color:red;"> / </span><b>Item Cost:</b> {{cart.itemCost}}</div>
+						<button ng-disabled="player.nextCartId < cart.id" ng-if="!cart.active" class="btn btn-warning" ng-click="playerBuyCart(cart.id, 1)" >Buy {{cart.name}} with {{cart.purchaseWith}}</button>   
+
+						<img ng-if="cart.active" style="border:3px solid {{cart.borderColor}}" width={{cart.width}} height={{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImage(cart.id)"></img>
+							<span  class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
 								<img  style="border:2px solid {{card.borderColor}}" ng-click="userClickedCartItem(cart.id, $index)" ng-src="{{card.image}}" width = "{{card.cardImage.width}}" 	height = "{{card.cardImage.height}}" />
-							</div>
+							</span>
+						<span>
+						<button ng-if="cart.active && cart.size - cart.cards.playingCards.length >= (game.selectedCartItemsCount+game.selectedItemsCount) && cart.cardSumSelected === 0 && game.activePlayer.actionsRemaining > 0 && game.selectedCartItemsCount + game.selectedItemsCount > 0" class="btn btn-info" ng-click="moveItemsToCart(cart.id, 1)" > Move to {{cart.name}}? </button>   
+						<button class="btn btn-warning" ng-click="playerCartDiscard($index,1)" ng-if="cart.cards.playingCards.length > 0 && game.activePlayer.actionsRemaining > 0 && cart.cardSumSelected > 0" >Discard </button>    
+						<button class="btn btn-warning" ng-click="playerCartFish($index,1)" ng-if="cart.cardSumSelected && cart.cards.playingCards.length > 0 && game.activePlayer.actionsRemaining > 0 && game.selectedCartItemsCount === 1" >Fish </button>    
+					</span>	
 
-						<p>Cart size: {{cart.size}}</p>
+
+						<p>Cart can hold: {{cart.size -  cart.cards.playingCards.length}} more items(s)</p>
+						<!--<p>cart items selected count:{{game.selectedCartItemsCount}}</p>-->
+						<!--<p>selected items count:{{game.selectedItemsCount}}</p>-->
+						<!--<p>items in cart: {{cart.cards.playingCards.length}}</p>-->
 				</div>
 			</div>
 			
-				<div class="demo" style=padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in player.cards.cardsInStack" >
-					<img style="border:2px solid {{card.borderColor}}"  ng-src="{{card.image}}"	width = "{{card.cardImage.width}}" 	height = "{{card.cardImage.height}}" />
-					 <span class="show-off" ng-click="userClickedItemImage($index)"  />
-					 <!---->
-					 <!---->
-				</div>
-			</div>			
+				<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in player.cards.playingCards track by $index" >
+					<img ng-click="userClickedItemImage($index)" style="border:2px solid {{card.borderColor}}"  ng-src="{{card.image}}"	width = "{{card.cardImage.width}}" 	height = "{{card.cardImage.height}}" />
+				</span>
+			</div>	<p></p>		
+			<button class="btn btn-warning" ng-click="playerFish(1)" ng-if="game.activePlayer.actionsRemaining > 0 && game.selectedItemsCount === 1"> Fish</button>    
+			<button class="btn btn-warning" ng-click="playerDiscard(1)" ng-disabled="!game.activePlayer.actionsRemaining > '0' && !game.activePlayer.maxHand > 'game.activePlayer.cards.playingCards.length'" >Discard</button>    
+
+
+				<table style="float: center" table table-condensed">
+					<thead>
+					<tr>
+						<td>
+							<h4>Quests </h4> 
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<span ng-repeat="questcard in game.questsInPlay.playingCards track by $index">
+								<button ng-if="questcard.selected===true" class="btn btn-warning" ng-click="playerCompleteQuest($index)">Complete Quest?</button>
+								<questcard ng-click="userClickedQuestImage($index)" info="questcard"></questcard>
+							</span>	
+						</td>
+					</tr>
+					</thead>
+				</table>
+
+			
 
 
 
-
-			<h4>Quests</h4>
-			<span ng-repeat="questcard in game.questsInPlay.cardsInStack">
-                <questcard ng-click="userClickedQuestImage($index)" info="questcard"></questcard>
-			</span>	
 
 
 			<h4>Market</h4>
 				<table class="table table-condensed">
 					<thead>
 					<tr>
-						<span ng-repeat="cardcount in game.marketHolders.playingCards">
+						<span ng-repeat="cardcount in game.marketHolders.playingCards track by $index">
 							<marketcardcount info="cardcount"></marketcardcount>
 						</span>
 					</tr>
 					<button class="btn btn-warning" ng-show="game.sumMarketValueSelected < 11 && game.sumMarketValueSelected > 0" ng-click="playerMarketTrade()" >Trade {{game.sumMarketValueSelected}} item points?</button>    
 					<td>
-						<span ng-repeat="marketcard in game.marketHolders.playingCards">
+						<span ng-repeat="marketcard in game.marketHolders.playingCards track by $index">
 							<img style="border:2px solid {{marketcard.borderColor}}" width = "{{marketcard.cardImage.width}}" height = "{{marketcard.cardImage.height}}" ng-src="{{marketcard.image}}" ng-show = "marketcard.count > 0" ng-click="userClickedMarketImage($index)"></img>
 						</span>
 					</td>
 					<tr>
-						<span ng-repeat="tradecard in game.marketDeckInTrade.playingCards">
+						<span ng-repeat="tradecard in game.marketDeckInTrade.playingCards track by $index">
 							<img style="border:2px solid {{tradecard.borderColor}}" width = "{{tradecard.cardImage.width}}" height = "{{tradecard.cardImage.height}}" ng-src="{{tradecard.image}}" ng-click="userClickedMarketTradeImage($index)"></img>
 						</span>
 					</tr>
 					</thead>
 				</table>
+				
+				<div>My Completed Quests</div>
+				<span ng-repeat="questcard in game.activePlayer.questsCompleted.playingCards track by $index">
+					<img width = "80" height = "100" ng-src="{{questcard.image}}"></img>
+				</span>
 
 				<br></br>
 				<div class="col-sm-2">
@@ -111,15 +140,14 @@
 						</th>	
 						<th>
 						<img ng-show="game.discardsCount > 0" ng-src="{{game.lastDiscard.image}}" width = auto height = "180" ></img>
-						</th>	
+						</th>
 						</tr>
 					</thead>
-			
 			
 				</div>
 
 	</div>
-	
+
 </div> <!-- done row -->
 		
 			

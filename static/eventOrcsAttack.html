@@ -1,0 +1,122 @@
+﻿<div class="row" ng-repeat="player in game.players" >
+	<div class="panel panel-primary" ng-show="player.active">  
+		<div class="panel-heading">  
+			<div class="panel-body">
+			
+					<table class="table table-condensed">
+
+						
+							<tr>
+								<th><big>{{player.name}}</big></th>
+								<th><big>Actions Remaining {{player.actionsRemaining}}</big></th>
+								<th><big>VP: {{player.vp}}</big></th>
+								<th><big>Bonus: {{player.bonus}}</big></th>
+								<th><big>Gold: {{player.gold}}</big></th>								
+								<th><big>Total: {{player.gold + player.vp + player.bonus}}</big></th>								
+								<th><big>Turns: {{player.turns}}</big></th>
+							</tr>
+						
+					</table>
+					
+
+			</div>
+		</div>
+		<br></br>
+		<div class="container-fluid">
+			<div class="row">
+
+			<div class="col-sm-3" ng-repeat="cart in player.carts track by $index" >
+						<button ng-if="activeEvent==='eventOrcsAttack'" class="btn btn-warning" ng-click="playerCompleteEvent('eventOrcsAttack')" >Buy back wheelbarrow for 5+ item points?</button>   
+
+						<img ng-if="activeEvent==='eventOrcsAttack' && cart.id === 0" style="border:3px solid {{cart.borderColor}}" width={{cart.width}} height={{cart.height}}" ng-src="{{cart.image}}" ></img>
+						<span>
+					</span>	
+				</div>
+			</div>
+			
+				<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in player.cards.playingCards track by $index" >
+					<img ng-click="userClickedItemImage($index)" style="border:2px solid {{card.borderColor}}"  ng-src="{{card.image}}"	width = "{{card.cardImage.width}}" 	height = "{{card.cardImage.height}}" />
+				</span>
+			</div>	<p></p>		
+
+				<table style="float: center" table table-condensed">
+					<thead>
+					<tr>
+						<td>
+							<h4>Quests </h4> 
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<span ng-repeat="questcard in game.questsInPlay.playingCards track by $index">
+								<questcard info="questcard"></questcard>
+							</span>	
+						</td>
+					</tr>
+					</thead>
+				</table>
+
+			
+
+
+
+
+
+			<h4>Market</h4>
+				<table class="table table-condensed">
+					<thead>
+					<tr>
+						<span ng-repeat="cardcount in game.marketHolders.playingCards track by $index">
+							<marketcardcount info="cardcount"></marketcardcount>
+						</span>
+					</tr>
+					<td>
+						<span ng-repeat="marketcard in game.marketHolders.playingCards track by $index">
+							<img style="border:2px solid {{marketcard.borderColor}}" width = "{{marketcard.cardImage.width}}" height = "{{marketcard.cardImage.height}}" ng-src="{{marketcard.image}}" ng-show = "marketcard.count > 0" ></img>
+						</span>
+					</td>
+					<tr>
+						<span ng-repeat="tradecard in game.marketDeckInTrade.playingCards track by $index">
+							<img style="border:2px solid {{tradecard.borderColor}}" width = "{{tradecard.cardImage.width}}" height = "{{tradecard.cardImage.height}}" ng-src="{{tradecard.image}}" ></img>
+						</span>
+					</tr>
+					</thead>
+				</table>
+				
+				<div>My Completed Quests</div>
+				<span ng-repeat="questcard in game.activePlayer.questsCompleted.playingCards track by $index">
+					<img width = "80" height = "100" ng-src="{{questcard.image}}"></img>
+				</span>
+
+				<br></br>
+				<div class="col-sm-2">
+			      <table class="table table-condensed">
+
+					<thead>
+						<tr>
+							<th class="alignleft"><big>Item Cards: {{game.itemsCountRemaining}}</big></th>
+							<th class="alignjustify"><big>Quest Cards: {{game.questsCountRemaining}}</big></th>
+							<th ng-show="game.discardsCount > 0" ><big>Discards: {{game.discardsCount}}</big></th>
+						</tr>
+						<tr>
+						<th>
+						<img ng-src="images/shoppingCardBack.jpg" width = auto height = "180" class="alignleft"></img>
+						</th>	
+						<th>
+						<img ng-src="images/vendorback.jpg" width = auto height = "180" class="alignjustify"</img>
+						</th>	
+						<th>
+						<img ng-show="game.discardsCount > 0" ng-src="{{game.lastDiscard.image}}" width = auto height = "180" ></img>
+						</th>
+						</tr>
+					</thead>
+			
+				</div>
+
+			</div>
+
+		</div> <!-- done row -->
+	</div>	
+</div>
+		
+			
