@@ -62,66 +62,6 @@ cardSet.shuffleCards(optional integer: times)
 	you pass an integer to it, it will sort that many times (in case the browser has a bad random number
 	generator). Default is 3 times.
 
-public class cardStack(mixed: type,mixed: index,bool: createDiv,optional string: stackText)
-	A class representing a visual stacking of cards within the game area, for example, the deck of undealt
-	cards in a game of solitaire. type and index are arbitrary, and can be used simply to keep a reference
-	of the features of a specific stack. If createDiv is true, the hotspot property will be created as a
-	div with position:absolute, and a className of 'hotspot'. If a hotspot is created, then any text you
-	provide in stackText will be added to the hotspot.
-cardStack.cardsInStack
-	Array of all cards in the stack.
-cardStack.hotspot
-	A reference to a div element with position set to absolute.
-cardStack.type
-	The specified stack type.
-cardStack.index
-	The specified stack index.
-cardStack.moveToStack(playingCard)
-	Moves a given card into the current stack, and removes it from any existing stack. Note that
-	cardStack.cardsInStack does not automatically collapse down when cards are removed from it. This is
-	behaviourly synonymous to playingCard.moveToStack
-cardStack.setStyles(left,top,zIndex,width,height,fontSize)
-	Sets the appropriate styles on the card stack's hotspot.
-cardStack.truncate(optional integer: length)
-	Shortens the number of cards in the stack to the given length. If no length is given, the card stack
-	will be shortened to remove all trailing empty cells.
-
-public class imagePacks()
-	Class representing an available set of images, including their sizes, so that appropriate size of
-	image set can be chosen for the available space. Do not create instances of this class directly,
-	they are created atomatically for each cardSet and can be accessed through cardSet.imagePacks.
-imagePacks.availCombo
-	Object with property names matching each combination of image set and back image. The property names are
-	created as width+'x'+height+'|'+imageset+'|'+backimage (for use with storing and retrieving preferences).
-	Each property references an image pack that match that image combination. Image packs are stored in
-	object form with the properties 'imageset', 'backimages', 'extension', 'width', 'height', and 'name'
-	(these will match the values passed to the addImagePack method).
-imagePacks.availHeights
-	Array of available card heights, added using imagePacks.addCardPack. Array will be sorted in descending
-	order.
-imagePacks.availWidths
-	Array of available card widths, added using imagePacks.addCardPack. Array will be sorted in descending
-	order.
-imagePacks.heights
-	Object with property names matching the sizes of the available cards. Each property references an array
-	of image packs that match that size (in the same way as with imagePacks.availCombo). For example,
-	imagePacks.heights[100][0] will reference the first image pack added with a height of 100.
-imagePacks.widths
-	Same as imagePacks.heights, but for widths instead of heights.
-imagePacks.addImagePack(string: imageset,array: backimages,string: extension,integer: cardWidth,integer: cardHeight,string: name)
-	Adds an image pack into the list of available image packs. The values of imageset and extension should be
-	compatible with those used by cardSet.setImagePack. cardWidth and cardHeight are for use with
-	getFittingImageSize. backimages should be an array of entries. Each entry should be an array with two
-	cells: string backimage, string name. This should list all available card back images in this image set.
-	Each should be compatible with the backimage value expected by cardSet.setImagePack. The name is a name
-	that you want to refer to the image pack as (this is used only for your own reference, so multiple image
-	packs may share the same name).
-imagePacks.getFittingImageSize(bool: heightOrWidth,integer: size)
-	Attempts to find the largest possible card size within the given size limit. The appropriate size of the
-	card is returned. If none can be found, it returns the smallest available card size. If no card packs are
-	available, it returns null. heightOrWidth should be true if you want to check heights, and false if you
-	want to check widths.
-
 public class playingCard(string: suit,integer: cardnumber,mixed: color,object: cardSet)
 	Class representing a card in the deck. It is generally best to use cardSet.create52Cards,
 	cardSet.addCard, or playingCard.changeCard instead of creating instances manually - if you do,
@@ -173,52 +113,21 @@ function cardSet() {
 	
 	// Storage for card references
 	this.playingCards = [];
-	this.massiveImageCache = {};
-	this.imagePacks = new imagePacks();
-
 }
-
-cardSet.prototype.defaultCardNames = ['1','2','3','4','5','6','7','8','9','10'];
-cardSet.prototype.defaultCardWord = 'Card';
-
-cardSet.prototype.toString = function () { return '[object cardSet]'; };
+//
+//cardSet.prototype.defaultCardNames = ['1','2','3','4','5','6','7','8','9','10'];
+//cardSet.prototype.defaultCardWord = 'Card';
+//cardSet.prototype.toString = function () { return '[object cardSet]'; };
 
 cardSet.prototype.addCard = function (oNumber,oImage,oCount) {
 	// Add a card to the deck
 	this.playingCards[this.playingCards.length] = new playingCard(oNumber,oImage,oCount,this);
 };
 
-//cardSet.prototype.addCardc = function (oCard) {
-//	// Add a Quest to the deck
-//	this.playingCards[this.playingCards.length] = new playingCard(oCard.oNumber,oCard.oImage,oCard.oCount,oCard.cardImage.width, oCard.cardImage.height);
-//};
-
-
-cardSet.prototype.addImageCache = function (imUrl) {
-	// Add an image into the cache
-	if( !this.massiveImageCache[imUrl] ) {
-		var oSet = this;
-		this.massiveImageCache[imUrl] = new Image();
-		this.massiveImageCache[imUrl].onerror = function () {
-			if( !oSet.hasAlertedImageError ) {
-				oSet.hasAlertedImageError = true;
-				if( !window.hideCardGameErrors ) { alert('Warning: Card game image failed\n\nA card image failed to load - the card game may not play correctly:\n'+this.src+'\n\nNo more warnings will be shown for cards in this card set.'); }
-			}
-		};
-		this.massiveImageCache[imUrl].src = imUrl;
-	}
+cardSet.prototype.peek = function (i) {
+	return this.playingCards[ i + 1 ];
 };
 
-cardSet.prototype.setImagePack = function (oImageSet,oBackImage,oExtension) {
-	// Set card images
-	this.cardSet = oImageSet;
-	this.imageExtension = oExtension;
-	this.backImage = oImageSet+'back'+oBackImage+oExtension;
-	this.addImageCache(this.backImage);
-	for( var i = 0; i < this.playingCards.length; i++ ) {
-		this.playingCards[i].inheritCardDesign();
-	}
-};
 
 cardSet.prototype.shuffleCards = function (oTimes) {
 	// Sorting function - based on the easier Knuth shuffle
@@ -244,26 +153,18 @@ cardSet.prototype.setCardSize = function (oWidth,oHeight) {
 	}
 };
 
-cardSet.prototype.redrawCards = function () {
-	// Redraws all cards (resets their images and alt text to the correct values)
-	for( var i = 0; i < this.playingCards.length; i++ ) {
-		this.playingCards[i].redrawCardImage();
-	}
-};
+//cardSet.prototype.redrawCards = function () {
+//	// Redraws all cards (resets their images and alt text to the correct values)
+//	for( var i = 0; i < this.playingCards.length; i++ ) {
+//		this.playingCards[i].redrawCardImage();
+//	}
+//};
 
-cardSet.prototype.setCardNames = function (oCardWord,oCardNames) {
-	// Change the text representation of the cards
-	if( !oCardWord ) { oCardWord = this.defaultCardWord; }
-	if( !oCardNames ) { oCardNames = this.defaultCardNames; }
-	this.cardWord = oCardWord;
-	this.cardNames = oCardNames;
-	this.redrawCards();
-};
 
-cardSet.prototype.forcePageRedraw = function () {
-	// Force full document redraw
-	document.body.className = document.body.className ? ( document.body.className + '' ) : '';
-};
+//cardSet.prototype.forcePageRedraw = function () {
+//	// Force full document redraw
+//	document.body.className = document.body.className ? ( document.body.className + '' ) : '';
+//};
 
 cardSet.prototype.create75Cards = function () {
 	// Create 75 cards
@@ -288,161 +189,12 @@ cardSet.prototype.createBlankMarket = function() {
 
 	}
 
-	cardSet.prototype.truncate = function () {
+cardSet.prototype.truncate = function () {
 	for(var i = this.playingCards.length-1; i >= 0; i--){              // STEP 1
 		if(this.playingCards[i] === null){ // STEP 2
 			this.playingCards.splice(i,1);                             // STEP 3
 		}
 	}	
-};
-
-
-/*****************************************
- A class representing a visual card stack
- - this can be extended by the game code
-*****************************************/
-
-function cardStack(oType,oIndex,oWithDiv,oDivText) {
-
-	this.cardsInStack = [];
-	this.type = oType;
-	this.index = oIndex;
-	if( oWithDiv ) {
-		this.hotspot = document.createElement('div');
-		this.hotspot.relatedObject = this;
-		this.hotspot.className = 'hotspot';
-		this.hotspot.style.position = 'absolute';
-		if( oDivText ) { this.hotspot.appendChild(document.createTextNode(oDivText)); }
-	}
-	
-};
-
-cardStack.prototype.toString = function () { return '[object cardStack: type '+this.type+', index '+this.index+']'; };
-
-//cardStack.prototype.getSelectedCard = function() {
-//	var card = null;
-//	for(var i = this.cardsInStack.length-1; i >= 0; i--){              // STEP 1
-//		if(this.cardsInStack[i].selected === true){ // STEP 2
-//			card = this.cardsInStack[i];
-//		}
-//	}	
-//
-//	return card;
-//}
-
-cardStack.prototype.shuffleCards = function (oTimes) {
-	// Sorting function - based on the easier Knuth shuffle
-	if( !oTimes ) { oTimes = 3; }
-	for( var n = 0; n < oTimes; n++ ) {
-		// Three times, just in case the browser's random number generator is not very good
-		for( var i = 0; i < this.cardsInStack.length; i++ ) {
-			this.cardsInStack[i].tmpShuffleSortingIndex = Math.random();
-		}
-		this.cardsInStack.sort( function (a,b) {
-			// OmniWeb and older Safari insists that I return a whole number, not a fraction
-			return ( ( b.tmpShuffleSortingIndex - a.tmpShuffleSortingIndex ) > 0 ) ? 1 : -1;
-		} );
-	}
-	// Enable this for debugging
-//	for( var i = 0, s=''; i < this.playingCards.length - 1; i++ ) { s+= this.playingCards[i].number + ' ' + this.playingCards[i].suit + '\n'; } alert(s);
-};
-
-cardStack.prototype.sorterAscending = function(a,b) {
-    return a-b;
-};
-
-cardStack.prototype.sorterDescending = function(a,b) {
-    return b-a;
-};
-
-cardStack.prototype.sorterNumberAsc = function(a,b) {
-    return parseInt(a.number) - parseInt(b.number);
-};
-
-cardStack.prototype.sorterNumberDes = function(a,b) {
-    return parseInt(b['number']) - parseInt(b['number']);
-};
-
-cardStack.prototype.moveToStack = function (oCard) {
-	// Moving is actually done in the oposite direction
-	oCard.moveToStack(this);
-};
-
-cardStack.prototype.truncate = function () {
-	for(var i = this.cardsInStack.length-1; i >= 0; i--){              // STEP 1
-		if(this.cardsInStack[i] === null){ // STEP 2
-			this.cardsInStack.splice(i,1);                             // STEP 3
-		}
-	}	
-};
-
-cardStack.prototype.truncateOrig = function (oLength) {
-	// Truncate the cardsInStack array
-	if( typeof(oLength) == typeof(0) ) {
-		this.cardsInStack.length = oLength;
-	} else {
-		while( this.cardsInStack.length && !this.cardsInStack[this.cardsInStack.length-1] ) {
-			this.cardsInStack.length--;
-		}
-	}
-};
-
-cardStack.prototype.setStyles = function (oLeft,oTop,zIndex,oWidth,oHeight,oFont) {
-	// Set the position of the card stack
-	this.leftPos = oLeft;
-	this.topPos = oTop;
-	this.hotspot.style.left = oLeft + 'px';
-	this.hotspot.style.top = oTop + 'px';
-	this.hotspot.style.zIndex = zIndex;
-	this.hotspot.style.width = oWidth;
-	this.hotspot.style.height = oHeight;
-	this.hotspot.style.fontSize = oFont;
-	this.hotspot.style.overflow = 'hidden';
-};
-
-
-/*******************************************************************************
- A class representing a set of available image packs, used to display the cards
-*******************************************************************************/
-  
-function imagePacks() {
-	this.availWidths = [];
-	this.availHeights = [];
-	this.widths = {};
-	this.heights = {};
-	this.packNames = {};
-	this.availCombo = {};
-}
-
-imagePacks.prototype.toString = function () { return '[object imagePacks]'; };
-
-imagePacks.prototype.addImagePack = function (oImageSet,oBackImages,oExtension,oWidth,oHeight,oName) {
-	// Add an image back with size information
-	if( !this.widths[oWidth] ) {
-		this.availWidths[this.availWidths.length] = oWidth;
-		this.widths[oWidth] = [];
-	}
-	if( !this.heights[oHeight] ) {
-		this.availHeights[this.availHeights.length] = oHeight;
-		this.heights[oHeight] = [];
-	}
-	var oStore = this.widths[oWidth][this.widths[oWidth].length] = this.heights[oHeight][this.heights[oHeight].length] =
-		{imageset:oImageSet,backimages:oBackImages,extension:oExtension,width:oWidth,height:oHeight,name:oName,toString:function () { return '[private object imagePack: '+this.imageset+']'; }};
-	for( var i = 0; i < oBackImages.length; i++ ) {
-		this.availCombo[oWidth+'x'+oHeight+'|'+oImageSet+'|'+oBackImages[i][0]] = oStore;
-	}
-	var sortFunc = function ( a, b ) { return b - a; };
-	this.availWidths.sort(sortFunc);
-	this.availHeights.sort(sortFunc);
-};
-
-imagePacks.prototype.getFittingImageSize = function (oHeightWidth,oSize) {
-	// Get the nearest image set that fits. If none fit, then get the first set up.
-	var checkingList = oHeightWidth ? this.availWidths : this.availHeights;
-	for( var i = 0; i < checkingList.length; i++ ) {
-		if( checkingList[i] <= oSize ) { return checkingList[i]; }
-	}
-	return checkingList.length ? checkingList[checkingList.length-1] : null;
 };
 
 
@@ -455,11 +207,9 @@ function playingCard(oNumber,oImage,oCount,oCardSet) {
 	this.number = oNumber;
 	this.image = oImage;
 	this.count = oCount;
-//	this.suit = oSuit;
-//	this.color = oColour;
 	this.wayup = false;
 	this.cardSet = oCardSet;
-	this.cardStack = null;
+	this.owner = null;
 	this.positionOnStack = 0;
 	this.selected = false;
 	this.borderColor = 'black'
@@ -471,60 +221,11 @@ function playingCard(oNumber,oImage,oCount,oCardSet) {
 	this.cardImage = document.createElement('img');
 	this.cardImage.style.display = 'block';
 	this.representation.appendChild(this.cardImage);
-}
 
-playingCard.prototype.toString = function () { return '[object playingCard: '+this.number+']'; };
-
-playingCard.prototype.moveToStack = function (oNewStack) {
-	// Move onto another card stack
-	if( this.cardStack ) {
-		this.cardStack.cardsInStack[ this.positionOnStack ] = null;
 	}
-	this.cardStack = oNewStack;
-	this.positionOnStack = oNewStack.cardsInStack.length;
-	oNewStack.cardsInStack[this.positionOnStack] = this;
-};
 
-playingCard.prototype.nextOnStack = function () {
-	// Like nextSibling but related to card stacks
-	if( !this.cardStack ) { return null; }
-	return this.cardStack.cardsInStack[ this.positionOnStack + 1 ];
-};
+//playingCard.prototype.toString = function () { return '[object playingCard: '+this.number+']'; };
 
-playingCard.prototype.previousOnStack = function () {
-	// Like previousSibling but related to card stacks
-	if( !this.cardStack ) { return null; }
-	return this.cardStack.cardsInStack[ this.positionOnStack - 1 ];
-};
-
-playingCard.prototype.inheritCardDesign = function () {
-	// Get the new card set images
-	this.faceImage = this.cardSet.cardSet+this.number+this.cardSet.imageExtension;
-	this.cardSet.addImageCache(this.faceImage);
-	this.redrawCardImage();
-};
-
-playingCard.prototype.changeCard = function (oNumber) {
-	this.number = oNumber;
-//	this.suit = oSuit;
-	this.inheritCardDesign();
-};
-
-playingCard.prototype.redrawCardImage = function () {
-	// Set or change the image showing on the card face
-	if( !this.faceImage || !this.cardSet.backImage ) { return; }
-	// Bug in Firefox - alt attributes do not change unless they are made _before_ an SRC change
-	this.cardImage.setAttribute('alt',this.wayup?(this.cardSet.cardNames[this.number-1]):this.cardSet.cardWord);
-	this.cardImage.src = this.wayup ? this.faceImage : this.cardSet.backImage;
-};
-
-playingCard.prototype.showFace = function (oWhich) {
-	// Used to flip a card over
-	if( this.redrawNewImage != oWhich ) {
-		this.wayup = oWhich;
-		this.redrawCardImage();
-	}
-};
 
 playingCard.prototype.setCardSize = function (oWidth,oHeight) {
 	// Set the width of the card image
