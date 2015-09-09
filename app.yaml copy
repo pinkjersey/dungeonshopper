@@ -1,0 +1,60 @@
+application: dungeonshopper
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+  login: admin
+
+
+
+- url: /index\.html
+  static_files: index.html
+  upload: index\.html
+  login: admin
+
+- url: /game\.html
+  static_files: game.html
+  upload: game\.html
+
+- url: /nogame\.html
+  static_files: nogame.html
+  upload: nogame\.html
+
+- url: /questcard\.html
+  static_files: questcard.html
+  upload: questcard\.html
+
+- url: /marketcardcount\.html
+  static_files: marketcardcount.html
+  upload: marketcardcount\.html
+
+- url: /custom\.css
+  static_files: custom.css
+  upload: custom\.css
+
+- url: /ds\.js
+  static_files: ds.js
+  upload: ds\.js
+
+- url: /items\.js
+  static_files: items.js
+  upload: items\.js
+
+- url: /quests\.js
+  static_files: quests.js
+  upload: quests\.js
+
+- url: /images
+  static_dir: images
+
+- url: .*
+  script: main.app
+
+libraries:
+- name: webapp2
+  version: "2.5.2"

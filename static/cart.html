@@ -1,0 +1,6 @@
+﻿<img width = {{cart.width}} height = {{cart.height}} ng-src="{{cart.image}}"></img>
+<p>Cart size: {{cart.size}}</p>
+<!--<p ng-if="cart.active">Purchased</p>-->
+<button ng-if="!cart.active" class="btn btn-warning" ng-click="playerBuyCart(cart.id)" >Purchase {{cart.name}}</button>    
+<!--<p ng-if="!cart.active" style="color: red;">Not purchased</p>-->
+<!--<p>Contains: {{cart.contains()}}</p>-->

@@ -1,0 +1,42 @@
+﻿<!DOCTYPE html >
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" ng-app="dsApp">
+<head>
+    <meta charset="utf-8" />
+    
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.3/angular-animate.js"></script>
+	<link rel="stylesheet" href="custom.css">
+<!--    <script type="text/javascript" src="items.js"></script>
+<script type="text/javascript" src="quests.js"></script>-->
+    <script type="text/javascript" src="ds.js" ></script>
+	
+	<!--
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.3/angular.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    
+   
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"/>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="http://cdn.jsdelivr.net/animatecss/2.1.0/animate.min.css"/>--> 
+	<!--	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>-->
+
+	
+</head>
+
+<body ng-controller="dsCtrl">
+
+    <div class="panel panel-info">
+		<div class="panel-heading">
+			<h4>Dungeon shopper</h4>
+			<span class="panel-title pull-right"><button class="btn btn-primary" ng-show="displayMode == 'game'" ng-click="noGame()">Reset</button></span>
+
+        <ng-include src="'nogame.html'" ng-show="displayMode == 'nogame'"></ng-include>
+        <ng-include src="'game.html'" ng-show="displayMode == 'game'"></ng-include>
+		</div>
+	</div>
+</body>
+</html>
