@@ -1,5 +1,5 @@
-﻿<div class="row" ng-repeat="player in game.players" >
-	<div class="panel panel-primary" ng-show="player.active">  
+﻿<div class="row" ng-show="player.active" ng-repeat="player in game.players" >
+	<div class="panel panel-primary" >  
 		<div class="panel-heading">  
 			<div class="panel-body">
 
@@ -21,8 +21,8 @@
 						<div class="container-fluid">
 							<div class="row">
 								<span ng-repeat="questcard in game.questsInPlay.playingCards track by $index">
-									<questcard ng-show="questcard.level=='e'" info="questcard"></questcard>
-									<button ng-show="questcard.level=='e'" class="btn btn-warning" ng-click="playerCompleteEvent(0, $index)">Complete Event?</button>
+									<questcard ng-show="questcard.level==='e'" info="questcard"></questcard>
+									<button ng-show="questcard.level==='e'" class="btn btn-warning" ng-click="playerCompleteEvent(0, $index)">Complete Event?</button>
 								</span>	
 							</div>
 						</div>

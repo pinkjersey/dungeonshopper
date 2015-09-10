@@ -2,10 +2,12 @@
  <!--   <div class="container">-->
    <!--     <div class="row">-->
 	
-			  <li> Enter your name: <input type="text" ng-model="p1Name" {{p1Name}}></input></li>
-  			  <li> Enter your name: <input type="text" ng-model="p2Name" {{p2Name}}></input></li>
-  			  <li> Enter your name: <input type="text" ng-model="p3Name" {{p3Name}}></input></li>
- 			  <li> Enter your name: <input type="text" ng-model="p4Name" {{p4Name}}></input></li>
+			<img  ng-src="../images/boxtop.jpg" width = auto height = "500" ></img>
+
+			  <li>   Enter your name: <input type="text" ng-model="p1Name"{{p1Name}}></input></li>
+  			  <li>   Enter your name: <input type="text" ng-model="p2Name"{{p2Name}}></input></li>
+  			  <li>   Enter your name: <input type="text" ng-model="p3Name"{{p3Name}}></input></li>
+ 			  <li>   Enter your name: <input type="text" ng-model="p4Name"{{p4Name}}></input></li>
  			<li> Number of players?: <input type="text" ng-model="numberOfPlayers" /></li>
 			<br></br>
             <button ng-show="numberOfPlayers<5" class="btn btn-primary" ng-click="newGame(p1Name, p2Name, p3Name, p4Name, numberOfPlayers)" ng-cloak>New Game</button>            

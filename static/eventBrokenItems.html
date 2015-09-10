@@ -1,23 +1,17 @@
-﻿		<div class="container">
-			<div class="row">
-
-
-				<div  style="float:right; padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 5px;">
-								<button class="btn btn-warning" ng-click="endGame()">Quit</button>
-				</div>
-
-			</div>
+﻿<div class="container">
+	<div class="row">
+		<div  style="float:right; padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 5px;">
+						<button class="btn btn-warning" ng-click="endGame()">Quit</button>
 		</div>
+	</div>
+</div>
 
 
-<div class="row" ng-repeat="player in game.players" >
-	<div class="panel panel-primary" ng-show="player.active">  
+<div class="row" ng-show="player.active" ng-repeat="player in game.players" >
+	<div class="panel panel-primary" >  
 		<div class="panel-heading">  
 			<div class="panel-body">
-			
 					<table class="table table-condensed">
-
-						
 							<tr>
 								<th><big>{{player.name}}</big></th>
 								<th><big>Actions Remaining {{player.actionsRemaining}}</big></th>
@@ -27,37 +21,36 @@
 								<th><big>Total: {{player.gold + player.vp + player.bonus}}</big></th>								
 								<th><big>Turns: {{player.turns}}</big></th>
 							</tr>
-						
 					</table>
-					
-
 			</div>
 		</div>
 		<br></br>
 		<div class="container-fluid">
 			<div class="row">
 
-			<div class="col-sm-3" ng-repeat="cart in player.carts track by $index" >
+				<div class="col-sm-3" ng-repeat="cart in player.carts track by $index" >
 						<img ng-if="cart.active" style="border:3px solid {{cart.borderColor}}" width={{cart.width}} height={{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImage(cart.id)"></img>
 							<span  class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
-								<img  style="border:2px solid {{card.borderColor}}" ng-click="userClickedCartItem(cart.id, $index)" ng-src="{{card.image}}" width = "{{card.cardImage.width}}" 	height = "{{card.cardImage.height}}" />
-							</span>
-						<span>
-					</span>	
+							<img  style="border:2px solid {{card.borderColor}}" ng-click="userClickedCartItem(cart.id, $index)" ng-src="{{card.image}}" width = "{{card.cardImage.width}}" 	height = "{{card.cardImage.height}}" />
+							<button class="btn btn-warning" ng-click="playerCartFish($index,0)" ng-if="eventActionsRemaining > 0 && card.selected===true && cart.cards.playingCards.length > 0 && discardDeck === 1" >Replace item </button>    
+
+						
 				</div>
 			</div>
 			<br></br>
 				<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in player.cards.playingCards track by $index" >
 					<img ng-click="userClickedItemImage($index)" style="border:2px solid {{card.borderColor}}"  ng-src="{{card.image}}"	width = "{{card.cardImage.width}}" 	height = "{{card.cardImage.height}}" />
-				</span>
-			</div>	<p></p>		
-			
-					<h4 class="panel panel-danger">Event! - Select up to two items to repair  (Click zero, one or two items)</h4>
+					<button class="btn btn-warning" ng-click="playerFish(0)" ng-if="eventActionsRemaining > 0 && selectedItemsCount === 1 && card.selected===true"> Replace Item</button>    
+
+					</span>
+		</div>			
+			<br></br>
+					<h4 class="panel panel-danger">Event! Broken Items - Select up to two items to replace  (Click zero, one or two items)</h4>
 						<div class="container-fluid">
 							<div class="row">
 								<span ng-repeat="questcard in game.questsInPlay.playingCards track by $index">
-									<questcard ng-show="questcard.level=='e'" info="questcard"></questcard>
-									<button ng-show="questcard.level=='e'" class="btn btn-warning" ng-click="playerCompleteEvent(0, $index)">Complete Event?</button>
+									<questcard ng-show="questcard.level==='e'" info="questcard"></questcard>
+									<button ng-show="questcard.level==='e'" class="btn btn-warning" ng-click="playerCompleteEvent(0, $index)">Complete Event?</button>
 								</span>	
 							</div>
 						</div>
@@ -97,10 +90,10 @@
 						</tr>
 						<tr>
 						<th>
-						<img ng-src="images/shoppingCardBack.jpg" width = auto height = "180" class="alignleft"></img>
+						<img ng-src="{{itemCardBack}}" width = auto height = "180" class="alignleft"></img>
 						</th>	
 						<th>
-						<img ng-src="images/vendorback.jpg" width = auto height = "180" class="alignjustify"</img>
+						<img ng-src="{{vendorCardBack}}" width = auto height = "180" class="alignjustify"</img>
 						</th>	
 						<th>
 						<img ng-show="game.discardsCount > 0" ng-src="{{game.lastDiscard.image}}" width = auto height = "180" ></img>
