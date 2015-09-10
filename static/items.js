@@ -172,7 +172,7 @@ cardSet.prototype.create75Cards = function () {
 	for( a = 1; a <= 10; a = a + 1) {
 	   for( b = 12; b >= a; b = b - 1)	   
 	   {
-		   oImage="images/"+a+"_card.jpg";
+		   oImage="../images/"+a+"_card.jpg";
 			this.addCard(a,oImage,1,this);
 		}
 
@@ -183,7 +183,7 @@ cardSet.prototype.createBlankMarket = function() {
 	// Create 10 cards
 	var oImage = "";
 	   for (var a=1; a<11; a++) { 
-		   oImage="images/"+a+"_card.jpg";
+		   oImage="../images/"+a+"_card.jpg";
 			this.addCard(a,oImage,0,this);
 		}
 

@@ -102,7 +102,7 @@
 							<marketcardcount info="cardcount"></marketcardcount>
 						</span>
 					</tr>
-					<button class="btn btn-warning" ng-show="game.sumMarketValueSelected < 11 && game.sumMarketValueSelected > 0" ng-click="playerMarketTrade()" >Trade {{game.sumMarketValueSelected}} item points?</button>    
+					<button class="btn btn-warning" ng-show="game.sumMarketValueSelected < 11 && game.sumMarketValueSelected > 0" ng-click="playerMarketTrade(1)" >Trade {{game.sumMarketValueSelected}} item points?</button>    
 					<td>
 						<span ng-repeat="marketcard in game.marketHolders.playingCards track by $index">
 							<img style="border:2px solid {{marketcard.borderColor}}" width = "{{marketcard.cardImage.width}}" height = "{{marketcard.cardImage.height}}" ng-src="{{marketcard.image}}" ng-show = "marketcard.count > 0" ng-click="userClickedMarketImage($index)"></img>
@@ -133,10 +133,10 @@
 						</tr>
 						<tr>
 						<th>
-						<img ng-src="images/shoppingCardBack.jpg" width = auto height = "180" class="alignleft"></img>
+						<img ng-src="{{itemCardBack}}" width = auto height = "180" class="alignleft"></img>
 						</th>	
 						<th>
-						<img ng-src="images/vendorback.jpg" width = auto height = "180" class="alignjustify"</img>
+						<img ng-src="{{vendorCardBack}}" width = auto height = "180" class="alignjustify"</img>
 						</th>	
 						<th>
 						<img ng-show="game.discardsCount > 0" ng-src="{{game.lastDiscard.image}}" width = auto height = "180" ></img>
