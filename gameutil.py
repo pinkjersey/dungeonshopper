@@ -1,5 +1,6 @@
 import random
 import json
+import logging
 from game_model import *
 
 def playerState(game, playerId):
@@ -32,6 +33,12 @@ def whatToArray(what):
 
     return ret
 
+def getCartId(where):
+    if ("cart" in where):
+        cartid = int(where[4:])
+        return cartid
+    else:
+        raise ValueError("where isn't a cartid")
 
 def discardItem(game, whati, where):
     """Utility discard function"""
@@ -68,6 +75,64 @@ def discardItem(game, whati, where):
         raise ValueError('Where value is invalid')
 
     return found
+
+def cartCards(game, what, where):
+    """Moves cards from hand to cart"""
+    if game.actionsRemaining == 0:
+        # no actions remaining
+        logging.error("No actions remaining")        
+        return False
+
+    # convert input to array
+    whats = whatToArray(what)
+    if (len(whats) == 0):
+        logging.error("Empty whats")        
+        return False
+
+    player = game.players[game.curPlayer]
+
+    try:
+        # discard items from hand
+        allFound = True
+        for whati in whats:        
+            found = discardItem(game, whati, "hand")
+            if (found == False):
+                logging.error("Couldn't find all whats {0}".format(whati))        
+                return False                
+
+        # find cart id
+        cartid = getCartId(where)
+        if (cartid <0 or cartid > 3):
+            logging.error("Invalid cart id")        
+            return False
+
+        # find cart
+        cart = player.carts[cartid]
+
+        # cart needs to be purchased
+        if (cart.purchased == False):
+            logging.error("Cart not purchased")        
+            return False
+
+        # has enough space
+        spaceRemaining = cart.cartSize - len(cart.inCart)
+        if (spaceRemaining < len(whats)):
+            logging.error("Not enough space in cart")        
+            return False
+
+        # add items to cart
+        for whati in whats:
+            cart.inCart.append(whati)
+
+    except ValueError as e:
+        logging.error("Exception ({0}): {1}".format(e.errno, e.strerror))        
+        return False
+
+    game.actionsRemaining = game.actionsRemaining -1
+    game.put()
+
+    return True
+
 
 def discard(game, what, where):
     if game.actionsRemaining == 0:
@@ -173,9 +238,10 @@ def createNewGame(numPlayers):
             dealItemCard(p, game)
 
     # create carts
+    sizes = [ 3, 3, 4, 5]
     for p in range(game.numPlayers):
         for i in range(4):
-            c=Cart(purchased=False)
+            c=Cart(purchased=False, cartSize=sizes[i])
             if (i == 0):
                 c.purchased = True
             game.players[p].carts.append(c)

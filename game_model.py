@@ -19,6 +19,7 @@ class QuestCard(ndb.Model):
 class Cart(ndb.Model):
     purchased = ndb.BooleanProperty(required=True, default=False)
     inCart = ndb.IntegerProperty(repeated=True)
+    cartSize = ndb.IntegerProperty(required=True)
 
 class Player(ndb.Model):
     hand = ndb.IntegerProperty(repeated=True)

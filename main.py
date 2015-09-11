@@ -6,11 +6,12 @@ This is the back end for dungeon shopper
 
 import webapp2
 import json
-
+import logging
 
 from google.appengine.ext import ndb
 from gameutil import *
 from game_model import *
+from google.appengine.api.logservice import logservice
 
 class GameHandler(webapp2.RequestHandler):
     def newGame(self):
@@ -100,9 +101,36 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
+    def cartCards(self):
+        logging.error("Cart cards")        
+        game_k = ndb.Key('Game', 'theGame')
+        game = game_k.get()
+
+        where = self.request.get('where')
+        if (where == None or where == ""):
+            self.error(500)
+            return
+
+        what = self.request.get('what')
+        if (where == None or where == ""):
+            self.error(500)
+            return
+
+        result = cartCards(game, what, where)
+        if (result == False):
+            self.error(500)
+            return
+
+        retstr = playerState(game, game.curPlayer)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(retstr)
 
     def get(self):
         """Switchboard for game actions"""
+        logging.error("in get")
+
+
         action = self.request.get('action')
         if action == None:
             self.error(500)
@@ -123,6 +151,10 @@ class GameHandler(webapp2.RequestHandler):
         if action == "discard":
             return self.discard()
 
+        if action == "cartCards":
+            return self.cartCards()
+
+        logging.error("Invalid action")
         self.error(500)
 
 
@@ -134,3 +166,10 @@ config['webapp2_extras.sessions'] = {
 app = webapp2.WSGIApplication([
     ('/game', GameHandler)
 ], debug=True,config=config)
+
+def main():
+    logging.getLogger().setLevel(logging.DEBUG)
+    webapp2.util.run_wsgi_app(app)
+
+if __name__ == '__main__':
+    main()
