@@ -383,38 +383,15 @@ if(level===3){
 	this.addCard(level,0,3,4,7,8,9,6,'Siege of Harfleur',5,image,this);
 }
 
-<<<<<<< HEAD
-if(level==='e'){
-	var image="../images/dungeonevent";
-//	this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',0,image+"BarbarianAttack",this);
-//	this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',0,image+"BrokenItems",this);
-//		this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',0,image+"BrokenItems",this);
-//			this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',0,image+"BrokenItems",this);
-//			this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',0,image+"BrokenItems",this);
-//			this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',0,image+"BrokenItems",this);
-//			this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',0,image+"BrokenItems",this);
-=======
 if(level==='4'){
 	var image="../images/dungeonevent";
 //	this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',0,image+"BarbarianAttack",this);
 	this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',0,image+"BrokenItems",this);
->>>>>>> origin/master
 //	this.addCard(level,0,0,0,0,0,0,0,'eventCastleTaxation',0,image+"CastleTaxation",this);
 //	this.addCard(level,0,0,0,0,0,0,0,'eventGolbinRaid',0,image+"GolbinRaid",this);
 //	this.addCard(level,0,0,0,0,0,0,0,'eventKingsFeast',0,image+"KingsFeast",this);	
 //	this.addCard(level,0,0,0,0,0,0,0,'eventMarketShortage',0,image+"MarketShortage",this);	
 //	this.addCard(level,0,0,0,0,0,0,0,'eventMarketSurplus',0,image+"MarketSurplus",this);	
-<<<<<<< HEAD
-	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-		this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-			this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-		this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-		this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-//	this.addCard(level,0,0,0,0,0,0,0,'eventSandStorm',0,image+"SandStorm",this);	
-//	this.addCard(level,0,0,0,0,0,0,0,'eventThrownInTheDungeon',0,image+"ThrownInTheDungeon",this);	
-//	this.addCard(level,0,0,0,0,0,0,0,'eventTreasure',0,image+"Treasure",this);	
-	//	this.addCard(level,0,0,0,0,0,0,0,'eventVikingParade',0,image+"VikingParade",this);	
-=======
 	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
 	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
 	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
@@ -428,7 +405,6 @@ if(level==='4'){
 //	this.addCard(level,0,0,0,0,0,0,0,'eventThrownInTheDungeon',0,image+"ThrownInTheDungeon",this);	
 	this.addCard(level,0,0,0,0,0,0,0,'eventTreasure',0,image+"Treasure",this);	
 //	this.addCard(level,0,0,0,0,0,0,0,'eventVikingParade',0,image+"VikingParade",this);	
->>>>>>> origin/master
 	}
 
 }

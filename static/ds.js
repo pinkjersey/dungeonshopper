@@ -9,10 +9,6 @@ var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased,
 	this.height=100;
 	this.name = name;
 	this.purchaseWith = 'gold';
-<<<<<<< HEAD
-	this.image = image;
-	this.imageNotPurchased = this.image + this.id + "_not_purchased.jpg";
-=======
 	this.image = imageNotPurchased;
 
 	//set initial state of carts
@@ -25,7 +21,6 @@ var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased,
 		
 	this.imagePurchased = imagePurchased;
 	this.imageNotPurchased = imageNotPurchased;
->>>>>>> origin/master
 	this.goldCost = goldCost;
 	this.itemCost = itemCost;
 	this.cards = new cardSet;
@@ -109,17 +104,10 @@ var Player = function (id, name) {
 	this.nextCartId = 1;
 	this.nextCartName = 'Hand Cart';
 	this.winner=false;
-<<<<<<< HEAD
-    this.carts = [new Cart(0, 3, 1, 0, 5,'Wheelbarrow','../images/shoppercarts_v3_'), 
-		new Cart(1, 3, 0, 1, 10, 'Hand Cart', '../images/shoppercarts_v3_'), 
-		new Cart(2, 4, 0, 2, 15, 'Horse Wagon','../images/shoppercarts_v3_'), 
-		new Cart(3, 5, 0, 3, 20, 'War Wagon','../images/shoppercarts_v3_')];
-=======
     this.carts = [new Cart(0, 3, 1, 0, 5,'Wheelbarrow','../images/shoppercarts_v3_0.jpg','../images/shoppercarts_v3_0_not_purchased.jpg'), 
 				  new Cart(1, 3, 0, 1, 10, 'Hand Cart', '../images/shoppercarts_v3_1.jpg','../images/shoppercarts_v3_1_not_purchased.jpg'), 
 				  new Cart(2, 4, 0, 2, 15, 'Horse Wagon','../images/shoppercarts_v3_2.jpg','../images/shoppercarts_v3_2_not_purchased.jpg'), 
 			      new Cart(3, 5, 0, 3, 20, 'War Wagon','../images/shoppercarts_v3_3.jpg','../images/shoppercarts_v3_3_not_purchased.jpg')];
->>>>>>> origin/master
 };
 
 
@@ -717,8 +705,6 @@ $scope.newGame = function (p1Name, p2Name, p3Name, p4Name, numberOfPlayers) {
 		$scope.playersCompletedEventCount = 0;
 		$scope.itemCardBack = "../images/shoppingCardBack.jpg"
 		$scope.vendorCardBack = "../images/vendorback.jpg"
-<<<<<<< HEAD
-=======
 		$scope.eventActionsRemaining=0;
 		$scope.debug = true;
 		//gui variable to control item buttons
@@ -749,7 +735,6 @@ $scope.newGame = function (p1Name, p2Name, p3Name, p4Name, numberOfPlayers) {
 		$scope.game.itemDeck = $scope.game.cards;
 		$scope.activePlayerId = $scope.game.firstPlayer;
 
->>>>>>> origin/master
 		//create players
         for (var i = 0; i < numberOfPlayers; ++i) {   
 			var pName = function(i) {
@@ -908,31 +893,6 @@ setMarketCounts = function() {
 
 }
 
-<<<<<<< HEAD
-playerCardSum = function(player) {
-	var total = 0;
-	for (var i = 0; i < player.cards.playingCards.length; ++i) {
-		total += player.cards.playingCards[i].number;
-	}
-	return total;
-}
-
-wheelbarrowCardSum = function() {
-	var total = 0;
-	var game = $scope.game;
-	var player = game.activePlayer;
-	for (var i = 0; i < player.carts[0].cards.playingCards.length; ++i) {
-		total += player.carts[0].cards.playingCards[i].number;
-	}
-	$scope.wheelbarrowCardSum = total;
-	return total;
-}
-
-//deal cards for initial game quests
-dealCardToQuests = function(questsInPlay, questSet){
-	var game = $scope.game;
-	var player = game.activePlayer;
-=======
 playerCardSum = function(player, selectedCardsOnly) {
 	var total = 0;
 	for (var i = 0; i < player.cards.playingCards.length; ++i) {
@@ -955,7 +915,6 @@ playerCardSum = function(player, selectedCardsOnly) {
 dealCardToQuests = function(questsInPlay, questSet){
 	var game = $scope.game;
 	var player = $scope.activePlayer;
->>>>>>> origin/master
 	for (var i = 0; i < questSet.playingCards.length; ++i) { // deal numberOfCards cards
 		var questCardinplay = questSet.playingCards[i]; // get a reference to the first card on the deck
 				if (questCardinplay === null||questCardinplay===undefined) {
@@ -970,15 +929,6 @@ dealCardToQuests = function(questsInPlay, questSet){
 
 	questSet.truncate();
 	$scope.activeEvent = getActiveEvent(questCardinplay);
-<<<<<<< HEAD
-	
-	switch ($scope.activeEvent)
-	{
-		//fixme
-			case 'eventOrcsAttack':
-				//set variable for items in cart[0]
-				var  total = wheelbarrowCardSum();
-=======
 	prepareEventForPlayer(questCardinplay, player);
 }
 
@@ -998,7 +948,6 @@ prepareEventForPlayer = function(questCardinplay, player) {
 				$scope.eventActionsRemaining=1;
 				$scope.wheelbarrowCardSum=0;
 				var  total = wheelbarrowCardSum(player, false);
->>>>>>> origin/master
 				if (total < 5) {
 					//discard all items from cart to hand
 					for (var i = 0; i < player.carts[0].cards.playingCards.length; ++i)  {
@@ -1010,25 +959,14 @@ prepareEventForPlayer = function(questCardinplay, player) {
 							
 						player.carts[0].cards.truncate();	
 						player.cards.setCardSize("60","80");
-<<<<<<< HEAD
-						
-						
-=======
 						player.carts[0].active=false;
 						player.carts[0].image = player.carts[0].imageNotPurchased;
->>>>>>> origin/master
 					}
 					
 					
 				
 				break;
 			case 'eventBarbarianAttack':
-<<<<<<< HEAD
-				break;
-			case 'eventBrokenItems':
-				break;
-			case 'eventCastleTaxation':
-=======
 				$scope.eventActionsRemaining=0;
 				break;
 			case 'eventBrokenItems':
@@ -1036,17 +974,10 @@ prepareEventForPlayer = function(questCardinplay, player) {
 				break;
 			case 'eventCastleTaxation':
 				$scope.eventActionsRemaining=2;
->>>>>>> origin/master
 				break;
 			case 'eventGolbinRaid':
 				break;
 			case 'eventKingsFeast':
-<<<<<<< HEAD
-				break;
-			case 'eventMarketShortage':
-				break;
-			case 'eventMarketSurplus':
-=======
 				$scope.eventActionsRemaining=1;
 				break;
 			case 'eventMarketShortage':
@@ -1054,7 +985,6 @@ prepareEventForPlayer = function(questCardinplay, player) {
 				break;
 			case 'eventMarketSurplus':
 				$scope.eventActionsRemaining=0;
->>>>>>> origin/master
 				break;
 			case 'eventSandStorm':
 				break;
@@ -1065,20 +995,13 @@ prepareEventForPlayer = function(questCardinplay, player) {
 			case 'eventThrownInTheDungeon':
 				break;
 			case 'eventTreasure':
-<<<<<<< HEAD
-=======
 				$scope.eventActionsRemaining=1;
->>>>>>> origin/master
 				break;
 			case 'eventVikingParade':
 				break;
 			default:
 				resetDisplayMode('game');
-<<<<<<< HEAD
-		}
-=======
 	}
->>>>>>> origin/master
 	
 	$scope.displayMode = $scope.activeEvent;
 
@@ -1121,13 +1044,9 @@ $scope.playerCompleteEvent = function(actionCost, id) {
 	var game = $scope.game;
 	var player = $scope.activePlayer;
 	var playerCardCount = player.cards.playingCards.length;
-<<<<<<< HEAD
-	var playerCardsSum = playerCardSum(player);
-=======
 	var playerCardsSum = playerCardSum(player, false);
 	var playerCardsSumSelected = playerCardSum(player, true);
 	var questCardinplay = game.questsInPlay.playingCards[id];
->>>>>>> origin/master
 	var event = $scope.activeEvent;
 
 
@@ -1135,16 +1054,6 @@ $scope.playerCompleteEvent = function(actionCost, id) {
 			case 'eventOrcsAttack':
 			if(id==='Y') {
 				//discard selected card
-<<<<<<< HEAD
-				if(playerCardsSum< 5){
-						alert("You do not have enough items selected.");
-						return;
-					}
-			}
-			if(id==='N') {
-				//flip over cart[0]
-				player.carts[0].active=false;
-=======
 				if(playerCardsSumSelected < 5){
 						alert("You do not have enough items selected.");
 						return;
@@ -1159,7 +1068,6 @@ $scope.playerCompleteEvent = function(actionCost, id) {
 			}
 			if(id==='N') {
 				//do nothing, nothing was destroyed
->>>>>>> origin/master
 				
 				
 			}
@@ -1245,38 +1153,6 @@ $scope.playerCompleteEvent = function(actionCost, id) {
 		}
 		
 		$scope.playersCompletedEventCount++;
-<<<<<<< HEAD
-		
-			//when all players have finished event and clicked playerCompleteEvent
-		if ($scope.playersCompletedEventCount === $scope.numberOfPlayers) {
-			$scope.playersCompletedEventCount = 0;
-			resetDisplayMode('game');
-			//discard quest
-			game.questsInPlay.playingCards[id] = null;
-			game.questsInPlay.truncate();
-		
-			//draw new one
-			dealCardToQuests($scope.game.questsInPlay, $scope.game.quests);
-			eventCycleToNextPlayer(game);
-		}
-		else	{
-			eventCycleToNextPlayer(game);
-		}
-
-	}
-
-	eventCycleToNextPlayer = function(game) {
-		game.activePlayer.active = false;
-		if(game.activePlayer.id === game.numOpponents) {
-			game.activePlayerId=0;
-		}
-		else {
-			game.activePlayerId++;
-		}
-		game.activePlayer = game.players[game.activePlayerId];
-		game.activePlayer.active = true;
-	}
-=======
 
 		checkIfAllPlayersFinishedEvent(questCardinplay, id);
 }
@@ -1311,7 +1187,6 @@ eventCycleToNextPlayer = function(game, questCardinplay) {
 	$scope.activePlayer.active = true;
 	prepareEventForPlayer(questCardinplay, $scope.activePlayer);	
 }
->>>>>>> origin/master
 
 
 //deal cards for initial market
@@ -1360,15 +1235,9 @@ dealCardToPlayer = function(player, items) {
 			//peek looks at i+1
 			var nextPlayerCard = items.peek(i); 
 			
-<<<<<<< HEAD
-			player.cards.playingCards.push(itemCard); 	
-//			items.playingCards.shift();
-			items.playingCards[i] = null;
-=======
 //			player.cards.playingCards.push(itemCard); 	
 			player.cards.playingCards.push(items.playingCards.shift());
 //			items.playingCards[i] = null;
->>>>>>> origin/master
 			
 			if(nextPlayerCard === undefined) {
 				//got last card, need to shuffle, but you need to keep dealing cards after reshuffle!
@@ -1888,15 +1757,9 @@ tradeSelectedCards = function(player){
 					continue;
 					}
 			if(card.number === marketCard.number) {
-<<<<<<< HEAD
-			player.cards.playingCards.push(card);
-//			game.marketDeck.playingCards.shift();
-			game.marketDeck.playingCards[j]=null;
-=======
 //			player.cards.playingCards.push(card);
 			player.cards.playingCards.push(game.marketDeck.playingCards.shift());
 //			game.marketDeck.playingCards[j]=null;
->>>>>>> origin/master
 			break;
 			}
 		}
@@ -2012,18 +1875,6 @@ if(cartId === 2)
 
 activateNextPlayer = function(){
 	var game = $scope.game;
-<<<<<<< HEAD
-	if( game.activePlayer.id === game.numOpponents) {
-	game.activePlayerId=0;
-		}
-	else {
-	game.activePlayerId++;
-	}
-		
-	game.activePlayer = $scope.game.players[game.activePlayerId];
-	game.players[game.activePlayerId].actionsRemaining = game.startingActions;
-	game.activePlayer.active = true;
-=======
 //	if( $scope.activePlayer.id === game.numOpponents) {
 	$scope.activePlayerId=0;
 //		}
@@ -2034,7 +1885,6 @@ activateNextPlayer = function(){
 	$scope.activePlayer = $scope.game.players[$scope.activePlayerId];
 	game.players[$scope.activePlayerId].actionsRemaining = game.startingActions;
 	$scope.activePlayer.active = true;
->>>>>>> origin/master
 	updateCounts();
 }
 
