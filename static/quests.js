@@ -65,7 +65,7 @@ questSet.prototype.addCard = function (level,gold,item1,item2,item3,item4,item5,
 	if(level===3) {
 		oImage = oImage + item1 + item2 + item3 + item4 + item5	 + '.jpg'
 		}
-	if(level==='e') {
+	if(level==='4') {
 		oImage = oImage + '.jpg'
 		}	
 	this.playingCards[this.playingCards.length] = new questCard(level,gold,item1,item2,item3,item4,item5,vp,name,sortorder,oImage,this);
@@ -127,6 +127,42 @@ questSet.prototype.setCardSize = function (oWidth,oHeight) {
 //};
 
 
+questSet.prototype.create75CardsQuestDeck = function (numOfOpponents) {
+	// Create quest deck
+	
+	var level1 = new questSet();
+	var level2 = new questSet();
+	var level3 = new questSet();
+	var events = new questSet();
+	
+	level1.createQuestDecks(1);
+	level2.createQuestDecks(2);
+	level3.createQuestDecks(3);
+	events.createQuestDecks('4');
+
+	//create and add all quests to the quests deck
+
+		for( var i = 0; i < level1.playingCards.length; i++ ) {
+            var cardt = level1.playingCards[i];
+			this.addCardc(cardt);
+        }
+		for( var i = 0; i < level2.playingCards.length; i++ ) {
+            var cardm = level2.playingCards[i];
+			this.addCardc(cardm);
+        }
+		for( var i = 0; i < level3.playingCards.length; i++ ) {
+            var cardb = level3.playingCards[i];
+			this.addCardc(cardb);
+        }
+		for( var i = 0; i < events.playingCards.length; i++ ) {
+            var carde = events.playingCards[i];
+			this.addCardc(carde);
+        }
+	
+
+}
+
+
 
 questSet.prototype.createQuestDeck = function (numOfOpponents) {
 	// Create quest deck
@@ -139,7 +175,7 @@ questSet.prototype.createQuestDeck = function (numOfOpponents) {
 	level1.createQuestDecks(1);
 	level2.createQuestDecks(2);
 	level3.createQuestDecks(3);
-	events.createQuestDecks('e');
+	events.createQuestDecks('4');
 
 	level1.shuffleCards(10);
 	level2.shuffleCards(10);
@@ -347,7 +383,7 @@ if(level===3){
 	this.addCard(level,0,3,4,7,8,9,6,'Siege of Harfleur',5,image,this);
 }
 
-if(level==='e'){
+if(level==='4'){
 	var image="../images/dungeonevent";
 //	this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',0,image+"BarbarianAttack",this);
 	this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',0,image+"BrokenItems",this);
