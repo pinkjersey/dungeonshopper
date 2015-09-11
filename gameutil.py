@@ -19,6 +19,7 @@ def playerState(game, playerId):
         questlist.append(q.to_dict())
         
     thedict["questsInPlay"] = questlist
+    thedict["actionsRemaining"] = game.actionsRemaining
 
     jsonstr = json.dumps(thedict)
     return jsonstr   
@@ -133,6 +134,51 @@ def cartCards(game, what, where):
 
     return True
 
+def buyCart(game, cartidstr, withGold, items):
+    """Buys cart with gold or items"""
+    if game.actionsRemaining == 0:
+        # no actions remaining
+        logging.error("No actions remaining")        
+        return False
+
+    player = game.players[game.curPlayer]
+    # find cart id
+    cartid = getCartId(cartidstr)
+    if (cartid <0 or cartid > 3):
+        logging.error("Invalid cart id")        
+        return False
+
+    # find cart
+    cart = player.carts[cartid]
+
+    if (cart.purchased):
+        # cart already purchased
+        return False
+
+    if (withGold == "1"):
+        if (player.gold < cart.goldCost):
+            return False
+
+        player.gold = player.gold - cart.goldCost
+        cart.purchased = True
+    else:
+        whats = whatToArray(items)
+        sumTotal = sum(whats)
+        if sumTotal < cart.cardCost:
+            return False
+        
+        for whati in whats:        
+            found = discardItem(game, whati, "hand")
+            if (found == False):
+                logging.error("Couldn't find all whats {0}".format(whati))        
+                return False   
+            
+        cart.purchased = True
+
+    game.actionsRemaining = game.actionsRemaining -1
+    game.put()    
+
+    return True
 
 def discard(game, what, where):
     if game.actionsRemaining == 0:
@@ -239,9 +285,12 @@ def createNewGame(numPlayers):
 
     # create carts
     sizes = [ 3, 3, 4, 5]
+    gcosts = [ 0, 1, 2, 3]
+    ccosts = [ 5, 10, 15, 20]
+
     for p in range(game.numPlayers):
         for i in range(4):
-            c=Cart(purchased=False, cartSize=sizes[i])
+            c=Cart(purchased=False, cartSize=sizes[i], goldCost=gcosts[i], cardCost=ccosts[i])
             if (i == 0):
                 c.purchased = True
             game.players[p].carts.append(c)

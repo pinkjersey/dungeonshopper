@@ -20,10 +20,14 @@ class Cart(ndb.Model):
     purchased = ndb.BooleanProperty(required=True, default=False)
     inCart = ndb.IntegerProperty(repeated=True)
     cartSize = ndb.IntegerProperty(required=True)
+    goldCost = ndb.IntegerProperty(required=True)
+    cardCost = ndb.IntegerProperty(required=True)
+    destroyed = ndb.BooleanProperty(required=True, default=False)
 
 class Player(ndb.Model):
     hand = ndb.IntegerProperty(repeated=True)
     carts = ndb.LocalStructuredProperty(Cart, repeated=True)
+    gold = ndb.IntegerProperty(required=True, default=2)
 
 class Game(ndb.Model):
     curPlayer = ndb.IntegerProperty(default=0)

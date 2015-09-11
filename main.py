@@ -126,6 +126,39 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
+    def buyCart(self):               
+        game_k = ndb.Key('Game', 'theGame')
+        game = game_k.get()
+
+        withGold = self.request.get('withGold')
+        if (withGold == None or withGold == ""):
+            self.error(500)
+            return
+
+        items = self.request.get('items')
+        if (items == None):
+            self.error(500)
+            return
+
+        cartidstr = self.request.get('cart')        
+        if (cartidstr == None or cartidstr == ""):
+            self.error(500)
+            return
+
+        if (withGold == 0 and items == ""):
+            self.error(500)
+            return
+
+        result = buyCart(game, cartidstr, withGold, items)
+        if (result == False):
+            self.error(500)
+            return
+
+        retstr = playerState(game, game.curPlayer)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(retstr)
+
     def get(self):
         """Switchboard for game actions"""
         logging.error("in get")
@@ -153,6 +186,9 @@ class GameHandler(webapp2.RequestHandler):
 
         if action == "cartCards":
             return self.cartCards()
+
+        if action == "buyCart":
+            return self.buyCart()
 
         logging.error("Invalid action")
         self.error(500)
