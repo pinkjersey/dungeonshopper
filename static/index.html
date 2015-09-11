@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.3/angular-animate.js"></script>
 	<link rel="stylesheet" href="custom.css">
+    <script type="text/javascript" src="dsApp.js" ></script>
+    <script type="text/javascript" src="factory.js" ></script>
     <script type="text/javascript" src="items.js"></script>
     <script type="text/javascript" src="quests.js"></script>
     <script type="text/javascript" src="ds.js" ></script>
@@ -42,7 +44,7 @@
 		<ng-include src="'eventTreasure.html'" ng-show="displayMode == 'eventTreasure'"></ng-include>
 		<ng-include src="'eventBrokenItems.html'" ng-show="displayMode == 'eventBrokenItems'"></ng-include>
 
-<!--        <ng-include src="'eventBarbarianAttack.html'" ng-show="displayMode == 'eventBarbarianAttack'"></ng-include>
+<!--    <ng-include src="'eventBarbarianAttack.html'" ng-show="displayMode == 'eventBarbarianAttack'"></ng-include>
 		<ng-include src="'eventCastleTaxation.html'" ng-show="displayMode == 'eventCastleTaxation'"></ng-include>
 		<ng-include src="'eventGolbinRaid.html'" ng-show="displayMode == 'eventGolbinRaid'"></ng-include>
 		<ng-include src="'eventKingsFeast.html'" ng-show="displayMode == 'eventKingsFeast'"></ng-include>
