@@ -46,7 +46,7 @@ def fish(game, what, where):
     elif ("cart" in where):
         # string "cart1" becomes int(1)
         cartid = int(where[4:])
-        if (cartid >=0 and cartid <=4):
+        if (cartid >=0 and cartid <4):
             cart = player.carts[cartid]
             if (cart.purchased == False):
                 # removing item from unpurchased cart is invalid
