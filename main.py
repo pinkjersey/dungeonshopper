@@ -76,6 +76,31 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
+    def discard(self):
+        game_k = ndb.Key('Game', 'theGame')
+        game = game_k.get()
+
+        where = self.request.get('where')
+        if (where == None or where == ""):
+            self.error(500)
+            return
+
+        what = self.request.get('what')
+        if (where == None or where == ""):
+            self.error(500)
+            return
+
+        result = discard(game, what, where)
+        if (result == False):
+            self.error(500)
+            return
+
+        retstr = playerState(game, game.curPlayer)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(retstr)
+
+
     def get(self):
         """Switchboard for game actions"""
         action = self.request.get('action')
@@ -95,6 +120,8 @@ class GameHandler(webapp2.RequestHandler):
         if action == "fish":
             return self.fish()
 
+        if action == "discard":
+            return self.discard()
 
         self.error(500)
 

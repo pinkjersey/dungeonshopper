@@ -30,6 +30,7 @@ class Game(ndb.Model):
     numPlayers = ndb.IntegerProperty(required=True)
     players = ndb.LocalStructuredProperty(Player, repeated=True)
     itemDeck = ndb.IntegerProperty(repeated=True)
+    discardPile = ndb.IntegerProperty(repeated=True)
     questDeck = ndb.LocalStructuredProperty(QuestCard, repeated=True)
     market = ndb.IntegerProperty(repeated=True)
     questsInPlay = ndb.LocalStructuredProperty(QuestCard, repeated=True)

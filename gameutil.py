@@ -22,6 +22,82 @@ def playerState(game, playerId):
     jsonstr = json.dumps(thedict)
     return jsonstr   
 
+def whatToArray(what):
+    ret = []
+    for c in what:
+        ci = int(c)
+        if (ci == 0):
+            ci = 10;
+        ret.append(ci)
+
+    return ret
+
+
+def discardItem(game, whati, where):
+    """Utility discard function"""
+    player = game.players[game.curPlayer]
+    
+    found = False
+    if (where == "hand"):
+        l = len(player.hand)
+        for i in range(l):
+            if player.hand[i] == whati:
+                game.discardPile.append(player.hand[i])
+                del player.hand[i]
+                found = True
+                break
+
+    elif ("cart" in where):
+        # string "cart1" becomes int(1)
+        cartid = int(where[4:])
+        if (cartid >=0 and cartid <4):
+            cart = player.carts[cartid]
+            if (cart.purchased == False):
+                # removing item from unpurchased cart is invalid
+                raise ValueError('Removing item from unpurchased cart is invalid')
+
+            l = len(cart.inCart)
+            for i in range(l):
+                if cart.inCart[i] == whati:
+                    game.discardPile.append(cart.inCart[i])
+                    del cart.inCart[i]
+                    found = True
+                    break
+    else:
+        # invalid where
+        raise ValueError('Where value is invalid')
+
+    return found
+
+def discard(game, what, where):
+    if game.actionsRemaining == 0:
+        # no actions remaining
+        return False
+
+    whats = whatToArray(what)
+    if (len(whats) == 0):
+        return False
+
+    allFound = True
+    for whati in whats:
+        try:
+            found = discardItem(game, whati, where)
+            if (found == False):
+                allFound = False
+                break
+
+        except ValueError as e:
+            return False
+
+    if (allFound == False):
+        # couldn't find 'what'
+        return False
+    
+    game.actionsRemaining = game.actionsRemaining -1
+    game.put()
+
+    return True
+
 def fish(game, what, where):
     if game.actionsRemaining == 0:
         # no actions remaining
@@ -34,32 +110,9 @@ def fish(game, what, where):
 
     player = game.players[game.curPlayer]
     
-    found = False
-    if (where == "hand"):
-        l = len(player.hand)
-        for i in range(l):
-            if player.hand[i] == whati:
-                del player.hand[i]
-                found = True
-                break
-
-    elif ("cart" in where):
-        # string "cart1" becomes int(1)
-        cartid = int(where[4:])
-        if (cartid >=0 and cartid <4):
-            cart = player.carts[cartid]
-            if (cart.purchased == False):
-                # removing item from unpurchased cart is invalid
-                return False
-
-            l = len(cart.inCart)
-            for i in range(l):
-                if cart.inCart[i] == whati:
-                    del cart.inCart[i]
-                    found = True
-                    break
-    else:
-        # invalid where
+    try:
+        found = discardItem(game, whati, where)
+    except ValueError as e:
         return False
 
     if (found == False):
