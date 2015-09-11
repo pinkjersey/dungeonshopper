@@ -26,11 +26,7 @@ class Player(ndb.Model):
 
 class Game(ndb.Model):
     curPlayer = ndb.IntegerProperty(default=0)
-    startingActions = ndb.IntegerProperty(default=2)
-    startingCards = ndb.IntegerProperty(default=5)
-    marketStart = ndb.IntegerProperty(default=4)
-    questStart = ndb.IntegerProperty(default=4)
-    itemDeckStartCount = ndb.IntegerProperty(default=75)
+    actionsRemaining = ndb.IntegerProperty(default=2)        
     numPlayers = ndb.IntegerProperty(required=True)
     players = ndb.LocalStructuredProperty(Player, repeated=True)
     itemDeck = ndb.IntegerProperty(repeated=True)
