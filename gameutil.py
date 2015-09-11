@@ -175,6 +175,15 @@ def buyCart(game, cartidstr, withGold, items):
             
         cart.purchased = True
 
+    if cartid == 1:
+        # deal quest, assign one victory point
+        dealQuest(game)
+        player.points += 1
+    elif cartid == 2:
+        player.points += 3
+    elif cartid == 3:
+        player.maxHand += 1
+
     game.actionsRemaining = game.actionsRemaining -1
     game.put()    
 
@@ -208,6 +217,46 @@ def discard(game, what, where):
     game.put()
 
     return True
+
+def passPlayer(game, items):
+    whats = whatToArray(items)
+    numItems = len(whats)    
+
+    priorPlayer = game.curPlayer
+    player = game.players[game.curPlayer]
+
+    numItemsInHand = len(player.hand)
+    if (numItemsInHand - numItems) > player.maxHand:
+        raise ValueError("Need to discard more items")
+
+    if (numItems > 0 and (numItemsInHand - numItems) < player.maxHand):
+        raise ValueError("Discarded too many items")
+
+    # discard cards past max if needed
+    allFound = True
+    for whati in whats:        
+        found = discardItem(game, whati, "hand")
+        if (found == False):
+            allFound = False
+            break
+
+    if numItemsInHand < player.maxHand:
+        diff = player.maxHand - numItemsInHand
+        for i in range(diff):
+            dealItemCard(game.curPlayer, game)
+
+    # deal card to market
+    dealItemCardToMarket(game)
+
+    game.actionsRemaining = 2
+    game.curPlayer += 1
+    if game.curPlayer == game.numPlayers:
+        game.curPlayer = 0
+
+    # save game to data store
+    game.put()
+
+    return priorPlayer
 
 def fish(game, what, where):
     if game.actionsRemaining == 0:
@@ -320,7 +369,6 @@ def createNewGame(numPlayers):
     game.put()
     return game
 
-
 def shuffle(deck):
     shuffled = []
     sz = len(deck)
@@ -370,8 +418,6 @@ def createQuestStacks(top, middle, bottom, level1, level2, level3, level4,l1t, l
     for i in range(eb):
         bottom.append(level4[i])
         del level4[i]
-
-
 
 def newItemDeck():
     cards = []

@@ -25,6 +25,9 @@ class Player(ndb.Model):
     hand = ndb.IntegerProperty(repeated=True)
     carts = ndb.LocalStructuredProperty(Cart, repeated=True)
     gold = ndb.IntegerProperty(required=True, default=0)
+    points = ndb.IntegerProperty(required=True, default=0)
+    maxHand = ndb.IntegerProperty(required=True, default=5)
+    turns = ndb.IntegerProperty(required=True, default=0)
 
 class Game(ndb.Model):
     curPlayer = ndb.IntegerProperty(default=0)

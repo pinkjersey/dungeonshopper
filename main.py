@@ -173,6 +173,25 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
+    def passPlayer(self):
+        game_k = ndb.Key('Game', 'theGame')
+        game = game_k.get()
+
+        items = self.request.get('items')
+        if (items == None):
+            self.error(500)
+            return
+
+        try:
+            priorPlayer = passPlayer(game, items)
+        except ValueError as e:
+            self.error(500)
+            return
+
+        retstr = playerState(game, priorPlayer)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(retstr)        
 
     def get(self):
         """Switchboard for game actions"""
@@ -208,6 +227,8 @@ class GameHandler(webapp2.RequestHandler):
         if action == "buyAction":
             return self.buyAction()
 
+        if action == "pass":
+            return self.passPlayer()
 
         logging.error("Invalid action")
         self.error(500)
