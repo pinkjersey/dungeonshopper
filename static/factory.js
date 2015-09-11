@@ -13,12 +13,28 @@ angular.module('dsApp')
                joinGame: function (playerId, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       //url: 'http://vdknycfl00222:13080/game?action=join&playerId=' + playerId,
                        url: '/game?action=join&playerId=' + playerId,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
+               },
+               discard: function (what, where, callback, errorcallback) {
+                   $http({
+                       method: 'GET',
+                       url: '/game?action=discard&what=' + what + '&where=' + where,
+                       cache: false
+                   }).success(callback)
+                     .error(errorcallback);
                }
+               fish: function (what, where, callback, errorcallback) {
+                   $http({
+                       method: 'GET',
+                       url: '/game?action=fish&what=' + what + '&where=' + where,
+                       cache: false
+                   }).success(callback)
+                     .error(errorcallback);
+               }
+
            }
        });
 
