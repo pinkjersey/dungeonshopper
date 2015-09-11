@@ -69,7 +69,8 @@ var Game = function(numOpponents) {
 	//populated cardrs, marketholders and quests
 	this.cards.create75Cards();
 	this.marketHolders.createBlankMarket();
-	this.quests.createQuestDeck(this.numOpponents + 1);
+	this.quests.create75CardsQuestDeck();
+//	this.quests.createQuestDeck(this.numOpponents + 1);
 
 	this.players = [];
 	
@@ -616,18 +617,84 @@ function loadData(numPlayers) {
 }
 
 
-var newGameSuccessCallback = function (returnVal) {
-	alert(returnVal);
+var newGameSuccessCallback = function (data) {
+	getObjectResults(data);
 };
 
 var newGameErrorCallback = function (returnVal) {
 	alert(returnVal);
 };
 
+ function getObjectResults(data) {
+       // var data = new Object();
+		$scope.isActive = data.isActive;
+		$scope.activePlayer.active = data.isActive;
+		$scope.itemsCountRemaining = data.itemsCountRemaining;
+		$scope.questsCountRemaining = data.questsCountRemaining;
+		//$scope.activePlayerId = $scope.game.firstPlayer;	
 
+
+        for (var i = 0; i < data.hand.length; ++i) {   
+			dealNumberToPlayer($scope.game.players[$scope.activePlayerId], data.hand[i]);	
+		}
+        for (var i = 0; i < data.market.length; ++i) {   
+			dealNumberToMarket($scope.game.marketDeck, data.market[i]);	
+		}
+        for (var i = 0; i < data.questsInPlay.length; ++i) {   
+			dealQuestCard($scope.game.questsInPlay, data.questsInPlay[i].items);	
+		}
+
+	};
+
+	$scope.joinGame = function(playerId) {
+		
+	}
+	
+dealNumberToPlayer = function(player, number) {
+	var game = $scope.game;
+	for (var i = 0; i < game.marketHolders.playingCards.length; ++i)  {
+		var card = game.marketHolders.playingCards[i];
+			if(card.number === number) {
+				player.cards.playingCards.push(card);
+		}
+	}
+	updateCounts();
+}
+
+dealNumberToMarket = function(marketDeck, number) {
+	var game = $scope.game;
+	for (var i = 0; i < game.marketHolders.playingCards.length; ++i)  {
+		var card = game.marketHolders.playingCards[i];
+			if(card.number === number) {
+				marketDeck.playingCards.push(card);
+		}
+	}
+	updateCounts();
+}
+
+dealQuestCard = function(questsInPlay, items) {
+	var game = $scope.game;
+	
+	var itemString = "../images/shopping_card_master";
+	for (var i = 0; i < items.length; ++i)  {
+		itemString += items[i];
+	}
+	itemString += ".jpg";
+
+
+	for (var i = 0; i < game.quests.playingCards.length; ++i)  {
+		var card = game.quests.playingCards[i];
+			if(card.image === itemString) {
+				questsInPlay.playingCards.push(card);
+				break;
+		}
+	}
+	updateCounts();
+}
+
+	
 $scope.newGame = function (p1Name, p2Name, p3Name, p4Name, numberOfPlayers) {
 		
-		loadData(numberOfPlayers);
 		
 		$scope.p1Name = p1Name;	
 		$scope.p2Name = p2Name;
@@ -649,7 +716,7 @@ $scope.newGame = function (p1Name, p2Name, p3Name, p4Name, numberOfPlayers) {
 		//gui variable to control cart buttons
 		$scope.activeCartWithItems = -1;
 		//gui control of the market cards selected
-		$scope.selectedMarketTradeCount = 0
+		$scope.selectedMarketTradeCount = 0;
 		//used in gui to show items left in deck
 		$scope.itemsCountRemaining = 0;
 		//used in gui to show quests left in deck
@@ -661,11 +728,10 @@ $scope.newGame = function (p1Name, p2Name, p3Name, p4Name, numberOfPlayers) {
 		$scope.lastDiscard = new playingCard();
 		//gui control of the quests
 		$scope.questSelected=false;
+		$scope.isActive = false;
 		
-
-
 		$scope.game = new Game(numberOfPlayers-1);
-        $scope.game.cards.shuffleCards(10);
+        //$scope.game.cards.shuffleCards(10);
 		$scope.game.itemDeck = $scope.game.cards;
 		$scope.activePlayerId = $scope.game.firstPlayer;
 
@@ -681,13 +747,21 @@ $scope.newGame = function (p1Name, p2Name, p3Name, p4Name, numberOfPlayers) {
 
         }
 
+		$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
+		loadData(numberOfPlayers);
+
+
+		
+/*
 		// deal five cards to players
 		for (var i = 0; i < $scope.game.startingCards; ++i) { 
 			for (var j = 0; j < $scope.game.numOpponents + 1; ++j) { 
 				dealCardToPlayer($scope.game.players[j], $scope.game.itemDeck);	
+			
 			}
 		}
-      
+*/
+/*      
 		//figure out who is going first by total item card points	
 		var playerWithMostPoints = 0;
 		var lastPlayertotalNumbers = 0;
@@ -707,8 +781,8 @@ $scope.newGame = function (p1Name, p2Name, p3Name, p4Name, numberOfPlayers) {
 			$scope.game.firstPlayer = playerWithMostPoints;
 			totalNumbers=0;
 		}
-		
-		
+*/		
+/*		
 		//hand out extra card to non first player
 		for (var x = 0; x < (numberOfPlayers) ; ++x) { 
             if (x === $scope.game.firstPlayer) {
@@ -728,16 +802,16 @@ $scope.newGame = function (p1Name, p2Name, p3Name, p4Name, numberOfPlayers) {
 		
 		//deal market start
 		dealCardToMarket($scope.game.marketDeck, $scope.game.itemDeck, $scope.game.marketStart);
+*/
 		
-		$scope.activePlayerId = $scope.game.firstPlayer;	
-		$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
-		$scope.activePlayer.active = true;
-		updateCounts();
+//		$scope.activePlayer.active = true;
+//		updateCounts();
 		//$scope.game.anyActionsRemaining = true;
 		$scope.displayMode = "game";
 		
-	}
+	
 
+}
 updateMarketItemPoints = function(value) {
 	var game = $scope.game;
 	$scope.sumMarketValueSelected += value;
@@ -1103,12 +1177,12 @@ checkIfAllPlayersFinishedEvent = function(questCardinplay, id) {
 
 eventCycleToNextPlayer = function(game, questCardinplay) {
 	$scope.activePlayer.active = false;
-	if($scope.activePlayer.id === game.numOpponents) {
+//	if($scope.activePlayer.id === game.numOpponents) {
 		$scope.activePlayerId=0;
-	}
-	else {
-		$scope.activePlayerId++;
-	}
+//	}
+//	else {
+//		$scope.activePlayerId++;
+//	}
 	$scope.activePlayer = game.players[$scope.activePlayerId];
 	$scope.activePlayer.active = true;
 	prepareEventForPlayer(questCardinplay, $scope.activePlayer);	
@@ -1801,12 +1875,12 @@ if(cartId === 2)
 
 activateNextPlayer = function(){
 	var game = $scope.game;
-	if( $scope.activePlayer.id === game.numOpponents) {
+//	if( $scope.activePlayer.id === game.numOpponents) {
 	$scope.activePlayerId=0;
-		}
-	else {
-	$scope.activePlayerId++;
-	}
+//		}
+//	else {
+//	$scope.activePlayerId++;
+//	}
 		
 	$scope.activePlayer = $scope.game.players[$scope.activePlayerId];
 	game.players[$scope.activePlayerId].actionsRemaining = game.startingActions;
