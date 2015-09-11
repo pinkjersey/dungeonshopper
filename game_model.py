@@ -6,9 +6,6 @@ from google.appengine.ext import ndb
 
 import webapp2
 
-#class ItemCard(ndb.Model):
-#    value = ndb.IntegerProperty(required=True)
-
 class QuestCard(ndb.Model):
     level = ndb.IntegerProperty(required=True)
     coin = ndb.BooleanProperty(required=True, default=True)
@@ -27,7 +24,7 @@ class Cart(ndb.Model):
 class Player(ndb.Model):
     hand = ndb.IntegerProperty(repeated=True)
     carts = ndb.LocalStructuredProperty(Cart, repeated=True)
-    gold = ndb.IntegerProperty(required=True, default=2)
+    gold = ndb.IntegerProperty(required=True, default=0)
 
 class Game(ndb.Model):
     curPlayer = ndb.IntegerProperty(default=0)

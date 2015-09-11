@@ -159,6 +159,21 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
+    def buyAction(self):
+        game_k = ndb.Key('Game', 'theGame')
+        game = game_k.get()
+
+        result = buyAction(game)
+        if (result == False):
+            self.error(500)
+            return
+
+        retstr = playerState(game, game.curPlayer)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(retstr)
+
+
     def get(self):
         """Switchboard for game actions"""
         logging.error("in get")
@@ -190,6 +205,10 @@ class GameHandler(webapp2.RequestHandler):
         if action == "buyCart":
             return self.buyCart()
 
+        if action == "buyAction":
+            return self.buyAction()
+
+
         logging.error("Invalid action")
         self.error(500)
 
@@ -203,9 +222,4 @@ app = webapp2.WSGIApplication([
     ('/game', GameHandler)
 ], debug=True,config=config)
 
-def main():
-    logging.getLogger().setLevel(logging.DEBUG)
-    webapp2.util.run_wsgi_app(app)
 
-if __name__ == '__main__':
-    main()

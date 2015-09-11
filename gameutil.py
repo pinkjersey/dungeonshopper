@@ -236,6 +236,19 @@ def fish(game, what, where):
 
     return True
 
+def buyAction(game):    
+    buyCost = 2
+    player = game.players[game.curPlayer]
+    
+    if (player.gold < buyCost):
+        return False
+
+    player.gold = player.gold - buyCost    
+    game.actionsRemaining = game.actionsRemaining + 1
+    game.put()
+
+    return True
+
 def createNewGame(numPlayers):
     # Temporary: delete theGame from the data store
     # later, perhaps stale games will be deleted here
