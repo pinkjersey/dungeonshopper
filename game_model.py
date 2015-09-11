@@ -16,12 +16,16 @@ class QuestCard(ndb.Model):
     vp = ndb.IntegerProperty(required=True)
     type = ndb.IntegerProperty(required=True)
 
+class Cart(ndb.Model):
+    purchased = ndb.BooleanProperty(required=True, default=False)
+    inCart = ndb.IntegerProperty(repeated=True)
 
 class Player(ndb.Model):
     hand = ndb.IntegerProperty(repeated=True)
+    carts = ndb.LocalStructuredProperty(Cart, repeated=True)
 
 class Game(ndb.Model):
-    firstPlayer = ndb.IntegerProperty(default=0)
+    curPlayer = ndb.IntegerProperty(default=0)
     startingActions = ndb.IntegerProperty(default=2)
     startingCards = ndb.IntegerProperty(default=5)
     marketStart = ndb.IntegerProperty(default=4)
@@ -31,6 +35,8 @@ class Game(ndb.Model):
     players = ndb.LocalStructuredProperty(Player, repeated=True)
     itemDeck = ndb.IntegerProperty(repeated=True)
     questDeck = ndb.LocalStructuredProperty(QuestCard, repeated=True)
+    market = ndb.IntegerProperty(repeated=True)
+    questsInPlay = ndb.LocalStructuredProperty(QuestCard, repeated=True)
 
 
 
