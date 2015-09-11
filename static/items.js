@@ -214,13 +214,8 @@ function playingCard(oNumber,oImage,oCount,oCardSet) {
 	this.selected = false;
 	this.borderColor = 'black'
 	// Create the card image and placeholder
-	this.representation = document.createElement('div');
-	this.representation.relatedObject = this;
-	this.representation.style.position = 'absolute';
-	this.representation.className = 'playingcard';
 	this.cardImage = document.createElement('img');
 	this.cardImage.style.display = 'block';
-	this.representation.appendChild(this.cardImage);
 
 	}
 
@@ -234,6 +229,4 @@ playingCard.prototype.setCardSize = function (oWidth,oHeight) {
 	this.cardImage.height = oHeight;
 	this.cardImage.style.width = oWidth;
 	this.cardImage.style.height = oHeight;
-	this.representation.style.width = oWidth;
-	this.representation.style.height = oHeight;
 };

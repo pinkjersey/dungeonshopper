@@ -28,9 +28,16 @@
 			<div class="row">
 
 				<div class="col-sm-3" ng-repeat="cart in player.carts track by $index" >
+<<<<<<< HEAD
 						<img ng-if="cart.active" style="border:3px solid {{cart.borderColor}}" width={{cart.width}} height={{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImage(cart.id)"></img>
 						<span  class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
 						<img  style="border:2px solid {{card.borderColor}}" ng-src="{{card.image}}" width = "{{card.cardImage.width}}" 	height = "{{card.cardImage.height}}" />
+=======
+						<img style="border:3px solid {{cart.borderColor}}" width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}" ></img>
+						<span  class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
+							<img  style="border:2px solid {{card.borderColor}}" ng-src="{{card.image}}" width = "{{card.cardImage.width}}" 	height = "{{card.cardImage.height}}" />
+						</span>
+>>>>>>> origin/master
 				</div>
 			</div>
 			<br></br>
@@ -42,6 +49,7 @@
 			<br></br>
 
 
+<<<<<<< HEAD
 			<h4 class="panel panel-danger">Event! - Orcs Attack! {{wheelbarrowCardSum}}</h4>
 			<div class="container-fluid">
 				<div class="row">
@@ -53,6 +61,19 @@
 						<button ng-show="questcard.level==='e'" ng-if="wheelbarrowCardSum>=5" class="btn btn-warning" ng-click="playerCompleteEvent(0, 'Y')">Complete Event</button>   
 						<button ng-show="questcard.level==='e'" ng-if="wheelbarrowCardSum<5" class="btn btn-warning" ng-click="playerCompleteEvent(0, 'Y')">Yes</button>   
 						<button ng-show="questcard.level==='e'" ng-if="wheelbarrowCardSum<5" class="btn btn-warning" ng-click="playerCompleteEvent(0, 'N')">No</button>   
+=======
+			<h4 class="panel panel-danger">Event! - Orcs Attack!  Here's whats in your wheelbarrow: {{wheelbarrowCardSum}}</h4>
+			<div class="container-fluid">
+				<div class="row">
+					<span ng-if="wheelbarrowCardSum < 5">Buy back wheelbarrow for 5+ item points?</span>
+
+					<span ng-repeat="questcard in game.questsInPlay.playingCards track by $index">
+
+					<questcard ng-show="questcard.level==='4'" info="questcard"></questcard>
+						<button ng-show="questcard.level==='4'" ng-if="wheelbarrowCardSum >= 5" class="btn btn-warning" ng-click="playerCompleteEvent(0, 'N')">Complete Event</button>   
+						<button ng-show="questcard.level==='4'" ng-if="eventActionsRemaining > 0 && wheelbarrowCardSum < 5" class="btn btn-warning" ng-click="playerCompleteEvent(0, 'Y')">Yes</button>   
+						<button ng-show="questcard.level==='4'" ng-if="eventActionsRemaining > 0 && wheelbarrowCardSum < 5" class="btn btn-warning" ng-click="playerCompleteEvent(0, 'N')">No</button>   
+>>>>>>> origin/master
 						</span>	
 				</div>
 			</div>
@@ -81,7 +102,7 @@
 				</table>
 				
 				<div>My Completed Quests</div>
-				<span ng-repeat="questcard in game.activePlayer.questsCompleted.playingCards track by $index">
+				<span ng-repeat="questcard in activePlayer.questsCompleted.playingCards track by $index">
 					<img width = "80" height = "100" ng-src="{{questcard.image}}"></img>
 				</span>
 
@@ -92,9 +113,9 @@
 
 					<thead>
 						<tr>
-							<th class="alignleft"><big>Item Cards: {{game.itemsCountRemaining}}</big></th>
-							<th class="alignjustify"><big>Quest Cards: {{game.questsCountRemaining}}</big></th>
-							<th ng-show="game.discardsCount > 0" ><big>Discards: {{game.discardsCount}}</big></th>
+							<th class="alignleft"><big>Item Cards: {{itemsCountRemaining}}</big></th>
+							<th class="alignjustify"><big>Quest Cards: {{questsCountRemaining}}</big></th>
+							<th ng-show="discardsCount > 0" ><big>Discards: {{discardsCount}}</big></th>
 						</tr>
 						<tr>
 						<th>
@@ -104,7 +125,7 @@
 						<img ng-src="{{vendorCardBack}}" width = auto height = "180" class="alignjustify"</img>
 						</th>	
 						<th>
-						<img ng-show="game.discardsCount > 0" ng-src="{{game.lastDiscard.image}}" width = auto height = "180" ></img>
+						<img ng-show="discardsCount > 0" ng-src="{{game.lastDiscard.image}}" width = auto height = "180" ></img>
 						</th>
 						</tr>
 					</thead>

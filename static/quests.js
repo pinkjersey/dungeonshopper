@@ -65,7 +65,7 @@ questSet.prototype.addCard = function (level,gold,item1,item2,item3,item4,item5,
 	if(level===3) {
 		oImage = oImage + item1 + item2 + item3 + item4 + item5	 + '.jpg'
 		}
-	if(level==='e') {
+	if(level==='4') {
 		oImage = oImage + '.jpg'
 		}	
 	this.playingCards[this.playingCards.length] = new questCard(level,gold,item1,item2,item3,item4,item5,vp,name,sortorder,oImage,this);
@@ -127,6 +127,42 @@ questSet.prototype.setCardSize = function (oWidth,oHeight) {
 //};
 
 
+questSet.prototype.create75CardsQuestDeck = function (numOfOpponents) {
+	// Create quest deck
+	
+	var level1 = new questSet();
+	var level2 = new questSet();
+	var level3 = new questSet();
+	var events = new questSet();
+	
+	level1.createQuestDecks(1);
+	level2.createQuestDecks(2);
+	level3.createQuestDecks(3);
+	events.createQuestDecks('4');
+
+	//create and add all quests to the quests deck
+
+		for( var i = 0; i < level1.playingCards.length; i++ ) {
+            var cardt = level1.playingCards[i];
+			this.addCardc(cardt);
+        }
+		for( var i = 0; i < level2.playingCards.length; i++ ) {
+            var cardm = level2.playingCards[i];
+			this.addCardc(cardm);
+        }
+		for( var i = 0; i < level3.playingCards.length; i++ ) {
+            var cardb = level3.playingCards[i];
+			this.addCardc(cardb);
+        }
+		for( var i = 0; i < events.playingCards.length; i++ ) {
+            var carde = events.playingCards[i];
+			this.addCardc(carde);
+        }
+	
+
+}
+
+
 
 questSet.prototype.createQuestDeck = function (numOfOpponents) {
 	// Create quest deck
@@ -139,7 +175,7 @@ questSet.prototype.createQuestDeck = function (numOfOpponents) {
 	level1.createQuestDecks(1);
 	level2.createQuestDecks(2);
 	level3.createQuestDecks(3);
-	events.createQuestDecks('e');
+	events.createQuestDecks('4');
 
 	level1.shuffleCards(10);
 	level2.shuffleCards(10);
@@ -180,16 +216,20 @@ questSet.prototype.createQuestDeck = function (numOfOpponents) {
 	//create and add all quests to the quests deck
 
 		for( var i = 0; i < top.playingCards.length; i++ ) {
-            var cardt = top.playingCards[i];
+            var cardt = top.playingCards[0];
 			this.addCardc(cardt);
+			top.playingCards.shift();
         }
 		for( var i = 0; i < middle.playingCards.length; i++ ) {
-            var cardm = middle.playingCards[i];
+            var cardm = middle.playingCards[0];
 			this.addCardc(cardm);
+			middle.playingCards.shift();
         }
 		for( var i = 0; i < bottom.playingCards.length; i++ ) {
-            var cardb = bottom.playingCards[i];
+            var cardb = bottom.playingCards[0];
 			this.addCardc(cardb);
+			bottom.playingCards.shift();
+			
         }
 	
 
@@ -200,44 +240,56 @@ questSet.prototype.createQuestDeck = function (numOfOpponents) {
 
 function createQuests(top, middle, bottom, level1, level2, level3, events, level1CardsTop, level1CardsMiddle, level2CardsMiddle, level1CardsBottom, level2CardsBottom, level3CardsBottom, eventCardsMiddle, eventCardsBottom)
 {
-	//build two player deck top
+	//build game deck top
 	    for (var i = 0; i < level1CardsTop; ++i) {
-            var cardL1 = level1.playingCards[i];
+            var cardL1 = level1.playingCards[0];
 			top.addCardc(cardL1);
+			level1.playingCards.shift();
         }
 
 
 	//build deck middle
 	
 		for (var i = 0; i < level1CardsMiddle; ++i) {
-            cardL1 = level1.playingCards[i];
+            cardL1 = level1.playingCards[0];
 			middle.addCardc(cardL1);
+			level1.playingCards.shift();
         }
 	    for (var i = 0; i < level2CardsMiddle; ++i) {
-            var cardL2 = level2.playingCards[i];
+            var cardL2 = level2.playingCards[0];
 			middle.addCardc(cardL2);
+			level2.playingCards.shift();
+
         }
 	    for (var i = 0; i < eventCardsMiddle; ++i) {
-            var cardevent = events.playingCards[i];
+            var cardevent = events.playingCards[0];
 			middle.addCardc(cardevent);
+			events.playingCards.shift();			
         }
 
 	//build deck bottom
 		for (var i = 0; i < level1CardsBottom; ++i) {
-            cardL1 = level1.playingCards[i];
+            cardL1 = level1.playingCards[0];
 			bottom.addCardc(cardL1);
+			level1.playingCards.shift();
+
         }
 	    for (var i = 0; i < level2CardsBottom; ++i) {
-            cardL2 = level2.playingCards[i];
+            cardL2 = level2.playingCards[0];
 			bottom.addCardc(cardL2);
+			level2.playingCards.shift();
+
         }
 	    for (var i = 0; i < level3CardsBottom; ++i) {
-            var cardL3 = level3.playingCards[i];
+            var cardL3 = level3.playingCards[0];
 			bottom.addCardc(cardL3);
+			level3.playingCards.shift();
+
         }
 		for (var i = 0; i < eventCardsBottom; ++i) {
-            var cardevent = events.playingCards[i];
+            var cardevent = events.playingCards[0];
 			bottom.addCardc(cardevent);
+			events.playingCards.shift();
         }
 
 }
@@ -331,6 +383,7 @@ if(level===3){
 	this.addCard(level,0,3,4,7,8,9,6,'Siege of Harfleur',5,image,this);
 }
 
+<<<<<<< HEAD
 if(level==='e'){
 	var image="../images/dungeonevent";
 //	this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',0,image+"BarbarianAttack",this);
@@ -340,11 +393,18 @@ if(level==='e'){
 //			this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',0,image+"BrokenItems",this);
 //			this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',0,image+"BrokenItems",this);
 //			this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',0,image+"BrokenItems",this);
+=======
+if(level==='4'){
+	var image="../images/dungeonevent";
+//	this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',0,image+"BarbarianAttack",this);
+	this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',0,image+"BrokenItems",this);
+>>>>>>> origin/master
 //	this.addCard(level,0,0,0,0,0,0,0,'eventCastleTaxation',0,image+"CastleTaxation",this);
 //	this.addCard(level,0,0,0,0,0,0,0,'eventGolbinRaid',0,image+"GolbinRaid",this);
 //	this.addCard(level,0,0,0,0,0,0,0,'eventKingsFeast',0,image+"KingsFeast",this);	
 //	this.addCard(level,0,0,0,0,0,0,0,'eventMarketShortage',0,image+"MarketShortage",this);	
 //	this.addCard(level,0,0,0,0,0,0,0,'eventMarketSurplus',0,image+"MarketSurplus",this);	
+<<<<<<< HEAD
 	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
 		this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
 			this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
@@ -354,6 +414,21 @@ if(level==='e'){
 //	this.addCard(level,0,0,0,0,0,0,0,'eventThrownInTheDungeon',0,image+"ThrownInTheDungeon",this);	
 //	this.addCard(level,0,0,0,0,0,0,0,'eventTreasure',0,image+"Treasure",this);	
 	//	this.addCard(level,0,0,0,0,0,0,0,'eventVikingParade',0,image+"VikingParade",this);	
+=======
+	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
+		this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
+			this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
+				this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
+				//	this.addCard(level,0,0,0,0,0,0,0,'eventSandStorm',0,image+"SandStorm",this);	
+//	this.addCard(level,0,0,0,0,0,0,0,'eventThrownInTheDungeon',0,image+"ThrownInTheDungeon",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventTreasure',0,image+"Treasure",this);	
+//	this.addCard(level,0,0,0,0,0,0,0,'eventVikingParade',0,image+"VikingParade",this);	
+>>>>>>> origin/master
 	}
 
 }
@@ -381,14 +456,8 @@ function questCard(level,gold,item1,item2,item3,item4,item5,vp,name, sortorder,i
 	this.cardStack = null;
 	this.positionOnStack = 0;
 	this.borderColor = 'black'
-	// Create the card image and placeholder
-	this.representation = document.createElement('div');
-	this.representation.relatedObject = this;
-	this.representation.style.position = 'absolute';
-	this.representation.className = 'questCard';
 	this.cardImage = document.createElement('img');
 	this.cardImage.style.display = 'block';
-	this.representation.appendChild(this.cardImage);
 
 }
 
@@ -401,6 +470,4 @@ questCard.prototype.setCardSize = function (oWidth,oHeight) {
 	this.cardImage.height = oHeight;
 	this.cardImage.style.width = oWidth;
 	this.cardImage.style.height = oHeight;
-	this.representation.style.width = oWidth;
-	this.representation.style.height = oHeight;
 };
