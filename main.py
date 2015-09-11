@@ -1,24 +1,11 @@
 #!/usr/bin/env python
-#
-# Copyright 2007 Google Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+
 import webapp2
 import json
 import random
 
-from webapp2_extras import sessions
+from google.appengine.ext import ndb
+
 from game_model import *
 
 class GameHandler(webapp2.RequestHandler):
@@ -37,10 +24,12 @@ class GameHandler(webapp2.RequestHandler):
         return card
 
     def createQuestStacks(self, top, middle, bottom, level1, level2, level3, level4,l1t, l1m, l2m, l1b, l2b, l3b, em, eb):
+        # top
         for i in range(l1t):
             top.append(level1[i])
             del level1[i]
 
+        # middle
         for i in range(l1m):
             middle.append(level1[i])
             del level1[i]
@@ -53,6 +42,7 @@ class GameHandler(webapp2.RequestHandler):
             middle.append(level4[i])
             del level4[i]
 
+        #bottom
         for i in range(l1b):
             bottom.append(level1[i])
             del level1[i]
@@ -67,7 +57,7 @@ class GameHandler(webapp2.RequestHandler):
 
         for i in range(eb):
             bottom.append(level4[i])
-            del bottom[i]
+            del level4[i]
 
     def newQuestDeck(self, numPlayers):
         level1Cards = []
@@ -172,13 +162,13 @@ class GameHandler(webapp2.RequestHandler):
         level3Cards = self.shuffle(level3Cards)
         level4Cards = self.shuffle(level4Cards)
 
-        if numPlayers == "2":
+        if numPlayers == "1":
             self.createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
-        elif numPlayers == "3":
+        elif numPlayers == "2":
             self.createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,7,1,4,1,2,4,2,2)
-        elif numPlayers == "4":
+        elif numPlayers == "3":
             self.createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,10,3,7,2,3,5,2,2)
-        elif numPlayers == "5":
+        elif numPlayers == "4":
             self.createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,12,4,10,2,4,6,3,3)
         
         top = self.shuffle(top)
@@ -200,15 +190,49 @@ class GameHandler(webapp2.RequestHandler):
         card = game.itemDeck[0]
         del game.itemDeck[0]
         game.players[playerIndex].hand.append(card)
-            
+
+    def dealItemCardToMarket(self, game):
+        card = game.itemDeck[0]
+        del game.itemDeck[0]
+        game.market.append(card)
+        
+    def dealQuest(self, game):
+        quest = game.questDeck[0]
+        del game.questDeck[0]
+        game.questsInPlay.append(quest)
+
+    def playerState(self, game, playerId):
+        player = game.players[playerId]
+        thedict = player.to_dict()
+        if game.curPlayer == playerId:
+            thedict["isActive"] = True
+        else:
+            thedict["isActive"] = False
+        
+        thedict["itemsCountRemaining"] = len(game.itemDeck)
+        thedict["questsCountRemaining"] = len(game.questDeck)
+        thedict["market"] = game.market
+        questlist = []
+        for q in game.questsInPlay:
+            questlist.append(q.to_dict())
+        
+        thedict["questsInPlay"] = questlist
+
+        jsonstr = json.dumps(thedict)
+        return jsonstr    
+
     def newGame(self):
         """Creates new game object"""
+
+        game_k = ndb.Key('Game', 'theGame')
+        game_k.delete()
+
         numPlayers = self.request.get('numPlayers')
         if (numPlayers == None or numPlayers == ""):
             self.error(500)
             return
         
-        game = Game(numPlayers=int(numPlayers))
+        game = Game(numPlayers=int(numPlayers), id='theGame')
         game.questDeck = self.newQuestDeck(numPlayers)
 
         game.itemDeck = self.newItemDeck()
@@ -221,32 +245,77 @@ class GameHandler(webapp2.RequestHandler):
             for j in range(game.numPlayers):
                 self.dealItemCard(j, game)
 
+        # deal four cards to the market
+        for i in range(4):
+            self.dealItemCardToMarket(game)
+
+        maxTotal = 0
+        game.curPlayer = 0
+        # determine the max card sum
+        for p in range(game.numPlayers):
+            pMax = sum(game.players[p].hand)
+            if (pMax > maxTotal):
+                maxTotal = pMax                
+        
+        # determine first player
+        for p in range(game.numPlayers):
+            pMax = sum(game.players[p].hand)
+            if (pMax == maxTotal):
+                game.curPlayer = p
+                break
+
+        # deal extra cards
+        for p in range(game.numPlayers):
+            if (p != game.curPlayer):
+                self.dealItemCard(p, game)
+
+        # create carts
+        for p in range(game.numPlayers):
+            for i in range(4):
+                c=Cart(purchased=False)
+                if (i == 0):
+                    c.purchased = True
+                game.players[p].carts.append(c)
+
         # sort items
         for p in range(game.numPlayers):
             game.players[p].hand.sort()
 
-        maxTotal = 0
-        game.firstPlayer = 0
-        for p in range(game.numPlayers):
-            pMax = sum(game.players[p].hand)
-            if (pMax > maxTotal):
-                maxTotal = pMax
-                game.firstPlayer = p
+        # deal quests
+        for i in range(4):
+            self.dealQuest(game)
+
+        game.put()
+
+        retstr = self.playerState(game, 0)        
+        #jsonstr = json.dumps([game.to_dict()])
                 
-        jsonstr = json.dumps([game.to_dict()])
-        self.session['game'] = jsonstr
-                
-        self.response.write(jsonstr)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(retstr)
     
     def info(self):
-        jsonstr = self.session['game']
+        game_k = ndb.Key('Game', 'theGame')
+        game = game_k.get()
+
+        jsonstr = json.dumps([game.to_dict()])
         if jsonstr == None or jsonstr == "":
             jsonstr = "no game in current session"
 
-        self.response.write(jsonstr)
-    
-    def session_info(self):
-        count = self.session_store.
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(jsonstr)    
+
+    def join(self):
+        game_k = ndb.Key('Game', 'theGame')
+        game = game_k.get()
+
+        retstr = self.playerState(game, 1)        
+        #jsonstr = json.dumps([game.to_dict()])
+                
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(retstr)
 
     def get(self):
         """Switchboard for game actions"""
@@ -258,29 +327,14 @@ class GameHandler(webapp2.RequestHandler):
         if action == "new":
             return self.newGame()
 
+        if action == "join":
+            return self.join()
+
         if action == "info":
             return self.info()
 
-        if actine == "session_info":
-            return self.session_info()
 
         self.error(500)
-
-    def dispatch(self):
-        # Get a session store for this request.
-        self.session_store = sessions.get_store(request=self.request)
-
-        try:
-            # Dispatch the request.
-            webapp2.RequestHandler.dispatch(self)
-        finally:
-            # Save all sessions.
-            self.session_store.save_sessions(self.response)
-
-    @webapp2.cached_property
-    def session(self):
-        # Returns a session using the default cookie key.
-        return self.session_store.get_session()
 
 
 config = {}

@@ -39,7 +39,7 @@ handlers:
 
 - url: .*
   script: main.app
-  login: admin
+#  login: admin
 
 libraries:
 - name: webapp2
