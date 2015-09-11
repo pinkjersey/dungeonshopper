@@ -59,16 +59,16 @@ var Game = function(numOpponents) {
 	//all the starter empty playingCards holders	
 	this.cards = new cardSet();
 	this.quests = new questSet();
-	this.marketHolders = new cardSet();
+	this.itemHolders = new cardSet();
 	this.itemDeck = new cardSet();
 	this.discardDeck = new cardSet();
 	this.questsInPlay = new cardSet();
 	this.marketDeck = new cardSet();
 	this.marketDeckInTrade = new cardSet();
 
-	//populated cardrs, marketholders and quests
+	//populated cardrs, itemHolders and quests
 	this.cards.create75Cards();
-	this.marketHolders.createBlankMarket();
+	this.itemHolders.createBlankMarket();
 	this.quests.create75CardsQuestDeck();
 //	this.quests.createQuestDeck(this.numOpponents + 1);
 
@@ -77,7 +77,7 @@ var Game = function(numOpponents) {
 	//set initial size of the cards for the gui
 	//their are times in the code that these are changed and reset
 	this.cards.setCardSize("60","80");
-	this.marketHolders.setCardSize("60","80");
+	this.itemHolders.setCardSize("60","80");
 	this.quests.setCardSize("auto","200");
 	this.quests.origWidth=0;
 	this.quests.origHeight=0;
@@ -322,7 +322,7 @@ cartCardsBetweenCarts = function(cart1, cart2){
 
 $scope.userClickedMarketImage = function(i) {
 	var game = $scope.game;
-	var card = game.marketHolders.playingCards[i];
+	var card = game.itemHolders.playingCards[i];
 	card.selected = !card.selected;
 
 	card.borderColor = 'black';
@@ -338,7 +338,7 @@ $scope.userClickedMarketTradeImage = function(i) {
 	
 	var game = $scope.game;
 	var card = game.marketDeckInTrade.playingCards[i];
-	var marketCard = game.marketHolders.playingCards[card.number-1];
+	var marketCard = game.itemHolders.playingCards[card.number-1];
 	//increase the number above the market card holder
 	marketCard.count++;
 	
@@ -613,15 +613,23 @@ updateCartItemPoints = function(cart) {
 }
 
 function loadData(numPlayers) {
-     gameFactory.newGame(numPlayers, newGameSuccessCallback, newGameErrorCallback);
+     gameFactory.newGame(numPlayers, processGameStateCallback, processGameStateErrorCallback);
+}
+
+function fish(what, where) {
+     gameFactory.fish(what, where, processGameStateCallback, processGameStateErrorCallback);
+}
+
+function discard(what, where) {
+     gameFactory.discard(what, where, processGameStateCallback, processGameStateErrorCallback);
 }
 
 
-var newGameSuccessCallback = function (data) {
+var processGameStateCallback = function (data) {
 	getObjectResults(data);
 };
 
-var newGameErrorCallback = function (returnVal) {
+var processGameStateErrorCallback = function (returnVal) {
 	alert(returnVal);
 };
 
@@ -652,8 +660,8 @@ var newGameErrorCallback = function (returnVal) {
 	
 dealNumberToPlayer = function(player, number) {
 	var game = $scope.game;
-	for (var i = 0; i < game.marketHolders.playingCards.length; ++i)  {
-		var card = game.marketHolders.playingCards[i];
+	for (var i = 0; i < game.itemHolders.playingCards.length; ++i)  {
+		var card = game.itemHolders.playingCards[i];
 			if(card.number === number) {
 				player.cards.playingCards.push(card);
 		}
@@ -663,8 +671,8 @@ dealNumberToPlayer = function(player, number) {
 
 dealNumberToMarket = function(marketDeck, number) {
 	var game = $scope.game;
-	for (var i = 0; i < game.marketHolders.playingCards.length; ++i)  {
-		var card = game.marketHolders.playingCards[i];
+	for (var i = 0; i < game.itemHolders.playingCards.length; ++i)  {
+		var card = game.itemHolders.playingCards[i];
 			if(card.number === number) {
 				marketDeck.playingCards.push(card);
 		}
@@ -749,9 +757,8 @@ $scope.newGame = function (p1Name, p2Name, p3Name, p4Name, numberOfPlayers) {
 
 		$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
 		loadData(numberOfPlayers);
-
-
-		
+		$scope.displayMode = "game";
+	
 /*
 		// deal five cards to players
 		for (var i = 0; i < $scope.game.startingCards; ++i) { 
@@ -803,15 +810,219 @@ $scope.newGame = function (p1Name, p2Name, p3Name, p4Name, numberOfPlayers) {
 		//deal market start
 		dealCardToMarket($scope.game.marketDeck, $scope.game.itemDeck, $scope.game.marketStart);
 */
-		
+/*
 //		$scope.activePlayer.active = true;
 //		updateCounts();
 		//$scope.game.anyActionsRemaining = true;
-		$scope.displayMode = "game";
-		
 	
-
+*/
 }
+
+$scope.playerCartFish = function (id, actionCost) {
+	var game = $scope.game;
+	var player = $scope.activePlayer;
+	var cart = player.carts[id];
+	
+	//if you have actions, discard selected cards	
+	var  selectedCount = 0;
+	var  cardCount = 0;
+
+	if($scope.selectedCartItemsCount != 1) {
+		alert("You must select one card when fishing for a new one!")
+		return;
+	}
+	
+	//if(player.cards.playingCards.length === player.maxHand) {
+	//	alert("You are already at max hand, discard item from hand first.")
+	//	return;
+	//}
+	
+	//if cart cards are selected, move between carts else its player items to cart
+	if($scope.selectedCartItemsCount > 0) {
+		var cart = player.carts[id];
+		
+		var cardNumber = getSelectedCard(cart);
+		removeSelectedCard(cardNumber, 'cart' + cart.id);
+//		removeSelectedCartCards(cart, true);
+
+		//get new card
+//		dealCardToPlayer(player, $scope.game.itemDeck)
+
+		player.actionsRemaining -= actionCost;
+		updateCounts();
+		checkItemsRemaining();
+		$scope.selectedCartItemsCount = 0;
+		resetCartCardsSelected(player,-1);
+		return;
+	}
+}
+
+getSelectedCard = function(deck){
+			for (var i = 0; i < deck.cards.playingCards.length; ++i)  {
+				var card = deck.cards.playingCards[i];
+				if(card.selected) {
+					break;
+			}
+			return card.number;
+	}
+}
+
+
+$scope.playerFish = function (actionCost) {
+	var game = $scope.game;
+	var player = $scope.activePlayer;
+	var selectedCount = 0;
+
+	if(player.actionsRemaining === 0 && actionCost ===1)	{
+		alert("You have no actions.")
+		return;
+	}	
+	
+	if($scope.selectedItemsCount != 1) {
+		alert("You must select one card when fishing for a new one!")
+		return;
+	}
+	
+	var cardNumber = getSelectedCard(player);
+//	for (var i = 0; i < player.cards.playingCards.length; ++i)  {
+//		var card = player.cards.playingCards[i];		
+//		if(card.selected) {
+//			selectedCount++;
+//		}
+//	}
+//	if(selectedCount != 1) {
+//		alert("You must select one card when fishing for a new one!")
+//		return;
+//	}
+
+	removeSelectedCard(cardNumber, 'hand');
+//	removeSelectedCards(player, true);
+
+	//get new card
+//	dealCardToPlayer(player, $scope.game.itemDeck)
+
+	//remove action
+	player.actionsRemaining -= actionCost;
+	//check if zero actions and highlight button to take another action if they have gold >= 2
+	updateCounts();
+	checkItemsRemaining();
+}
+
+removeSelectedCard(what, where) {
+	fish(what, where);
+}
+
+
+getSelectedCards = function(deck){
+	var selectedCards = "";
+	var cardNumber = "";
+			for (var i = 0; i < deck.cards.playingCards.length; ++i)  {
+				var card = deck.cards.playingCards[i];
+				if(card.selected) {
+					cardNumber = card.number;
+					if(card.number===10) {
+						cardNumber = 0;
+					}
+					selectedCards+=cardNumber;
+			}
+			
+			return selectedCards;
+	}
+}
+
+$scope.playerCartDiscard = function (id, actionCost) {
+	var game = $scope.game;
+	var player = $scope.activePlayer;
+	var cart = player.carts[id];
+	
+	//if you have actions, discard selected cards	
+	var  selectedCount = 0;
+	var  cardCount = 0;
+
+	if($scope.selectedCartItemsCount === 0) {
+				alert('Select some items to discard.');
+				return;
+	}
+	
+	//if cart cards are selected, move between carts else its player items to cart
+	if($scope.selectedCartItemsCount > 0) {
+		var cart = player.carts[id];
+		var selectedCards = getSelectedCards(cart);
+		discard(selectedCards, 'cart'+id)
+		player.actionsRemaining -= actionCost;
+		updateCounts();
+		checkItemsRemaining();
+		$scope.selectedCartItemsCount = 0;
+		resetCartCardsSelected(player,-1);
+		return;
+	}
+}
+
+
+$scope.playerDiscard = function (actionCost) {
+	var game = $scope.game;
+	var player = $scope.activePlayer;
+
+	//if you have actions, discard selected cards, if not but have too many cards, discard anyway	
+	var  selectedCount = 0;
+	var  cardCount = 0;
+
+	if($scope.selectedItemsCount === 0) {
+		alert('Select some items to discard.');
+		return;
+	}
+	
+	if(actionCost!=0) {
+		if(player.actionsRemaining === 0)	{
+		for (var i = 0; i < player.cards.playingCards.length; ++i)  {
+			var card = player.cards.playingCards[i];		
+			if(card != null && card != undefined) {
+				cardCount++;
+				}
+			}
+		
+			if(cardCount <= player.maxHand)	{
+				alert("You have no actions.");
+				return;
+			}
+		}
+	}
+	
+	for (var i = 0; i < player.cards.playingCards.length; ++i)  {
+		var card = player.cards.playingCards[i];		
+		if(card.selected) {
+			selectedCount++;
+		}
+	}
+
+	if(actionCost!=0) {
+	//if player cards is more than maxhand and no actions, and selected cards does not bring down to max hand, alert
+		if(player.cards.playingCards.length > player.maxHand) {
+			if(player.actionsRemaining === 0)	{
+				if(player.cards.playingCards.length - selectedCount != player.maxHand) {	
+					alert("You have no actions, you can't discard more than max hand: "+ player.maxHand + " cards.");
+					return;
+					//you have no actions, you can't discard more than max hand
+				}
+			}
+		}
+	}
+	
+	//actuall did a discard
+//	removeSelectedCards(player, true);
+	var selectedCards = getSelectedCards(player);
+	discard(selectedCards, 'hand')
+
+
+	if(player.actionsRemaining > 0 && selectedCount > 0) {	
+		player.actionsRemaining -= actionCost;
+	}
+	
+	updateCounts();
+	checkItemsRemaining();
+}
+
+
 updateMarketItemPoints = function(value) {
 	var game = $scope.game;
 	$scope.sumMarketValueSelected += value;
@@ -888,7 +1099,7 @@ setMarketCounts = function() {
 				}
 			}
 			//update the item card and the count
-			$scope.game.marketHolders.playingCards[j-1].count = cardCount;
+			$scope.game.itemHolders.playingCards[j-1].count = cardCount;
 	}
 
 }
@@ -1191,6 +1402,7 @@ eventCycleToNextPlayer = function(game, questCardinplay) {
 
 //deal cards for initial market
 dealCardToMarket = function(market, items, count){
+	/*
 	var cardsDealt = 0;
 
 		for (var i = 0; i < items.playingCards.length; ++i) { // deal count number of cards
@@ -1221,11 +1433,13 @@ dealCardToMarket = function(market, items, count){
 			} 
 			
 			items.truncate();
+			*/
 			
 }	
 
+
 dealCardToPlayer = function(player, items) {
-	for (var i = 0; i < items.playingCards.length; ++i) { 
+/*	for (var i = 0; i < items.playingCards.length; ++i) { 
 		var itemCard = items.playingCards[0]; // get a reference to the first card on the deck
 		if (itemCard === null) {
 				continue;	
@@ -1249,6 +1463,7 @@ dealCardToPlayer = function(player, items) {
 		
 //		items.truncate();
 		updateCounts();
+		*/
 }  
 
 discardCardFromMarket = function( discardCard, discardPile) {
@@ -1338,11 +1553,11 @@ resetItemDeckAndMarket = function() {
 	game.itemDeck.shuffleCards(10);
 	
 	//deal market start
-	game.marketHolders = new cardSet();
-	game.marketHolders.createBlankMarket();
+	game.itemHolders = new cardSet();
+	game.itemHolders.createBlankMarket();
 	game.marketDeck = new cardSet();
 	dealCardToMarket(game.marketDeck, game.itemDeck, game.marketStart);
-	game.marketHolders.setCardSize("60","80");
+	game.itemHolders.setCardSize("60","80");
 	
 	//now finish dealing cards to player
 	//draw new cards up to max hand
@@ -1459,73 +1674,6 @@ $scope.playerBuyCart	= function(cartId, actionCost) {
 	
 }
 
-$scope.playerCartFish = function (id, actionCost) {
-	var game = $scope.game;
-	var player = $scope.activePlayer;
-	var cart = player.carts[id];
-	
-	//if you have actions, discard selected cards	
-	var  selectedCount = 0;
-	var  cardCount = 0;
-
-	if($scope.selectedCartItemsCount > 1) {
-		alert("You must select one card when fishing for a new one!")
-		return;
-	}
-	
-	if(player.cards.playingCards.length === player.maxHand) {
-		alert("You are already at max hand, discard item from hand first.")
-		return;
-	}
-	
-	//if cart cards are selected, move between carts else its player items to cart
-	if($scope.selectedCartItemsCount > 0) {
-		var cart = player.carts[id];
-		removeSelectedCartCards(cart, true);
-
-		//get new card
-		dealCardToPlayer(player, $scope.game.itemDeck)
-
-		player.actionsRemaining -= actionCost;
-		updateCounts();
-		checkItemsRemaining();
-		$scope.selectedCartItemsCount = 0;
-		resetCartCardsSelected(player,-1);
-		return;
-	}
-}
-$scope.playerFish = function (actionCost) {
-	var game = $scope.game;
-	var player = $scope.activePlayer;
-	var selectedCount = 0;
-
-	if(player.actionsRemaining === 0 && actionCost ===1)	{
-		alert("You have no actions.")
-		return;
-	}	
-	
-	for (var i = 0; i < player.cards.playingCards.length; ++i)  {
-		var card = player.cards.playingCards[i];		
-		if(card.selected) {
-			selectedCount++;
-		}
-	}
-	if(selectedCount != 1) {
-		alert("You must select one card when fishing for a new one!")
-		return;
-	}
-
-	removeSelectedCards(player, true);
-
-	//get new card
-	dealCardToPlayer(player, $scope.game.itemDeck)
-
-	//remove action
-	player.actionsRemaining -= actionCost;
-	//check if zero actions and highlight button to take another action if they have gold >= 2
-	updateCounts();
-	checkItemsRemaining();
-}
 	
 $scope.playerBuyAction = function (actionCost) {
 		var game = $scope.game;
@@ -1540,94 +1688,6 @@ $scope.playerBuyAction = function (actionCost) {
 			return;
 		}
 		updateCounts();
-}
-
-$scope.playerCartDiscard = function (id, actionCost) {
-	var game = $scope.game;
-	var player = $scope.activePlayer;
-	var cart = player.carts[id];
-	
-	//if you have actions, discard selected cards	
-	var  selectedCount = 0;
-	var  cardCount = 0;
-
-	if($scope.selectedCartItemsCount === 0) {
-				alert('Select some items to discard.');
-				return;
-	}
-	
-	//if cart cards are selected, move between carts else its player items to cart
-	if($scope.selectedCartItemsCount > 0) {
-		var cart = player.carts[id];
-		removeSelectedCartCards(cart, true);
-		player.actionsRemaining -= actionCost;
-		updateCounts();
-		checkItemsRemaining();
-		$scope.selectedCartItemsCount = 0;
-		resetCartCardsSelected(player,-1);
-		return;
-	}
-}
-
-
-$scope.playerDiscard = function (actionCost) {
-	var game = $scope.game;
-	var player = $scope.activePlayer;
-
-	//if you have actions, discard selected cards, if not but have too many cards, discard anyway	
-	var  selectedCount = 0;
-	var  cardCount = 0;
-
-	if($scope.selectedItemsCount === 0) {
-		alert('Select some items to discard.');
-		return;
-	}
-	
-	if(actionCost!=0) {
-		if(player.actionsRemaining === 0)	{
-		for (var i = 0; i < player.cards.playingCards.length; ++i)  {
-			var card = player.cards.playingCards[i];		
-			if(card != null && card != undefined) {
-				cardCount++;
-				}
-			}
-		
-			if(cardCount <= player.maxHand)	{
-				alert("You have no actions.");
-				return;
-			}
-		}
-	}
-	
-	for (var i = 0; i < player.cards.playingCards.length; ++i)  {
-		var card = player.cards.playingCards[i];		
-		if(card.selected) {
-			selectedCount++;
-		}
-	}
-
-	if(actionCost!=0) {
-	//if player cards is more than maxhand and no actions, and selected cards does not bring down to max hand, alert
-		if(player.cards.playingCards.length > player.maxHand) {
-			if(player.actionsRemaining === 0)	{
-				if(player.cards.playingCards.length - selectedCount != player.maxHand) {	
-					alert("You have no actions, you can't discard more than max hand: "+ player.maxHand + " cards.");
-					return;
-					//you have no actions, you can't discard more than max hand
-				}
-			}
-		}
-	}
-	
-	//actuall did a discard
-	removeSelectedCards(player, true);
-
-	if(player.actionsRemaining > 0 && selectedCount > 0) {	
-		player.actionsRemaining -= actionCost;
-	}
-	
-	updateCounts();
-	checkItemsRemaining();
 }
 
 $scope.playerPass = function() {

@@ -98,13 +98,13 @@
 				<table class="table table-condensed">
 					<thead>
 					<tr>
-						<span ng-repeat="cardcount in game.marketHolders.playingCards track by $index">
+						<span ng-repeat="cardcount in game.itemHolders.playingCards track by $index">
 							<marketcardcount info="cardcount"></marketcardcount>
 						</span>
 					</tr>
 					<button class="btn btn-warning" ng-show="sumMarketValueSelected < 11 && sumMarketValueSelected > 0" ng-click="playerMarketTrade(1)" >Trade {{game.sumMarketValueSelected}} item points?</button>    
 					<td>
-						<span ng-repeat="marketcard in game.marketHolders.playingCards track by $index">
+						<span ng-repeat="marketcard in game.itemHolders.playingCards track by $index">
 							<img style="border:2px solid {{marketcard.borderColor}}" width = "{{marketcard.cardImage.width}}" height = "{{marketcard.cardImage.height}}" ng-src="{{marketcard.image}}" ng-show = "marketcard.count > 0" ng-click="userClickedMarketImage($index)"></img>
 						</span>
 					</td>
