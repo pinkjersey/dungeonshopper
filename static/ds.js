@@ -189,6 +189,8 @@ $scope.userClickedMarketImage = function(i) {
 	card.count--;
 	
 	game.marketDeckInTrade.addCard(card.number, card.image, 1);
+	var len = game.marketDeckInTrade.playingCards.length - 1;
+	game.marketDeckInTrade.playingCards[len].selected = true;
 	game.marketDeckInTrade.setCardSize("60","80");
 	updateMarketItemPoints(card.number);
 }
@@ -535,6 +537,19 @@ dealNumberToPlayer = function(player, number) {
 	}
 	updateCounts();
 }
+	
+updateDiscardPile = function(discardDeck, number) {
+	var game = $scope.game;
+	for (var i = 0; i < game.itemHolders.playingCards.length; ++i)  {
+		var card = game.itemHolders.playingCards[i];
+			if(card.number === number) {
+				discardDeck.addCardc(card);
+				break;
+		}
+	}
+	updateCounts();
+}
+
 
 dealNumberToMarket = function(marketDeck, number) {
 	var game = $scope.game;
@@ -1375,10 +1390,20 @@ var processGameStateErrorCallback = function (returnVal) {
        // var data = new Object();
 		$scope.isActive = data.isActive;
 		$scope.activePlayer.active = data.isActive;
+		$scope.activePlayer.actionsRemaining = data.actionsRemaining;
 		$scope.itemsCountRemaining = data.itemsCountRemaining;
 		$scope.questsCountRemaining = data.questsCountRemaining;
 		//$scope.activePlayerId = $scope.game.firstPlayer;	
-
+		$scope.game.questsInPlay = new cardSet();
+		$scope.game.marketDeck = new cardSet();
+		$scope.activePlayer.cards =  new cardSet();
+		$scope.activePlayer.carts[0].cards =  new cardSet();
+		$scope.activePlayer.carts[1].cards =  new cardSet();
+		$scope.activePlayer.carts[2].cards =  new cardSet();
+		$scope.activePlayer.carts[3].cards =  new cardSet();		
+//	this.questsInPlay.origWidth=100;
+//	this.questsInPlay.origHeight=200;
+		
 
         for (var i = 0; i < data.hand.length; ++i) {   
 			dealNumberToPlayer($scope.game.players[$scope.activePlayerId], data.hand[i]);	
@@ -1396,6 +1421,10 @@ var processGameStateErrorCallback = function (returnVal) {
 		for (var i = 0; i < data.carts.length; ++i) {   
 			updatePlayerCarts($scope.game.players[$scope.activePlayerId], data.carts[i]);	
 		}
+		
+		//for (var i = 0; i < data.discardPile.length; ++i) {   
+//			updateDiscardPile($scope.game.discardDeck, data.discardPile[i]);	
+//		}
 
 	};
 
