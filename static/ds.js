@@ -303,7 +303,7 @@ $scope.playerCompleteQuest = function(id) {
 	
 					//removeSelectedCartCards(cart, true);
 					updateCounts();
-					checkItemsRemaining();
+					//checkItemsRemaining();
 					$scope.selectedCartItemsCount = 0;
 					//resetCartCardsSelected(player,-1);
 					player.questsCompleted.setCardSize("auto","100");
@@ -787,8 +787,8 @@ $scope.playerCartFish = function (id, actionCost) {
 
 		//player.actionsRemaining -= actionCost;
 		updateCounts();
-		checkItemsRemaining();
-		$scope.selectedCartItemsCount = 0;
+		//checkItemsRemaining();
+		//$scope.selectedCartItemsCount = 0;
 		resetCartCardsSelected(player,-1);
 		return;
 	}
@@ -818,7 +818,7 @@ $scope.playerFish = function (actionCost) {
 	//remove action
 	//player.actionsRemaining -= actionCost;
 	updateCounts();
-	checkItemsRemaining();
+	//checkItemsRemaining();
 }
 
 $scope.playerDiscardFromCart = function (id, actionCost) {
@@ -842,8 +842,8 @@ $scope.playerDiscardFromCart = function (id, actionCost) {
 		discard(selectedCards, 'cart'+id)
 		//player.actionsRemaining -= actionCost;
 		updateCounts();
-		checkItemsRemaining();
-		$scope.selectedCartItemsCount = 0;
+		//checkItemsRemaining();
+		//$scope.selectedCartItemsCount = 0;
 		resetCartCardsSelected(player,-1);
 		return;
 	}
@@ -895,7 +895,7 @@ $scope.playerDiscard = function (actionCost) {
 	var selectedCards = getSelectedCards(player.cards);
 	discard(selectedCards, 'hand')
 	updateCounts();
-	checkItemsRemaining();
+	//checkItemsRemaining();
 }
 
 $scope.playerBuyCart	= function(cartId, actionCost) {
@@ -990,7 +990,7 @@ $scope.playerBuyCart	= function(cartId, actionCost) {
 //			player.actionsRemaining -= actionCost;
 			resetAllSelectedCards(player);
 			updateCounts();
-			checkItemsRemaining();
+
 		}
 	
 $scope.playerBuyAction = function(actionCost) {
@@ -1038,7 +1038,7 @@ $scope.playerPass = function() {
 	//wipe out any potential market trades in progress
 	game.marketDeckInTrade = new cardSet();
 	updateCounts();
-	checkItemsRemaining();
+	//checkItemsRemaining();
 }
 
 $scope.playerMarketTrade = function(actionCost) {
@@ -1095,15 +1095,6 @@ $scope.playerMarketTrade = function(actionCost) {
 }
 	
 	
-
-checkItemsRemaining = function() {
-	if($scope.itemsCountRemaining===0) {
-		return false;
-	}
-	else
-	{return true;}
-}
-
 updatePlayerItemPoints = function() {
 	var player = $scope.activePlayer;
 	player.cardSumSelected = 0;
@@ -1737,5 +1728,15 @@ activateNextPlayer = function(){
 	game.players[$scope.activePlayerId].actionsRemaining = game.startingActions;
 	$scope.activePlayer.active = true;
 	updateCounts();
+}
+*/
+
+/*
+checkItemsRemaining = function() {
+	if($scope.itemsCountRemaining===0) {
+		return false;
+	}
+	else
+	{return true;}
 }
 */
