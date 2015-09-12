@@ -668,6 +668,24 @@ getSelectedCardcount = function(deck){
 
 }
 
+getPlayerCardSum = function(player, selectedCardsOnly) {
+	var total = 0;
+	for (var i = 0; i < player.cards.playingCards.length; ++i) {
+		if(selectedCardsOnly){
+			if(player.cards.playingCards[i].selected){
+				total += player.cards.playingCards[i].number;				
+			}
+		}
+		else {
+			total += player.cards.playingCards[i].number;
+		}
+
+	}
+	return total;
+}
+
+
+
 
 	
 $scope.newGame = function (p1Name, p2Name, p3Name, p4Name, numberOfPlayers) {
@@ -1077,15 +1095,13 @@ $scope.playerPass = function() {
 		return;
 	}
 	
-	player.cardSumSelected = 0;
+	
 
 	pass(selectedCards);
 
 	resetAllSelectedCards(player);
 	
-	$scope.selectedItemsCount = 0;
-	$scope.selectedMarketTradeCount = 0;
-	$scope.sumMarketValueSelected = 0;
+
 	
 	//wipe out any potential market trades in progress
 	game.marketDeckInTrade = new cardSet();
@@ -1230,22 +1246,6 @@ setMarketCounts = function() {
 
 }
 
-playerCardSum = function(player, selectedCardsOnly) {
-	var total = 0;
-	for (var i = 0; i < player.cards.playingCards.length; ++i) {
-		if(selectedCardsOnly){
-			if(player.cards.playingCards[i].selected){
-				total += player.cards.playingCards[i].number;				
-			}
-		}
-		else {
-			total += player.cards.playingCards[i].number;
-		}
-
-	}
-	return total;
-}
-
 
 
 
@@ -1362,8 +1362,8 @@ $scope.playerCompleteEvent = function(actionCost, id) {
 	var game = $scope.game;
 	var player = $scope.activePlayer;
 	var playerCardCount = player.cards.playingCards.length;
-	var playerCardsSum = playerCardSum(player, false);
-	var playerCardsSumSelected = playerCardSum(player, true);
+	var playerCardsSum = getPlayerCardSum(player, false);
+	var playerCardsSumSelected = getPlayerCardSum(player, true);
 	var questCardinplay = game.questsInPlay.playingCards[id];
 	var event = $scope.activeEvent;
 
@@ -1618,6 +1618,10 @@ resetCartCardsSelected =  function(player, id) {
 resetAllSelectedCards = function(player) {
 	resetPlayerCardsSelected(player);
 	resetCartCardsSelected(player,-1);
+	player.cardSumSelected = 0;
+	//$scope.selectedItemsCount = 0;
+	$scope.selectedMarketTradeCount = 0;
+	$scope.sumMarketValueSelected = 0;
 }
 
 var nextCartName = function(cartId) {
