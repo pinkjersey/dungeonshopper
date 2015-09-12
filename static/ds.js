@@ -172,6 +172,13 @@ $scope.endGame = function() {
 	$scope.displayMode = "gameover";
 }
 
+var nextCartName = function(cartId) {
+if(cartId === 1)
+	return 'Horse Wagon';
+
+if(cartId === 2)
+	return 'War Wagon';
+}
 
 $scope.userClickedMarketImage = function(i) {
 	var game = $scope.game;
@@ -323,27 +330,11 @@ $scope.playerCompleteQuest = function(id) {
 		//for each quest.sortorder set of three, is three points
 		//for each quest.sortorder 1,2,3,4,5 is three points
 		//cannot get both with same card.
-		calculatePlayerBonus(player);
+		//calculatePlayerBonus(player);
 
 	}
 
-calculatePlayerBonus = function(player){
-	var bonus = 0;
-	
-	//loop through player completed quests
-	//if sortOrder count = 3, they have a match set (sortOrder or name can be used for the 5 different wars you are collecting)
-	//mark as !selected
-	//then go through and mark selected as you try to find sets.
-	//add VP+=3 when set is found
-	//continue after finding a set of three with the same sortOrder/name
-	//when loop through all 5, then loop again for a set of 1,2,3,4,5 that were not previously selected
-	//add VP+=3
-	
-	
-	
-	player.bonus = bonus;
-}	
-	
+
 $scope.userClickedCartItem = function(id, i) {
 	var game = $scope.game;
 	var player = $scope.activePlayer;
@@ -1475,28 +1466,6 @@ resetAllSelectedCards = function(player) {
 
 }
 
-var nextCartName = function(cartId) {
-if(cartId === 1)
-	return 'Horse Wagon';
-
-if(cartId === 2)
-	return 'War Wagon';
-}
-
-activateNextPlayer = function(){
-	var game = $scope.game;
-//	if( $scope.activePlayer.id === game.numOpponents) {
-	$scope.activePlayerId=0;
-//		}
-//	else {
-//	$scope.activePlayerId++;
-//	}
-		
-	$scope.activePlayer = $scope.game.players[$scope.activePlayerId];
-	game.players[$scope.activePlayerId].actionsRemaining = game.startingActions;
-	$scope.activePlayer.active = true;
-	updateCounts();
-}
 
 
 var processGameStateCallback = function (data) {
@@ -1733,5 +1702,40 @@ wheelbarrowCardSum = function(player) {
 	}
 	$scope.wheelbarrowCardSum = total;
 	return total;
+}
+*/
+/*
+calculatePlayerBonus = function(player){
+	var bonus = 0;
+	
+	//loop through player completed quests
+	//if sortOrder count = 3, they have a match set (sortOrder or name can be used for the 5 different wars you are collecting)
+	//mark as !selected
+	//then go through and mark selected as you try to find sets.
+	//add VP+=3 when set is found
+	//continue after finding a set of three with the same sortOrder/name
+	//when loop through all 5, then loop again for a set of 1,2,3,4,5 that were not previously selected
+	//add VP+=3
+	
+	
+	
+	player.bonus = bonus;
+}	
+*/
+
+/*
+activateNextPlayer = function(){
+	var game = $scope.game;
+//	if( $scope.activePlayer.id === game.numOpponents) {
+	$scope.activePlayerId=0;
+//		}
+//	else {
+//	$scope.activePlayerId++;
+//	}
+		
+	$scope.activePlayer = $scope.game.players[$scope.activePlayerId];
+	game.players[$scope.activePlayerId].actionsRemaining = game.startingActions;
+	$scope.activePlayer.active = true;
+	updateCounts();
 }
 */
