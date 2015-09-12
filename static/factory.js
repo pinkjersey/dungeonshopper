@@ -25,7 +25,23 @@ angular.module('dsApp')
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
-               }
+               },
+               move: function (what, where, callback, errorcallback) {
+                   $http({
+                       method: 'GET',
+                       url: '/game?action=move&what=' + what + '&where=' + where,
+                       cache: false
+                   }).success(callback)
+                     .error(errorcallback);
+               },
+               completeQuest: function (items, questKey, callback, errorcallback) {
+                   $http({
+                       method: 'GET',
+                       url: '/game?action=completeQuest&witems=' + items + '&questKey=' + questKey,
+                       cache: false
+                   }).success(callback)
+                     .error(errorcallback);
+               },
                buyCart: function (cart, goldFlag, items, callback, errorcallback) {
                    $http({
                        method: 'GET',
@@ -33,15 +49,15 @@ angular.module('dsApp')
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
-               }
-               pass: function (callback, errorcallback) {
+               },
+               pass: function (discard, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=pass',
+                       url: '/game?action=pass&discard=' + discard,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
-               }
+               },
                marketTrade: function (handItems, marketItems, callback, errorcallback) {
                    $http({
                        method: 'GET',
@@ -49,7 +65,7 @@ angular.module('dsApp')
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
-               }
+               },
                buyAction: function (callback, errorcallback) {
                    $http({
                        method: 'GET',
@@ -57,7 +73,7 @@ angular.module('dsApp')
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
-               }
+               },
                fish: function (what, where, callback, errorcallback) {
                    $http({
                        method: 'GET',
