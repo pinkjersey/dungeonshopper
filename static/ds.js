@@ -369,8 +369,7 @@ $scope.userClickedItemImage = function(id) {
 	var card = player.cards.playingCards[id];
 	resetCartCardsSelected(player, -1);
 	card.selected = !card.selected;
-	card.borderColor = cardColor(card);
-	updatePlayerItemPoints();
+	card.borderColor = cardColor(card);	
 	player.cardSumSelected = getSelectedCardSum(player.cards, true);
 
 	if(card.selected) {
