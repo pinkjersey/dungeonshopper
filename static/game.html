@@ -50,7 +50,7 @@
 							</span>
 						<span>
 						<button ng-if="cart.active && cart.size - cart.cards.playingCards.length >= (discardDeck+selectedItemsCount) && cart.cardSumSelected === 0 && activePlayer.actionsRemaining > 0 && discardDeck + selectedItemsCount > 0" class="btn btn-info" ng-click="moveItemsToCart(cart.id, 1)" > Move to {{cart.name}}? </button>   
-						<button class="btn btn-warning" ng-click="playerCartDiscard($index,1)" ng-if="cart.cards.playingCards.length > 0 && activePlayer.actionsRemaining > 0 && cart.cardSumSelected > 0" >Discard </button>    
+						<button class="btn btn-warning" ng-click="playerDiscardFromCart($index,1)" ng-if="cart.cards.playingCards.length > 0 && activePlayer.actionsRemaining > 0 && cart.cardSumSelected > 0" >Discard </button>    
 						<button class="btn btn-warning" ng-click="playerCartFish($index,1)" ng-if="cart.cardSumSelected && cart.cards.playingCards.length > 0 && activePlayer.actionsRemaining > 0 && discardDeck === 1" >Fish </button>    
 					</span>	
 
