@@ -11,7 +11,7 @@
  			<p> Number of players?: <input type="text" ng-model="numberOfPlayers" /></p>
 			<br></br>
             <button ng-show="numberOfPlayers < 5" class="btn btn-primary" ng-click="newGame(p1Name, p2Name, p3Name, p4Name, numberOfPlayers)" ng-cloak>New Game</button>            
-					
+            <button ng-show="numberOfPlayers > 1" class="btn btn-primary" ng-click="newGame(p1Name, p2Name, p3Name, p4Name, numberOfPlayers)" ng-cloak>Join Game</button>            					
   <!--      </div> <!-- done row -->
  <!--   </div> <!-- done container -->
 </div>

@@ -50,10 +50,10 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               pass: function (callback, errorcallback) {
+               pass: function (discard, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=pass',
+                       url: '/game?action=pass&discard=' + discard,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
