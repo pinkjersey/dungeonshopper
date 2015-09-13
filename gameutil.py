@@ -21,6 +21,12 @@ def playerState(game, playerId):
     thedict["questsInPlay"] = questlist
     thedict["actionsRemaining"] = game.actionsRemaining
 
+    discardLen = len(game.discardPile)
+    if discardLen > 0:
+        thedict["lastDiscarded"] = game.discardPile[discardLen-1]
+    else:
+        thedict["lastDiscarded"] = None
+
     jsonstr = json.dumps(thedict)
     return jsonstr   
 
