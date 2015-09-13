@@ -195,13 +195,80 @@ def buyCart(game, cartidstr, withGold, items):
 
     return True
 
+def marketTrade(game, handItems, marketItems):
+    if game.actionsRemaining == 0:
+        # no actions remaining
+        logging.error("No actions remaining")  
+        return False
+
+    whath = whatToArray(handItems)
+    whatm = whatToArray(marketItems)
+    if (len(whath) > 1 and len(whatm) > 1):
+        logging.error("Multi to multi trade not allowed")
+        return False
+
+    if (len(whath) == 0 or len(whatm) == 0):
+        logging.error("Item sizes must be greater than zero")
+        return False
+
+    if (sum(whath) != sum(whatm)):
+        logging.error("Sum mismatch")
+        return False
+
+    addToHand = []
+    addToMarket = []
+
+    player = game.players[game.curPlayer]
+
+    for whati in whath:
+        found = False
+        hlen = len(player.hand)
+        for i in range(hlen):
+            h = player.hand[i]
+            if h == whati:
+                found = True
+                addToMarket.append(player.hand[i])
+                del player.hand[i]
+                break
+
+        if found == False:
+            logging.error("Missing item in hand")
+            return False
+
+    for whati in whatm:
+        found = False
+        mlen = len(game.market)
+        for i in range(mlen):
+            m = game.market[i]
+            if m == whati:
+                found = True
+                addToHand.append(game.market[i])
+                del game.market[i]
+                break
+
+        if found == False:
+            logging.error("Missing item in market")
+            return False
+
+    game.market.extend(addToMarket)
+    game.market.sort()
+    player.hand.extend(addToHand)
+    player.hand.sort()
+    
+    game.actionsRemaining = game.actionsRemaining -1
+    game.put()
+
+    return True                
+
 def discard(game, what, where):
     if game.actionsRemaining == 0:
         # no actions remaining
+        logging.error("No actions remaining")  
         return False
 
     whats = whatToArray(what)
     if (len(whats) == 0):
+        logging.error("Blank what array")  
         return False
 
     allFound = True
@@ -209,6 +276,7 @@ def discard(game, what, where):
         try:
             found = discardItem(game, whati, where)
             if (found == False):
+                logging.error("Couldn't discard {0}".format(whati))
                 allFound = False
                 break
 
@@ -216,6 +284,7 @@ def discard(game, what, where):
             return False
 
     if (allFound == False):
+        logging.error("Couldn't discard one or more cards")  
         # couldn't find 'what'
         return False
     
