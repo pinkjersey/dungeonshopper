@@ -26,10 +26,10 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               move: function (what, where, callback, errorcallback) {
+               cartCards: function (what, where, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=move&what=' + what + '&where=' + where,
+                       url: '/game?action=cartCards&what=' + what + '&where=' + where,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
@@ -45,7 +45,7 @@ angular.module('dsApp')
                buyCart: function (cart, goldFlag, items, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=buyCart&cart=' + cart + '&gold=' + goldFlag + '&items=' + items,
+                       url: '/game?action=buyCart&withGold=' + goldFlag + '&items=' + items + '&cart=' + cart,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
@@ -53,7 +53,7 @@ angular.module('dsApp')
                pass: function (discard, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=pass&discard=' + discard,
+                       url: '/game?action=pass&items=' + discard,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
