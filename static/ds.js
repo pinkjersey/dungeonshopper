@@ -788,8 +788,8 @@ $scope.playerCartFish = function (id, actionCost) {
 	var cart = player.carts[id];
 	
 	//if you have actions, discard selected cards	
-	var  selectedCount = 0;
-	var  cardCount = 0;
+	//var  selectedCount = 0;
+	//var  cardCount = 0;
 
 	if(player.actionsRemaining === 0 && actionCost ===1)	{
 		alert("You have no actions.")
@@ -1403,10 +1403,47 @@ var processGameStateErrorCallback = function (returnVal) {
 };
 
  function getObjectResults(data) {
-       // var data = new Object();
+//class player(ndb.Model):
+//		hand = ndb.IntegerProperty(repeated=True)
+//		carts = ndb.LocalStructuredProperty(Cart, repeated=True)
+//		gold = ndb.IntegerProperty(required=True, default=0)
+//		points = ndb.IntegerProperty(required=True, default=0)
+//		maxHand = ndb.IntegerProperty(required=True, default=5)
+//		turns = ndb.IntegerProperty(required=True, default=0)
+
+//class QuestCard(ndb.Model):
+//    level = ndb.IntegerProperty(required=True)
+//    coin = ndb.BooleanProperty(required=True, default=True)
+//    items = ndb.IntegerProperty(repeated=True)
+//    vp = ndb.IntegerProperty(required=True)
+//    type = ndb.IntegerProperty(required=True)
+
+//class Cart(ndb.Model):
+//    purchased = ndb.BooleanProperty(required=True, default=False)
+//    inCart = ndb.IntegerProperty(repeated=True)
+//    cartSize = ndb.IntegerProperty(required=True)
+//    goldCost = ndb.IntegerProperty(required=True)
+//    cardCost = ndb.IntegerProperty(required=True)
+//    destroyed = ndb.BooleanProperty(required=True, default=False)
+
+//class Game(ndb.Model):
+//    curPlayer = ndb.IntegerProperty(default=0)
+//    actionsRemaining = ndb.IntegerProperty(default=2)        
+//    numPlayers = ndb.IntegerProperty(required=True)
+//    players = ndb.LocalStructuredProperty(Player, repeated=True)
+//    itemDeck = ndb.IntegerProperty(repeated=True)
+//    discardPile = ndb.IntegerProperty(repeated=True)
+//    questDeck = ndb.LocalStructuredProperty(QuestCard, repeated=True)
+//    market = ndb.IntegerProperty(repeated=True)
+//    questsInPlay = ndb.LocalStructuredProperty(QuestCard, repeated=True)
+		
 		$scope.isActive = data.isActive;
 		$scope.activePlayer.active = data.isActive;
 		$scope.activePlayer.actionsRemaining = data.actionsRemaining;
+		$scope.activePlayer.gold = data.gold;
+		$scope.activePlayer.turns = data.turns;
+		$scope.activePlayer.vp = data.points;
+		$scope.activePlayer.maxHand = data.maxHand;
 		$scope.itemsCountRemaining = data.itemsCountRemaining;
 		$scope.questsCountRemaining = data.questsCountRemaining;
 		//$scope.activePlayerId = $scope.game.firstPlayer;	
@@ -1438,11 +1475,11 @@ var processGameStateErrorCallback = function (returnVal) {
 			updatePlayerCarts($scope.game.players[$scope.activePlayerId].carts[i], data.carts[i]);	
 		}
 		
-		//for (var i = 0; i < data.discardPile.length; ++i) {   
+//		for (var i = 0; i < data.discardPile.length; ++i) {   
 //			updateDiscardPile($scope.game.discardDeck, data.discardPile[i]);	
 //		}
 
-	};
+}
 
 
 function loadData(numPlayers) {
@@ -1476,7 +1513,11 @@ function buyAction() {
 function marketTrade(handItems, marketItems) {
      gameFactory.marketTrade(handItems, marketItems, processGameStateCallback, processGameStateErrorCallback);
 }
-	
+
+function completeQuest(handItems, questKey) {
+     gameFactory.marketTrade(handItems, questKey, processGameStateCallback, processGameStateErrorCallback);
+}
+
 }]).directive('quest', function () {
 	return {
 		restrict: 'E',
@@ -1517,14 +1558,6 @@ function marketTrade(handItems, marketItems) {
         },
         templateUrl: 'questcard.html?2'
     };
-}).directive('marketcardcount', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            card: '=info'
-        },
-        templateUrl: 'marketcardcount.html?2'
-    };
 }).directive('marketcard', function () {
     return {
         restrict: 'E',
@@ -1544,6 +1577,17 @@ function marketTrade(handItems, marketItems) {
 });
 
 
+/*
+.directive('marketcardcount', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            card: '=info'
+        },
+        templateUrl: 'marketcardcount.html?2'
+    };
+})
+*/
 
 /*
 resetItemDeckAndMarket = function() {

@@ -37,7 +37,7 @@ angular.module('dsApp')
                completeQuest: function (items, questKey, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=completeQuest&witems=' + items + '&questKey=' + questKey,
+                       url: '/game?action=completeQuest&items=' + items + '&questKey=' + questKey,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);

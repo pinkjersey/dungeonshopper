@@ -106,8 +106,9 @@
 				<table class="table table-condensed">
 					<thead>
 					<tr>
-						<span ng-repeat="cardcount in game.itemHolders.playingCards track by $index">
-							<marketcardcount info="cardcount"></marketcardcount>
+						<span ng-repeat="card in game.itemHolders.playingCards track by $index">
+							<span ng-show = "card.count > 0" ><big>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{card.count}}&nbsp;&nbsp;&nbsp;&nbsp;</big></span>
+							<!--<marketcardcount info="card"></marketcardcount>-->
 						</span>
 					</tr>
 					<td>
