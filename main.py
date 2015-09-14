@@ -236,6 +236,20 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr) 
 
+    def completeQuest(self):
+        """
+        USAGE: /game?action=completeQuest&hand=<itemList>cart=<itemList>useCart=<cartID>
+        Completes a quest that matches the cards in hand and cart. The cart list can be empty. If the cart list is
+        provided than useCart is required.
+
+        To complete the quest, three things are required
+        1) The player must have the required cards
+        2) The quest must exists
+        3) A conduit cart must be available
+        x
+        """
+        pass
+
     def passPlayer(self):
         """
         USAGE: /game?action=passPlayer&items=<items to discard>
@@ -307,6 +321,9 @@ class GameHandler(webapp2.RequestHandler):
 
         if action == "marketTrade":
             return self.marketTrade()
+
+        if action == "completeQuest":
+            return self.completeQuest()
 
         logging.error("Invalid action")
         self.error(500)
