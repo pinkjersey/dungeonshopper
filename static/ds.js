@@ -692,6 +692,7 @@ $scope.newGame = function (numberOfPlayers) {
 		//gui control of the quests
 		$scope.questSelected=false;
 		$scope.isActive = false;
+		$scope.selectedCartItems = "";
 		
 		$scope.game = new Game(numberOfPlayers-1);
 		$scope.activePlayerId = $scope.game.firstPlayer;
@@ -731,9 +732,15 @@ $scope.moveItemsToCart = function(id, actionCost) {
 		return;
 	}	
 	
+	//fixme
+	//get this variable filled from previously clicked cart
+	//hardcoded to zero for test
+	$scope.selectedCartItems = getSelectedCards(player.carts[0]);
+	
 	//if cart cards are selected, move between carts else its player items to cart
-	if(selectedCartCount > 0) {
-		moveItemsBetweenCarts(id, selectedCartCount, actionCost);
+	//these are in the scope variable as the new cart they select is selectedCartCount
+	if($scope.selectedCartItemsCount > 0) {
+		moveItemsBetweenCarts(id, $scope.selectedCartItems, actionCost);
 		return;
 	}
 
@@ -742,11 +749,12 @@ $scope.moveItemsToCart = function(id, actionCost) {
 			return;
 	}
 	
-	if(selectedCardCount > cart.size - cart.cards.playingCards.length){
+	if($scope.selectedCartItemsCount > cart.size - cart.cards.playingCards.length){
 		alert('Cannot move that many items into the cart.');
 		return;
 	}
 	
+	//when moved from player to cart
 	move(selectedCards, 'cart'+id)
 		
 	cart.cards.setCardSize("38","55");
@@ -754,7 +762,7 @@ $scope.moveItemsToCart = function(id, actionCost) {
 	updateCounts();
 }
 
-moveItemsBetweenCarts = function(id, selectedCartCount, actionCost) {
+moveItemsBetweenCarts = function(id, selectedCartItems, actionCost) {
 	var game = $scope.game;
 	var player = $scope.activePlayer;
 	var cart = player.carts[id];
@@ -763,18 +771,18 @@ moveItemsBetweenCarts = function(id, selectedCartCount, actionCost) {
 		return;
 	}	
 	
-	if(selectedCartCount === 0){
+	if($scope.selectedCartItemsCount === 0){
 		alert('Select items to move between cart.');
 		return;
 	}	
 	
-	if(selectedCartCount > cart.size - cart.cards.playingCards.length){
+	if($scope.selectedCartItemsCount > cart.size - cart.cards.playingCards.length){
 		alert('Cannot move that many items into the cart.');
 		return;
 	}
 	
 	//move cart items to cart
-	move(selectedCartCards, 'cart'+id)
+	move($scope.selectedCardItems, 'cart'+id)
 	
 	resetAllSelectedCards(player);
 	updateCounts();
