@@ -34,10 +34,10 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               completeQuest: function (items, cart, callback, errorcallback) {
+               completeQuest: function (what, where, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=completeQuest&items=' + items + '&cart=' + cart,
+                       url: '/game?action=completeQuest&waht=' + what + '&where=' + where,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);

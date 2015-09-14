@@ -272,8 +272,6 @@ $scope.playerCompleteQuest = function(id) {
 			sortPlayerCartCards(cart);
 		}
 
-		//getSelectedCards
-		
 		var items =  new Array(questClicked.item1, questClicked.item2, questClicked.item3, questClicked.item4, questClicked.item5);
 		for(var j = 0; j < items.length; ++j) {
 			if(items[j]===0) {
@@ -302,6 +300,7 @@ $scope.playerCompleteQuest = function(id) {
 			}
 		}
 
+		var selectedCards = getSelectedCards(cart.cards);
 
 		//fix me back after testing
 		if($scope.debug) {
@@ -320,7 +319,7 @@ $scope.playerCompleteQuest = function(id) {
 					//removeSelectedCartCards(cart, true);
 					//checkItemsRemaining();
 //					$scope.selectedCartItemsCount = 0;
-					completeQuest(, cart.id);
+					completeQuest(selectedCards, 'cart' + cart.id);
 					//resetCartCardsSelected(player,-1);
 //					player.questsCompleted.setCardSize("auto","100");
 //					player.questsCompleted.playingCards.shift();
@@ -1518,8 +1517,8 @@ function marketTrade(handItems, marketItems) {
      gameFactory.marketTrade(handItems, marketItems, processGameStateCallback, processGameStateErrorCallback);
 }
 
-function completeQuest(handItems, cart) {
-     gameFactory.completeQuest(handItems, cart, processGameStateCallback, processGameStateErrorCallback);
+function completeQuest(cartItems, cart) {
+     gameFactory.completeQuest(cartItems, cart, processGameStateCallback, processGameStateErrorCallback);
 }
 
 }]).directive('quest', function () {
