@@ -69,8 +69,8 @@ var Game = function(numOpponents) {
 
 	//populated cardrs, itemHolders and quests
 	//this.cards.create75Cards();
-//	var questImageBase = "../images/shopping_card_master";
-	var questImageBase = "../images/shopping_card_masterxxx";
+	var questImageBase = "../images/shopping_card_master";
+//	var questImageBase = "../images/shopping_card_masterxxx";
 //	var blankMarketImageBase = "../images/"
 	var blankMarketImageBase = "../images/xxx"
 	this.itemHolders.createBlankMarket(blankMarketImageBase);
@@ -87,6 +87,12 @@ var Game = function(numOpponents) {
 	this.questsInPlay.origHeight=200;
 
 }
+
+var PlayersLog = function (id, text) {
+	this.id = id
+	this.text = text
+}
+
 
 var Player = function (id, name) {
 //	var imageBase = "../images/shoppercarts_v3_";
@@ -114,6 +120,7 @@ var Player = function (id, name) {
 }
 
 
+	
 app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory) {
 	
 	
@@ -647,44 +654,65 @@ getSelectedCardSum = function(deck, selectedCardsOnly){
 	
 $scope.newGame = function (numberOfPlayers) {
 		
-		$scope.activeEvent = null;
-		$scope.numberOfPlayers = Number(numberOfPlayers);
-		$scope.activeEvent=null;
-		$scope.playersCompletedEventCount = 0;
-		//$scope.itemCardBack = "../images/shoppingCardBack.jpg"
-		//$scope.vendorCardBack = "../images/vendorback.jpg"
-		$scope.itemCardBack = "../images/shoppingCardBack.jpgxxx"
-		$scope.vendorCardBack = "../images/vendorback.jpgxxx"
-		$scope.eventActionsRemaining=0;
-		$scope.debug = true;
-		//gui variable to control item buttons
-		$scope.selectedItemsCount = 0;
-		//gui variable to control cart buttons
-		$scope.selectedCartItemsCount = 0;
-		//gui variable to control market buttons
-		$scope.sumMarketValueSelected = 0;
-		//gui control of the market cards selected
-		$scope.selectedMarketTradeCount = 0;
-		//used in gui to show items left in deck
-		$scope.itemsCountRemaining = 0;
-		//used in gui to show quests left in deck
-		$scope.questsCountRemaining = 0;
-		//used in gui to show discard count
-		$scope.discardsCount = 0;
-		$scope.activePlayer = null;
-		//used to show the last card discarded in the gui
-		$scope.lastDiscard = new playingCard();
-		//gui control of the quests
-		$scope.questSelected=false;
-		$scope.isActive = false;
-		$scope.selectedCartItems = "";
-
-		//gui variable to control cart buttons
-		$scope.prevActiveCartId = -1;
-		$scope.activeCartId = -1;
+	$scope.activeEvent = null;
+	$scope.numberOfPlayers = Number(numberOfPlayers);
+	$scope.activeEvent=null;
+	$scope.playersCompletedEventCount = 0;
+	//$scope.itemCardBack = "../images/shoppingCardBack.jpg"
+	//$scope.vendorCardBack = "../images/vendorback.jpg"
+	$scope.itemCardBack = "../images/shoppingCardBack.jpgxxx"
+	$scope.vendorCardBack = "../images/vendorback.jpgxxx"
+	$scope.eventActionsRemaining=0;
+	$scope.debug = true;
+	//gui variable to control item buttons
+	$scope.selectedItemsCount = 0;
+	//gui variable to control cart buttons
+	$scope.selectedCartItemsCount = 0;
+	//gui variable to control market buttons
+	$scope.sumMarketValueSelected = 0;
+	//gui control of the market cards selected
+	$scope.selectedMarketTradeCount = 0;
+	//used in gui to show items left in deck
+	$scope.itemsCountRemaining = 0;
+	//used in gui to show quests left in deck
+	$scope.questsCountRemaining = 0;
+	//used in gui to show discard count
+	$scope.discardsCount = 0;
+	$scope.activePlayer = null;
+	//used to show the last card discarded in the gui
+	$scope.lastDiscard = new playingCard();
+	//gui control of the quests
+	$scope.questSelected=false;
+	$scope.isActive = false;
+	$scope.selectedCartItems = "";
+	$scope.playerslog = [];
+	$scope.showLog = false;
+	$scope.showLogText = "Show Players Log";
+	
+	
+	for(var i=0; i<100;++i) {
+		text = 'This is a log test ' + i;
+		$scope.playerslog.push(new PlayersLog(i, text));
+	}
+	
+	//gui variable to control cart buttons
+	$scope.prevActiveCartId = -1;
+	$scope.activeCartId = -1;
+	
+	$scope.showLogResults = function() {
+		if(!$scope.showLog) {
+			$scope.showLogText = "Hide Players Log";
+		}else {
+			$scope.showLogText = "Show Players Log";
+		}
 		
-		$scope.game = new Game(numberOfPlayers-1);
-		$scope.activePlayerId = $scope.game.firstPlayer;
+		$scope.showLog = !$scope.showLog;
+		
+	}
+
+
+	$scope.game = new Game(numberOfPlayers-1);
+	$scope.activePlayerId = $scope.game.firstPlayer;
 
 		//create players
         for (var i = 0; i < numberOfPlayers; ++i) {   
