@@ -26,18 +26,18 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               cartCards: function (what, where, callback, errorcallback) {
+               move: function (what, src, dst, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=cartCards&what=' + what + '&where=' + where,
+                       url: '/game?action=move&what=' + what + '&src=' + src + '&dst=' + dst,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
                },
-               completeQuest: function (items, questKey, callback, errorcallback) {
+               completeQuest: function (what, where, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=completeQuest&items=' + items + '&questKey=' + questKey,
+                       url: '/game?action=completeQuest&what=' + what + '&where=' + where,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);

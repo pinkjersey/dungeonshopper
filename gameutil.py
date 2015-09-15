@@ -38,6 +38,7 @@ def whatToArray(what):
             ci = 10;
         ret.append(ci)
 
+    ret.sort()
     return ret
 
 def getCartId(where):
@@ -83,7 +84,40 @@ def discardItem(game, whati, where):
 
     return found
 
-def cartCards(game, what, where):
+def removeItems(game, what, where):
+    """Utility function that removes items from a location"""
+    whats = whatToArray(what)
+    whatlen = len(whats)
+    if (whatlen == 0):
+        logging.error("removeItems: empty what array given")
+        raise ValueError("removeItems: empty what array given")
+    
+    player = game.players[game.curPlayer]
+
+    if (where == "hand"):
+        srclist = player.hand
+    else:
+        cartId = getCartId(where)
+        cart = player.carts[cartId]
+        srclist = cart.inCart
+
+    for whati in whats:
+        found = False
+        srclen = len(srclist)
+        for i in range(srclen):
+            srci = srclist[i]
+            if (whati == srci):
+                found = True
+                del srclist[i]
+                break
+
+        if (found == False):
+            raise ValueError("Failed to locate {0} in src list".format(whati))
+
+    return
+            
+
+def move(game, what, src, dst):
     """Moves cards from hand to cart"""
     if game.actionsRemaining == 0:
         # no actions remaining
@@ -98,20 +132,12 @@ def cartCards(game, what, where):
 
     player = game.players[game.curPlayer]
 
-    try:
-        # discard items from hand
-        allFound = True
-        for whati in whats:        
-            found = discardItem(game, whati, "hand")
-            if (found == False):
-                logging.error("Couldn't find all whats {0}".format(whati))        
-                return False                
+    try:        
+        # discard items from src
+        removeItems(game, what, src)             
 
-        # find cart id
-        cartid = getCartId(where)
-        if (cartid <0 or cartid > 3):
-            logging.error("Invalid cart id")        
-            return False
+        # get cart id
+        cartid = getCartId(dst)
 
         # find cart
         cart = player.carts[cartid]
@@ -130,6 +156,8 @@ def cartCards(game, what, where):
         # add items to cart
         for whati in whats:
             cart.inCart.append(whati)
+
+        cart.inCart.sort()
 
     except ValueError as e:
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror))        
@@ -287,6 +315,76 @@ def discard(game, what, where):
         logging.error("Couldn't discard one or more cards")  
         # couldn't find 'what'
         return False
+    
+    game.actionsRemaining = game.actionsRemaining -1
+    game.put()
+
+    return True
+
+def getIntersection(list1, list2):
+    tmp1 = list(list1)
+    tmp2 = list(list2)
+    ret = []
+    while (len(tmp1) > 0 and len(tmp2) > 0):
+        for i in range(len(tmp1)):
+            item1 = tmp1[i]
+            found = False
+            for j in range(len(tmp2)):
+                item2 = tmp2[j]
+                if (item1 == item2):
+                    found = True
+                    del tmp1[i]
+                    del tmp2[j]
+                    ret.append(item1)
+                    break
+            
+            if (found == True):
+                break
+
+    ret.sort()
+    return ret
+
+def completeQuest(game, what, where):
+    # completing quests require no actions
+    whats = whatToArray(what)
+    whatlen = len(whats)
+    if (whatlen == 0):
+        logging.error("Blank what array")  
+        return False
+
+    player = game.players[game.curPlayer]
+    try:
+        # find cart and make sure the cards exist in it
+        # delete them if exists
+        removeItems(game, what, where)
+
+        # match quest
+        questFound = False
+        numQuests = len(game.questsInPlay)
+        for i in range(numQuests):
+            q = game.questsInPlay[i]
+            inter = getIntersection(whats, q.items)
+
+            if (inter == whats):
+                questFound = True
+                player.questsCompleted.append(q)
+                if (q.coin):
+                    player.gold += 1
+
+                player.points += q.vp
+
+                del game.questsInPlay[i]
+                dealQuest(game)
+                break
+
+        if (questFound == False):
+            logging.error("Couldn't match quest")  
+            # couldn't find 'what'
+            return False
+
+    except ValueError as e:
+        logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
+        return False    
     
     game.actionsRemaining = game.actionsRemaining -1
     game.put()

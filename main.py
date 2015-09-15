@@ -113,29 +113,34 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
-    def cartCards(self):
+    def move(self):
         """
-        USAGE: /game?action=cartCards&what=<item list>&where=<cart0,cart1,etc>
-        example: /game?action=cartCards&what=23&where=cart0
-        Moves cards from hand to cart. Cart must be purchased and there must be enough space. Otherwise an error
-        is returned
+        USAGE: /game?action=cartCards&what=<item list>&src=<hand,cart0,cart1,etc>&dst=<cart0,cart1,etc>
+        example: /game?action=cartCards&what=23&src=hand&dst=cart0
+        Moves cards from hand to cart or cart to cart. Destination cart must be purchased and 
+        there must be enough space. Otherwise an error is returned
         returns error 500 when there is an error
         """
-        logging.error("Cart cards")        
+        logging.error("move")        
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
-        where = self.request.get('where')
-        if (where == None or where == ""):
+        src = self.request.get('src')
+        if (src == None or src == ""):
+            self.error(500)
+            return
+
+        dst = self.request.get('dst')
+        if (dst == None or dst == ""):
             self.error(500)
             return
 
         what = self.request.get('what')
-        if (where == None or where == ""):
+        if (what == None or what == ""):
             self.error(500)
             return
 
-        result = cartCards(game, what, where)
+        result = move(game, what, src, dst)
         if (result == False):
             self.error(500)
             return
@@ -238,17 +243,31 @@ class GameHandler(webapp2.RequestHandler):
 
     def completeQuest(self):
         """
-        USAGE: /game?action=completeQuest&hand=<itemList>cart=<itemList>useCart=<cartID>
-        Completes a quest that matches the cards in hand and cart. The cart list can be empty. If the cart list is
-        provided than useCart is required.
-
-        To complete the quest, three things are required
-        1) The player must have the required cards
-        2) The quest must exists
-        3) A conduit cart must be available
-        x
+        USAGE: /game?action=completeQuest&what=<itemList>where=<cartID>
+        Uses the items in the cart to complete a quest. If a quest with the cards in the cart doesn't exist, it returns an error
         """
-        pass
+        game_k = ndb.Key('Game', 'theGame')
+        game = game_k.get()
+
+        where = self.request.get('where')
+        if (where == None or where == ""):
+            self.error(500)
+            return
+
+        what = self.request.get('what')
+        if (what == None or what == ""):
+            self.error(500)
+            return
+
+        result = completeQuest(game, what, where)
+        if (result == False):
+            self.error(500)
+            return
+
+        retstr = playerState(game, game.curPlayer)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(retstr) 
 
     def passPlayer(self):
         """
@@ -307,8 +326,8 @@ class GameHandler(webapp2.RequestHandler):
         if action == "discard":
             return self.discard()
 
-        if action == "cartCards":
-            return self.cartCards()
+        if action == "move":
+            return self.move()
 
         if action == "buyCart":
             return self.buyCart()

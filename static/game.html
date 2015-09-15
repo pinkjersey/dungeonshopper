@@ -60,6 +60,8 @@
 <p>Cart Sum Selected: {{cart.cardSumSelected}}</p>
 <p>Card Sum Selected: {{activePlayer.cardSumSelected}}</p>
 <p>Sum Market Value Selected: {{sumMarketValueSelected}}</p>
+<p>Active Cart: {{activeCartId}}</p>
+<p>Previous Active Cart: {{prevActiveCartId}}</p>
 </div>
 
 						
@@ -78,6 +80,31 @@
 			<button class="btn btn-warning" ng-click="playerFish(1)" ng-if="activePlayer.actionsRemaining > 0 && selectedItemsCount === 1"> Fish</button>    
 			<button class="btn btn-warning" ng-click="playerDiscard(1)" ng-if="activePlayer.actionsRemaining > 0 && selectedItemsCount > 0" >Discard</button>    
 			<button class="btn btn-warning" ng-if="activePlayer.actionsRemaining > 0 && activePlayer.cardSumSelected === sumMarketValueSelected && activePlayer.cardSumSelected < 11 && activePlayer.cardSumSelected > 0" ng-click="playerMarketTrade(1)" >Trade {{activePlayer.cardSumSelected}} item points?</button>    														
+			<div>
+				<span class="panel-title pull-right"><button class="btn btn-primary" ng-show="true" ng-click="showLogResults()">{{showLogText}}</button></span>
+			</div>
+			<br></br>
+			<div ng-show="showLog" class="panel-title pull-right">
+				 <table table-height="200px" class="table table-bordered" fixed-header>
+					<thead>
+						<tr>
+							
+							<td width="550px">Log Results</td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="log in playerslog track by $index">
+							<td width="50px">{{activePlayer.name}}</td>
+							<td width="500px">{{log.text}}</td>
+						</tr>
+					</tbody>
+<!--					<tfoot>	<tr><td width="50px">End Log</td><td width="500px"></td></tr></tfoot>	-->
+				</table>
+			</div>
+			
+
+			
+			
 <div ng-show="debug">			
 <p>Card Sum Selected: {{activePlayer.cardSumSelected}}</p>
 <p>Sum Market Value Selected: {{sumMarketValueSelected}}</p>
