@@ -328,6 +328,7 @@ def getIntersection(list1, list2):
     while (len(tmp1) > 0 and len(tmp2) > 0):
         for i in range(len(tmp1)):
             item1 = tmp1[i]
+            found = False
             for j in range(len(tmp2)):
                 item2 = tmp2[j]
                 if (item1 == item2):
