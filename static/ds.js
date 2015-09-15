@@ -1198,7 +1198,7 @@ prepareEventForPlayer = function(questCardinplay) {
 					var cardsToMoveBackToHand = getSelectedCards(cart.cards,false);
 					//fix event
 					//cartDestroyed('cart0');
-					move(cardsToMoveBackToHand, 'cart0', hand');
+					move(cardsToMoveBackToHand, 'cart0', 'hand');
 //					for (var i = 0; i < cart.cards.playingCards.length; ++i)  {
 //						var card = cart.cards.playingCards[i];
 //							//discard selected card(s)
