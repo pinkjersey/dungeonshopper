@@ -43,6 +43,8 @@ def whatToArray(what):
 def getCartId(where):
     if ("cart" in where):
         cartid = int(where[4:])
+        if (cartid < 0 or cartid > 3):
+            raise ValueError("Invalid cart id")
         return cartid
     else:
         raise ValueError("where isn't a cartid")
@@ -83,7 +85,7 @@ def discardItem(game, whati, where):
 
     return found
 
-def cartCards(game, what, where):
+def cartCards(game, what, src, dst):
     """Moves cards from hand to cart"""
     if game.actionsRemaining == 0:
         # no actions remaining
@@ -92,44 +94,55 @@ def cartCards(game, what, where):
 
     # convert input to array
     whats = whatToArray(what)
-    if (len(whats) == 0):
+    whatlen = len(whats)
+    if (whatlen == 0):
         logging.error("Empty whats")        
         return False
 
     player = game.players[game.curPlayer]
 
     try:
-        # discard items from hand
+        # discard items from src
+        if src == "hand":
+            srclist = player.hand
+        else:
+            srcCartId = getCartId(src)            
+            srclist = player.carts[srcCartId].inCart
+
+        dstCartId = getCartId(dst)
+        dstcart = player.carts[dstCartId]
+        dstlist = dstcart.inCart
+
+        # discart items from src list
         allFound = True
-        for whati in whats:        
-            found = discardItem(game, whati, "hand")
+        for whati in whats:
+            found = False
+            handlen = len(srclist)
+            for i in range(handlen):
+                handi = srclist[i]
+                if handi == whati:
+                    found = True
+                    del srclist[i]
+                    break
+
             if (found == False):
                 logging.error("Couldn't find all whats {0}".format(whati))        
                 return False                
 
-        # find cart id
-        cartid = getCartId(where)
-        if (cartid <0 or cartid > 3):
-            logging.error("Invalid cart id")        
-            return False
-
-        # find cart
-        cart = player.carts[cartid]
-
         # cart needs to be purchased
-        if (cart.purchased == False):
+        if (dstcart.purchased == False):
             logging.error("Cart not purchased")        
             return False
 
         # has enough space
-        spaceRemaining = cart.cartSize - len(cart.inCart)
-        if (spaceRemaining < len(whats)):
+        spaceRemaining = dstcart.cartSize - len(dstcart.inCart)
+        if (spaceRemaining < whatlen):
             logging.error("Not enough space in cart")        
             return False
 
         # add items to cart
         for whati in whats:
-            cart.inCart.append(whati)
+            dstlist.append(whati)
 
     except ValueError as e:
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror))        

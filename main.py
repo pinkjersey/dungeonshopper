@@ -115,27 +115,32 @@ class GameHandler(webapp2.RequestHandler):
 
     def cartCards(self):
         """
-        USAGE: /game?action=cartCards&what=<item list>&where=<cart0,cart1,etc>
-        example: /game?action=cartCards&what=23&where=cart0
-        Moves cards from hand to cart. Cart must be purchased and there must be enough space. Otherwise an error
-        is returned
+        USAGE: /game?action=cartCards&what=<item list>&src=<hand,cart0,cart1,etc>&dst=<cart0,cart1,etc>
+        example: /game?action=cartCards&what=23&src=hand&dst=cart0
+        Moves cards from hand to cart or cart to car. Destination cart must be purchased and
+        there must be enough space. Otherwise an error is returned
         returns error 500 when there is an error
         """
         logging.error("Cart cards")        
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
-        where = self.request.get('where')
-        if (where == None or where == ""):
+        src = self.request.get('src')
+        if (src == None or src == ""):
             self.error(500)
             return
+
+        dst = self.request.get('dst')
+        if (dst == None or dst == ""):
+            self.error(500)
+            return        
 
         what = self.request.get('what')
-        if (where == None or where == ""):
+        if (what == None or what == ""):
             self.error(500)
             return
 
-        result = cartCards(game, what, where)
+        result = cartCards(game, what, src, dst)
         if (result == False):
             self.error(500)
             return
