@@ -26,10 +26,10 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               cartCards: function (what, src, dst, callback, errorcallback) {
+               move: function (what, src, dst, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=cartCards&what=' + what + '&src=' + src + '&dst=' + dst,
+                       url: '/game?action=move&what=' + what + '&src=' + src + '&dst=' + dst,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
