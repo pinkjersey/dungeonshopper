@@ -255,7 +255,7 @@ class GameHandler(webapp2.RequestHandler):
             return
 
         what = self.request.get('what')
-        if (where == None or where == ""):
+        if (what == None or what == ""):
             self.error(500)
             return
 

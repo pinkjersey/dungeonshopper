@@ -279,11 +279,14 @@ $scope.playerCompleteQuest = function(id) {
 		var cart = player.carts[$scope.activeCartId];
 
 		//if(!$scope.debug) {
-		if($scope.selectedCartItemsCount < 3 || $scope.selectedCartItemsCount != cart.size)	{
+		if($scope.selectedCartItemsCount < 3 || cart.cards.playingCards.length != $scope.selectedCartItemsCount) {
 			alert("Select all items in cart/wagon first.")
 			return;
 			}
 		//}
+
+		
+		
 
 		var selectedCards = getSelectedCards(cart.cards);
 		
