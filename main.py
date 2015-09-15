@@ -54,6 +54,12 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(retstr)
 
     def fish(self):
+        """
+        USAGE: /game?action=fish&what=<singlecard>&where=<hand,cart0,cart1,etc>
+        example: /game?action=fish&what=2&where=cart1
+        checks to make sure 2 is in cart1 before doing the action
+        returns error 500 when there is an error
+        """
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
@@ -78,6 +84,12 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(retstr)
 
     def discard(self):
+        """
+        USAGE: /game?action=discard&what=<item list>&where=<hand,cart0,cart1,etc>
+        example: /game?action=discard&what=234&where=hand
+        discards the given list of items from location given. Each item must exist, otherwise 500 is returned
+        returns error 500 when there is an error
+        """
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
@@ -101,22 +113,34 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
-    def cartCards(self):
+    def move(self):
+        """
+        USAGE: /game?action=cartCards&what=<item list>&src=<hand,cart0,cart1,etc>&dst=<cart0,cart1,etc>
+        example: /game?action=cartCards&what=23&src=hand&dst=cart0
+        Moves cards from hand to cart or cart to cart. Destination cart must be purchased and 
+        there must be enough space. Otherwise an error is returned
+        returns error 500 when there is an error
+        """
         logging.error("Cart cards")        
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
-        where = self.request.get('where')
-        if (where == None or where == ""):
+        src = self.request.get('src')
+        if (src == None or src == ""):
+            self.error(500)
+            return
+
+        dst = self.request.get('dst')
+        if (dst == None or dst == ""):
             self.error(500)
             return
 
         what = self.request.get('what')
-        if (where == None or where == ""):
+        if (what == None or what == ""):
             self.error(500)
             return
 
-        result = cartCards(game, what, where)
+        result = cartCards(game, what, src, dst)
         if (result == False):
             self.error(500)
             return
@@ -126,7 +150,13 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
-    def buyCart(self):               
+    def buyCart(self):
+        """
+        USAGE: /game?action=buyCart&withGold=<1or0>&items=<blank or itemlist>&cart=<cart0,cart1,etc>
+        example: /game?action=buyCart&withGold=0&items=37&cart=cart1
+        confirms the cart isn't purchased already and the item cost is greater or equal to the cart cost
+        returns error 500 when there is an error
+        """
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
@@ -160,6 +190,12 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(retstr)
 
     def buyAction(self):
+        """
+        USAGE: /game?action=buyAction
+        example: /game?action=buyAction
+        confirms the player has enough gold, if so the number of actions is increased
+        returns error 500 when there is an error
+        """
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
@@ -173,7 +209,79 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
+    def marketTrade(self):
+        """
+        USAGE: /game?action=marketTrade&handItems=<1 or more items>&marketItems=<1 or more items>
+        example: /game?action=marketTrade&handItems=23&marketItems=5
+
+        Trades with the market. The length of one of the list must be zero. Sum of the lists must be equal.
+        The cards must exist in the hand and in the market. Error 500 is returned if any of these conditions
+        aren't met
+        """
+        game_k = ndb.Key('Game', 'theGame')
+        game = game_k.get()
+
+        handItems = self.request.get('handItems')
+        if (handItems == None):
+            self.error(500)
+            return
+
+        marketItems = self.request.get('marketItems')
+        if (marketItems == None):
+            self.error(500)
+            return        
+
+        result = marketTrade(game, handItems, marketItems)
+        if (result == False):
+            self.error(500)
+            return
+
+        retstr = playerState(game, game.curPlayer)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(retstr) 
+
+    def completeQuest(self):
+        """
+        USAGE: /game?action=completeQuest&what=<itemList>where=<cartID>
+        Uses the items in the cart to complete a quest. If a quest with the cards in the cart doesn't exist, it returns an error
+        """
+        game_k = ndb.Key('Game', 'theGame')
+        game = game_k.get()
+
+        where = self.request.get('where')
+        if (where == None or where == ""):
+            self.error(500)
+            return
+
+        what = self.request.get('what')
+        if (where == None or where == ""):
+            self.error(500)
+            return
+
+        result = completeQuest(game, what, where)
+        if (result == False):
+            self.error(500)
+            return
+
+        retstr = playerState(game, priorPlayer)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(retstr) 
+
     def passPlayer(self):
+        """
+        USAGE: /game?action=passPlayer&items=<items to discard>
+        example: /game?action=passPlayer&items=2
+        Removes given items from players hand to bring it down to max hand
+        if handlen > maxHand, then items len must be so that once discarded handlen = maxHand
+        if handlen < maxHand, then items len must be zero. The player will be dealt enough cards to make handlen=maxHand
+        if handlen = maxHand, then items len must be zero. No changes occur to the players hand
+
+        Once the player hand is handled, the market is dealt one card. The current player is changed.
+        
+        returns error 500 when there is an error
+        """
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
@@ -218,8 +326,8 @@ class GameHandler(webapp2.RequestHandler):
         if action == "discard":
             return self.discard()
 
-        if action == "cartCards":
-            return self.cartCards()
+        if action == "move":
+            return self.move()
 
         if action == "buyCart":
             return self.buyCart()
@@ -229,6 +337,12 @@ class GameHandler(webapp2.RequestHandler):
 
         if action == "pass":
             return self.passPlayer()
+
+        if action == "marketTrade":
+            return self.marketTrade()
+
+        if action == "completeQuest":
+            return self.completeQuest()
 
         logging.error("Invalid action")
         self.error(500)

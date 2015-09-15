@@ -28,6 +28,7 @@ class Player(ndb.Model):
     points = ndb.IntegerProperty(required=True, default=0)
     maxHand = ndb.IntegerProperty(required=True, default=5)
     turns = ndb.IntegerProperty(required=True, default=0)
+    questsCompleted = ndb.LocalStructuredProperty(QuestCard, repeated=True)
 
 class Game(ndb.Model):
     curPlayer = ndb.IntegerProperty(default=0)
