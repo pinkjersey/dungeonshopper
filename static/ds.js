@@ -773,7 +773,7 @@ $scope.moveItemsToCart = function(id, actionCost) {
 	}
 	
 	//when moved from player to cart
-	move(selectedCards, 'cart'+id, 'hand')
+	move(selectedCards, 'hand','cart'+id)
 		
 	cart.cards.setCardSize("38","55");
 	resetAllSelectedCards(player);
@@ -800,7 +800,7 @@ moveItemsBetweenCarts = function(prevId, id, selectedCartItems, actionCost) {
 	}
 	
 	//move cart items to cart
-	move(selectedCartItems, 'cart'+id, 'cart'+prevId)
+	move(selectedCartItems, 'cart'+prevId, 'cart'+id )
 	
 	resetAllSelectedCards(player);
 	updateCounts();
@@ -1521,8 +1521,8 @@ function pass(discard) {
      gameFactory.pass(discard, processGameStateCallback, processGameStateErrorCallback);
 }
 
-function move(what, where, source) {
-     gameFactory.cartCards(what, where, source, processGameStateCallback, processGameStateErrorCallback);
+function move(what, src, dst) {
+     gameFactory.cartCards(what, src, dst, processGameStateCallback, processGameStateErrorCallback);
 }
 
 function fish(what, where) {
