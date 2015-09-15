@@ -271,7 +271,7 @@ $scope.playerCompleteQuest = function(id) {
 		var questClicked = game.questsInPlay.playingCards[id];
 		var questCanBeCompleted = false;
 
-		if(!$scope.activeCartId >= 0)	{
+		if(!$scope.activeCartId < 0 )	{
 			alert("Select a cart with items first.")
 			return;
 		}
@@ -1593,7 +1593,7 @@ function pass(discard) {
 }
 
 function move(what, src, dst) {
-     gameFactory.cartCards(what, src, dst, processGameStateCallback, processGameStateErrorCallback);
+     gameFactory.move(what, src, dst, processGameStateCallback, processGameStateErrorCallback);
 }
 
 function fish(what, where) {
