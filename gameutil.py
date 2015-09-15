@@ -157,6 +157,8 @@ def move(game, what, src, dst):
         for whati in whats:
             cart.inCart.append(whati)
 
+        cart.inCart.sort()
+
     except ValueError as e:
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror))        
         return False
@@ -338,10 +340,8 @@ def getIntersection(list1, list2):
             if (found == True):
                 break
 
+    ret.sort()
     return ret
-
-            
-
 
 def completeQuest(game, what, where):
     # completing quests require no actions
@@ -351,6 +351,7 @@ def completeQuest(game, what, where):
         logging.error("Blank what array")  
         return False
 
+    player = game.players[game.curPlayer]
     try:
         # find cart and make sure the cards exist in it
         # delete them if exists
@@ -366,7 +367,13 @@ def completeQuest(game, what, where):
             if (inter == whats):
                 questFound = True
                 player.questsCompleted.append(q)
+                if (q.coin):
+                    player.gold += 1
+
+                player.points += q.vp
+
                 del game.questsInPlay[i]
+                dealQuest(game)
                 break
 
         if (questFound == False):
@@ -377,8 +384,6 @@ def completeQuest(game, what, where):
     except ValueError as e:
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
         return False    
-
-
     
     game.actionsRemaining = game.actionsRemaining -1
     game.put()

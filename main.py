@@ -121,7 +121,7 @@ class GameHandler(webapp2.RequestHandler):
         there must be enough space. Otherwise an error is returned
         returns error 500 when there is an error
         """
-        logging.error("Cart cards")        
+        logging.error("move")        
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
@@ -140,7 +140,7 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        result = cartCards(game, what, src, dst)
+        result = move(game, what, src, dst)
         if (result == False):
             self.error(500)
             return
@@ -264,7 +264,7 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        retstr = playerState(game, priorPlayer)
+        retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr) 
