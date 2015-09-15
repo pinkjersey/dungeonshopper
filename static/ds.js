@@ -71,8 +71,8 @@ var Game = function(numOpponents) {
 	//this.cards.create75Cards();
 	var questImageBase = "../images/shopping_card_master";
 //	var questImageBase = "../images/shopping_card_masterxxx";
-//	var blankMarketImageBase = "../images/"
-	var blankMarketImageBase = "../images/xxx"
+	var blankMarketImageBase = "../images/"
+//	var blankMarketImageBase = "../images/xxx"
 	this.itemHolders.createBlankMarket(blankMarketImageBase);
 	this.quests.create75CardsQuestDeck(questImageBase);
 
@@ -95,8 +95,8 @@ var PlayersLog = function (id, text) {
 
 
 var Player = function (id, name) {
-//	var imageBase = "../images/shoppercarts_v3_";
-	var imageBase = "../images/shoppercarts_v3_xxx";
+	var imageBase = "../images/shoppercarts_v3_";
+//	var imageBase = "../images/shoppercarts_v3_xxx";
     this.id = id;
 	this.name = name;
 	this.turns = 0;
@@ -758,7 +758,7 @@ $scope.moveItemsToCart = function(id, actionCost) {
 	//if cart cards are selected, move between carts else its player items to cart
 	//these are in the scope variable as the new cart they select is selectedCartCount
 	if($scope.selectedCartItemsCount > 0) {
-		moveItemsBetweenCarts(id, $scope.selectedCartItems, actionCost);
+		moveItemsBetweenCarts($scope.prevActiveCartId, id, $scope.selectedCartItems, actionCost);
 		return;
 	}
 
@@ -773,14 +773,14 @@ $scope.moveItemsToCart = function(id, actionCost) {
 	}
 	
 	//when moved from player to cart
-	move(selectedCards, 'cart'+id)
+	move(selectedCards, 'cart'+id, 'hand')
 		
 	cart.cards.setCardSize("38","55");
 	resetAllSelectedCards(player);
 	updateCounts();
 }
 
-moveItemsBetweenCarts = function(id, selectedCartItems, actionCost) {
+moveItemsBetweenCarts = function(prevId, id, selectedCartItems, actionCost) {
 	var game = $scope.game;
 	var player = $scope.activePlayer;
 	var cart = player.carts[id];
@@ -800,7 +800,7 @@ moveItemsBetweenCarts = function(id, selectedCartItems, actionCost) {
 	}
 	
 	//move cart items to cart
-	move(selectedCartItems, 'cart'+id)
+	move(selectedCartItems, 'cart'+id, 'cart'+prevId)
 	
 	resetAllSelectedCards(player);
 	updateCounts();
@@ -1521,8 +1521,8 @@ function pass(discard) {
      gameFactory.pass(discard, processGameStateCallback, processGameStateErrorCallback);
 }
 
-function move(what, where) {
-     gameFactory.cartCards(what, where, processGameStateCallback, processGameStateErrorCallback);
+function move(what, where, source) {
+     gameFactory.cartCards(what, where, source, processGameStateCallback, processGameStateErrorCallback);
 }
 
 function fish(what, where) {
