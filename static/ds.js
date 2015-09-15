@@ -271,16 +271,26 @@ $scope.playerCompleteQuest = function(id) {
 		var questClicked = game.questsInPlay.playingCards[id];
 		var questCanBeCompleted = false;
 
-		if(!$scope.activeCartId < 0 )	{
+		if($scope.activeCartId < 0 )	{
 			alert("Select a cart with items first.")
 			return;
 		}
 
 		var cart = player.carts[$scope.activeCartId];
-		if(cart != null) {
-			sortPlayerCartCards(cart);
-		}
+		//if(cart != null) {
+		//	sortPlayerCartCards(cart);
+		//}
 
+		//if(!$scope.debug) {
+		if($scope.selectedCartItemsCount < 3 || $scope.selectedCartItemsCount != cart.size)	{
+			alert("Select all items in cart/wagon first.")
+			return;
+			}
+		//}
+
+		var selectedCards = getSelectedCards(cart.cards);
+
+		
 		var items =  new Array(questClicked.item1, questClicked.item2, questClicked.item3, questClicked.item4, questClicked.item5);
 		for(var j = 0; j < items.length; ++j) {
 			if(items[j]===0) {
@@ -303,19 +313,11 @@ $scope.playerCompleteQuest = function(id) {
 	
 		}
 		
-		if(!$scope.debug) {
-			if($scope.selectedCartItemsCount < 3 || $scope.selectedCartItemsCount != cart.size)	{
-				alert("Select all items in cart/wagon first.")
-				return;
-			}
-		}
-
-		var selectedCards = getSelectedCards(cart.cards);
 
 		//fix me back after testing
-		if($scope.debug) {
-			questCanBeCompleted = true;
-		}
+//		if($scope.debug) {
+//			questCanBeCompleted = true;
+//		}
 		
 		if (questCanBeCompleted === true) {
 			var r =  confirm("Confirm purchase from " + cart.name +"?");
@@ -1198,7 +1200,7 @@ prepareEventForPlayer = function(questCardinplay) {
 					var cardsToMoveBackToHand = getSelectedCards(cart.cards,false);
 					//fix event
 					//cartDestroyed('cart0');
-					move(cardsToMoveBackToHand, 'hand');
+					move(cardsToMoveBackToHand, 'cart0', 'hand');
 //					for (var i = 0; i < cart.cards.playingCards.length; ++i)  {
 //						var card = cart.cards.playingCards[i];
 //							//discard selected card(s)
