@@ -277,19 +277,18 @@ $scope.playerCompleteQuest = function(id) {
 		}
 
 		var cart = player.carts[$scope.activeCartId];
-		//if(cart != null) {
-		//	sortPlayerCartCards(cart);
-		//}
 
 		//if(!$scope.debug) {
-		if($scope.selectedCartItemsCount < 3 || $scope.selectedCartItemsCount != cart.size)	{
+		if($scope.selectedCartItemsCount < 3 || cart.cards.playingCards.length != $scope.selectedCartItemsCount) {
 			alert("Select all items in cart/wagon first.")
 			return;
 			}
 		//}
 
-		var selectedCards = getSelectedCards(cart.cards);
+		
+		
 
+		var selectedCards = getSelectedCards(cart.cards);
 		
 		var items =  new Array(questClicked.item1, questClicked.item2, questClicked.item3, questClicked.item4, questClicked.item5);
 		for(var j = 0; j < items.length; ++j) {
@@ -314,7 +313,7 @@ $scope.playerCompleteQuest = function(id) {
 		}
 		
 
-		//fix me back after testing
+//fix me back after testing
 //		if($scope.debug) {
 //			questCanBeCompleted = true;
 //		}
@@ -322,25 +321,12 @@ $scope.playerCompleteQuest = function(id) {
 		if (questCanBeCompleted === true) {
 			var r =  confirm("Confirm purchase from " + cart.name +"?");
 			if(r===true) {
-					
 				//check if player completed quest and move it to their completed quests
-					//player.questsCompleted.playingCards.push(questClicked);
-					//player.gold+=questClicked.gold;
-					//player.vp+=questClicked.vp;
-	
-					//removeSelectedCartCards(cart, true);
-					//checkItemsRemaining();
-//					$scope.selectedCartItemsCount = 0;
-					completeQuest(selectedCards, 'cart' + cart.id);
-					//resetCartCardsSelected(player,-1);
-//					player.questsCompleted.setCardSize("auto","100");
-//					player.questsCompleted.playingCards.shift();
-					//game.questsInPlay.playingCards[id] = null;
-					//game.questsInPlay.truncate();
-					//dealCardToQuests(game.questsInPlay, game.quests);
-//					sortPlayerQuests();
-					updateCounts(text);
-				}
+				completeQuest(selectedCards, 'cart' + cart.id);
+				resetAllSelectedCards(player);
+				player.questsCompleted.setCardSize("auto","100");
+				updateCounts(text);
+			}
 		}
 		else {
 			alert(cart.name + " does not contain the necessary items for this quest!")
