@@ -157,6 +157,8 @@ def move(game, what, src, dst):
         for whati in whats:
             cart.inCart.append(whati)
 
+        cart.inCart.sort()
+
     except ValueError as e:
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror))        
         return False
@@ -338,6 +340,7 @@ def getIntersection(list1, list2):
             if (found == True):
                 break
 
+    ret.sort()
     return ret
 
 def completeQuest(game, what, where):
