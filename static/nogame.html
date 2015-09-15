@@ -1,17 +1,13 @@
 ﻿<div class="panel-body">
- <!--   <div class="container">-->
-   <!--     <div class="row">-->
-	
-			<img  ng-src="../images/boxtop.jpg" width = "auto" height = "500" ></img>
-
-			  <p>Enter your name: <input type="text" ng-model="p1Name"{{p1Name}}></input></p>
-  			  <p>Enter your name: <input type="text" ng-model="p2Name"{{p2Name}}></input></p>
-  			  <p>Enter your name: <input type="text" ng-model="p3Name"{{p3Name}}></input></p>
- 			  <p>Enter your name: <input type="text" ng-model="p4Name"{{p4Name}}></input></p>
- 			<p> Number of players?: <input type="text" ng-model="numberOfPlayers" /></p>
+			<span class="panel-title pull-right"><button class="btn btn-primary" ng-click="noGame()">Reset</button></span>
+			<img  ng-src="{{splashImage}}" width = "auto" height = "500" ></img>
 			<br></br>
-            <button ng-show="numberOfPlayers < 5" class="btn btn-primary" ng-click="newGame(p1Name, p2Name, p3Name, p4Name, numberOfPlayers)" ng-cloak>New Game</button>            
-            <button ng-show="numberOfPlayers > 1" class="btn btn-primary" ng-click="newGame(p1Name, p2Name, p3Name, p4Name, numberOfPlayers)" ng-cloak>Join Game</button>            					
-  <!--      </div> <!-- done row -->
- <!--   </div> <!-- done container -->
+			<br></br>
+			<span ng-show="numberOfPlayersJoined < 4">
+				<p>Enter your name: <input type="text" ng-model="playerName"></input></p>
+				<br></br>
+				<button class="btn btn-primary" ng-click="joinGame(numberOfPlayersJoined, playerName)" ng-cloak>Join Game</button>            					
+			</span>
+
+            <button ng-show="numberOfPlayersJoined > 0" class="btn btn-primary" ng-click="newGame(numberOfPlayersJoined)" ng-cloak>Start Game</button>            
 </div>

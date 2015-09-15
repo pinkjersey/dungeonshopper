@@ -127,7 +127,7 @@ questSet.prototype.setCardSize = function (oWidth,oHeight) {
 //};
 
 
-questSet.prototype.create75CardsQuestDeck = function (numOfOpponents) {
+questSet.prototype.create75CardsQuestDeck = function (questImageBase) {
 	// Create quest deck
 	
 	var level1 = new questSet();
@@ -135,10 +135,10 @@ questSet.prototype.create75CardsQuestDeck = function (numOfOpponents) {
 	var level3 = new questSet();
 	var events = new questSet();
 	
-	level1.createQuestDecks(1);
-	level2.createQuestDecks(2);
-	level3.createQuestDecks(3);
-	events.createQuestDecks('4');
+	level1.createQuestDecks(1, questImageBase);
+	level2.createQuestDecks(2, questImageBase);
+	level3.createQuestDecks(3, questImageBase);
+	events.createQuestDecks(4, questImageBase);
 
 	//create and add all quests to the quests deck
 
@@ -163,8 +163,8 @@ questSet.prototype.create75CardsQuestDeck = function (numOfOpponents) {
 }
 
 
-
-questSet.prototype.createQuestDeck = function (numOfOpponents) {
+/*  hotseat create quest deck
+questSet.prototype.createQuestDeck = function (numOfOpponents, ) {
 	// Create quest deck
 	
 	var level1 = new questSet();
@@ -234,7 +234,7 @@ questSet.prototype.createQuestDeck = function (numOfOpponents) {
 	
 
 }
-
+*/
 
 
 
@@ -294,9 +294,9 @@ function createQuests(top, middle, bottom, level1, level2, level3, events, level
 
 }
 
-questSet.prototype.createQuestDecks = function (level) {
+questSet.prototype.createQuestDecks = function (level, imageBase) {
 	
-var image="../images/shopping_card_master";
+var image=imageBase;
 	
 if(level===1){
 	
