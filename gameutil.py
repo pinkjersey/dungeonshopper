@@ -44,6 +44,8 @@ def whatToArray(what):
 def getCartId(where):
     if ("cart" in where):
         cartid = int(where[4:])
+        if (cartid < 0 or cartid > 3):
+            raise ValueError("Invalid cart id")
         return cartid
     else:
         raise ValueError("where isn't a cartid")
@@ -126,7 +128,8 @@ def move(game, what, src, dst):
 
     # convert input to array
     whats = whatToArray(what)
-    if (len(whats) == 0):
+    whatlen = len(whats)
+    if (whatlen == 0):
         logging.error("Empty whats")        
         return False
 
@@ -143,19 +146,19 @@ def move(game, what, src, dst):
         cart = player.carts[cartid]
 
         # cart needs to be purchased
-        if (cart.purchased == False):
+        if (dstcart.purchased == False):
             logging.error("Cart not purchased")        
             return False
 
         # has enough space
-        spaceRemaining = cart.cartSize - len(cart.inCart)
-        if (spaceRemaining < len(whats)):
+        spaceRemaining = dstcart.cartSize - len(dstcart.inCart)
+        if (spaceRemaining < whatlen):
             logging.error("Not enough space in cart")        
             return False
 
         # add items to cart
         for whati in whats:
-            cart.inCart.append(whati)
+            dstlist.append(whati)
 
         cart.inCart.sort()
 
