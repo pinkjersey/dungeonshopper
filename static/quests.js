@@ -385,26 +385,18 @@ if(level===3){
 
 if(level==='4'){
 	var image="../images/dungeonevent";
-//	this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',0,image+"BarbarianAttack",this);
-	this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',0,image+"BrokenItems",this);
-//	this.addCard(level,0,0,0,0,0,0,0,'eventCastleTaxation',0,image+"CastleTaxation",this);
-//	this.addCard(level,0,0,0,0,0,0,0,'eventGolbinRaid',0,image+"GolbinRaid",this);
-//	this.addCard(level,0,0,0,0,0,0,0,'eventKingsFeast',0,image+"KingsFeast",this);	
-//	this.addCard(level,0,0,0,0,0,0,0,'eventMarketShortage',0,image+"MarketShortage",this);	
-//	this.addCard(level,0,0,0,0,0,0,0,'eventMarketSurplus',0,image+"MarketSurplus",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-		this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-			this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-				this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',0,image+"OrcsAttack",this);	
-				//	this.addCard(level,0,0,0,0,0,0,0,'eventSandStorm',0,image+"SandStorm",this);	
-//	this.addCard(level,0,0,0,0,0,0,0,'eventThrownInTheDungeon',0,image+"ThrownInTheDungeon",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventTreasure',0,image+"Treasure",this);	
-//	this.addCard(level,0,0,0,0,0,0,0,'eventVikingParade',0,image+"VikingParade",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',6,image+"BarbarianAttack",this);
+	this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',7,image+"BrokenItems",this);
+	this.addCard(level,0,0,0,0,0,0,0,'eventCastleTaxation',8,image+"CastleTaxation",this);
+	this.addCard(level,0,0,0,0,0,0,0,'eventGolbinRaid',9,image+"GolbinRaid",this);
+	this.addCard(level,0,0,0,0,0,0,0,'eventKingsFeast',10,image+"KingsFeast",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventMarketShortage',11,image+"MarketShortage",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventMarketSurplus',12,image+"MarketSurplus",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',13,image+"OrcsAttack",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventSandStorm',14,image+"SandStorm",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventThrownInTheDungeon',15,image+"ThrownInTheDungeon",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventTreasure',16,image+"Treasure",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventVikingParade',17,image+"VikingParade",this);	
 	}
 
 }
@@ -412,7 +404,7 @@ if(level==='4'){
 /****************************
  A class representing a card
 ****************************/
-function questCard(level,gold,item1,item2,item3,item4,item5,vp,name, sortorder,image,oCardSet) {
+function questCard(level,gold,item1,item2,item3,item4,item5,vp,name, nameId,image,oCardSet) {
 
 	// Initialise settings
 	this.level=level;
@@ -423,7 +415,7 @@ function questCard(level,gold,item1,item2,item3,item4,item5,vp,name, sortorder,i
 	this.item5=item5;
 	this.gold = gold;
 	this.name = name;
-	this.sortorder = sortorder;
+	this.nameId = nameId;
 	this.selected = false;
 	this.vp = vp;
 	this.image = image;

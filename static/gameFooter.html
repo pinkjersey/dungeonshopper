@@ -1,0 +1,23 @@
+<div class="col-sm-2">
+  <table class="table table-condensed">
+
+	<thead>
+		<tr>
+			<th class="alignleft"><big>Item Cards: {{itemsCountRemaining}}</big></th>
+			<th class="alignjustify"><big>Quest Cards: {{questsCountRemaining}}</big></th>
+			<th ng-show="discardsCount > 0" ><big>Discards: {{discardsCount}}</big></th>
+		</tr>
+		<tr>
+			<th>
+				<img ng-src="{{itemCardBack}}" width = auto height = "180" class="alignleft"></img>
+			</th>	
+			<th>
+				<img ng-src="{{vendorCardBack}}" width = auto height = "180" class="alignjustify"</img>
+			</th>	
+			<th>
+			<img ng-show="discardsCount > 0" ng-src="{{lastDiscard.image}}" width = auto height = "180" ></img>
+			</th>
+		</tr>
+	</thead>
+
+</div>
