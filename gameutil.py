@@ -22,6 +22,7 @@ def playerState(game, playerId):
     thedict["actionsRemaining"] = game.actionsRemaining
 
     discardLen = len(game.discardPile)
+    thedict["discardsCount"] = discardLen    
     if discardLen > 0:
         thedict["lastDiscarded"] = game.discardPile[discardLen-1]
     else:
