@@ -139,16 +139,19 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	setupNoGame = function() {
 		$scope.displayMode = "nogame";
 		$scope.spashImage = "../images/boxtop.jpg";
-		$scopeNextPlayerId = 0;
+		//$scopeNextPlayerId = 0;
 		$scope.playerName="Player1";
 		$scopeNextPlayerId=0;		
-		$scope.numberOfPlayersJoined =0;
+		//$scope.numberOfPlayersJoined =0;
 		$scope.game=null;
 	}	
 
 	setupNoGame();
 	
-	$scope.joinGame = function(playerId, playerName) {
+	$scope.joinGame = function(playerName) {
+		
+		$scopeNextPlayerId++;		
+/*
 		switch (playerId) {
 			case 0:
 				$scope.p1Name = playerName;
@@ -166,10 +169,11 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				$scope.p1Name = playerName;
 				break;
 		}
-		$scopeNextPlayerId++;
-		$scope.playerName = "Player"+($scopeNextPlayerId+1);
-		$scope.numberOfPlayersJoined = $scopeNextPlayerId;
-			
+		*/
+		//$scopeNextPlayerId++;
+		//$scope.playerName = "Player"+($scopeNextPlayerId+1);
+		//$scope.numberOfPlayersJoined = $scopeNextPlayerId;
+		joinGame($scopeNextPlayerId);
 	}
 
 	var cardColor = function(card) {
@@ -1669,9 +1673,21 @@ var processGameStateErrorCallback = function (returnVal) {
 		}
 }
 
+$scope.playerRefresh = function() {
+	playerRefresh;
+}
+
 
 function loadData(numPlayers) {
      gameFactory.newGame(numPlayers, processGameStateCallback, processGameStateErrorCallback);
+}
+
+function playerRefresh() {
+     gameFactory.newGame(processGameStateCallback, processGameStateErrorCallback);
+}
+
+function joinGame(playerId) {
+     gameFactory.joinGame(playerId, processGameStateCallback, processGameStateErrorCallback);
 }
 
 function pass(discard) {
