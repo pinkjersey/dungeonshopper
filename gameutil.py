@@ -120,7 +120,7 @@ def removeItems(game, what, where):
             
 
 def move(game, what, src, dst):
-    """Moves cards from hand to cart"""
+    """Moves cards from src to dst"""
     if game.actionsRemaining == 0:
         # no actions remaining
         logging.error("No actions remaining")        
@@ -139,28 +139,31 @@ def move(game, what, src, dst):
         # discard items from src
         removeItems(game, what, src)             
 
-        # get cart id
-        cartid = getCartId(dst)
+        if dst == "hand":
+            dstlist = player.hand
+        else:
+            # get cart id
+            cartid = getCartId(dst)
+            # find cart
+            cart = player.carts[cartid]
+            # cart needs to be purchased
+            if (cart.purchased == False):
+                logging.error("Cart not purchased")        
+                return False
+            
+            # has enough space
+            spaceRemaining = cart.cartSize - len(cart.inCart)
+            if (spaceRemaining < whatlen):
+                logging.error("Not enough space in cart")        
+                return False
 
-        # find cart
-        cart = player.carts[cartid]
-
-        # cart needs to be purchased
-        if (dstcart.purchased == False):
-            logging.error("Cart not purchased")        
-            return False
-
-        # has enough space
-        spaceRemaining = dstcart.cartSize - len(dstcart.inCart)
-        if (spaceRemaining < whatlen):
-            logging.error("Not enough space in cart")        
-            return False
+            dstlist = cart.inCart
 
         # add items to cart
         for whati in whats:
             dstlist.append(whati)
 
-        cart.inCart.sort()
+        dstlist.sort()
 
     except ValueError as e:
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror))        
@@ -367,21 +370,16 @@ def completeQuest(game, what, where):
     try:
         # find cart and make sure the cards exist in it
         # delete them if exists
-        logging.error("Compelete quest: removing items")
         removeItems(game, what, where)
-        logging.error("Compelete quest: done removing items")
 
         # match quest
         questFound = False
         numQuests = len(game.questsInPlay)
         for i in range(numQuests):
             q = game.questsInPlay[i]
-            logging.error("Compelete quest: checking quest {0}".format(i))
             inter = getIntersection(whats, q.items)
-            logging.error("Compelete quest: got intersection")
 
             if (inter == whats):
-                logging.error("Compelete quest: intersection matched")
                 questFound = True
                 player.questsCompleted.append(q)
                 if (q.coin):
@@ -402,8 +400,6 @@ def completeQuest(game, what, where):
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
         return False    
     
-    logging.error("Compelete quest: saving game")
-    game.actionsRemaining = game.actionsRemaining -1
     game.put()
 
     return True
