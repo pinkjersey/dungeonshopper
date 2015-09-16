@@ -1670,7 +1670,7 @@ var processGameStateErrorCallback = function (returnVal) {
 }
 
 $scope.playerRefresh = function() {
-	playerRefresh;
+	playerRefresh($scope.activePlayerId);
 }
 
 
@@ -1678,8 +1678,8 @@ function loadData(numPlayers) {
      gameFactory.newGame(numPlayers, processGameStateCallback, processGameStateErrorCallback);
 }
 
-function playerRefresh() {
-     gameFactory.refresh(processGameStateCallback, processGameStateErrorCallback);
+function playerRefresh(playerId) {
+     gameFactory.refresh(playerId, processGameStateCallback, processGameStateErrorCallback);
 }
 
 function joinGame(playerId) {

@@ -58,10 +58,10 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               refresh: function (callback, errorcallback) {
+               refresh: function (playerId, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=refresh',
+                       url: '/game?action=refresh&player=' + playerId,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
