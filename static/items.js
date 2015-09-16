@@ -186,11 +186,11 @@ cardSet.prototype.create75Cards = function () {
 	}
 }
 */
-cardSet.prototype.createBlankMarket = function() {
+cardSet.prototype.createBlankMarket = function(imageBase) {
 	// Create 10 cards
 	var oImage = "";
-	   for (var a=1; a<11; a++) { 
-		   oImage="../images/"+a+"_card.jpg";
+	   for (var a = 1; a < 11; a++) { 
+		   oImage=imageBase + a + "_card.jpg";
 			this.addCard(a,oImage,0);
 		}
 
