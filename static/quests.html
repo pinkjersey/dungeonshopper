@@ -8,7 +8,7 @@
 	<tr>
 		<td>
 			<span ng-repeat="questcard in game.questsInPlay.playingCards track by $index">
-				<button ng-if="questcard.selected===true" class="btn btn-warning" ng-click="playerCompleteQuest($index)">Complete Quest?</button>
+				<button ng-disabled="loadingData===true" ng-show="isActive===true" ng-if="questcard.selected===true" class="btn btn-warning" ng-click="playerCompleteQuest($index)">Complete Quest?</button>
 				<questcard ng-click="userClickedQuestImage($index)" info="questcard"></questcard>
 			</span>	
 		</td>
