@@ -1,0 +1,18 @@
+﻿<table style="float: center" table table-condensed">
+	<thead>
+	<tr>
+		<td>
+			<h4>Quests </h4> 
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<span ng-repeat="questcard in game.questsInPlay.playingCards track by $index">
+				<button ng-if="questcard.selected===true" class="btn btn-warning" ng-click="playerCompleteQuest($index)">Complete Quest?</button>
+				<questcard ng-click="userClickedQuestImage($index)" info="questcard"></questcard>
+			</span>	
+		</td>
+	</tr>
+	</thead>
+</table>
+
