@@ -58,6 +58,14 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
+               refresh: function (callback, errorcallback) {
+                   $http({
+                       method: 'GET',
+                       url: '/game?action=refresh',
+                       cache: false
+                   }).success(callback)
+                     .error(errorcallback);
+               },
                marketTrade: function (handItems, marketItems, callback, errorcallback) {
                    $http({
                        method: 'GET',
