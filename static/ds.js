@@ -62,7 +62,7 @@ var Game = function(numOpponents) {
 	this.quests = new questSet();
 	this.itemHolders = new cardSet();
 	//this.itemDeck = new cardSet();
-	this.discardDeck = new cardSet();
+	//this.discardDeck = new cardSet();
 	this.questsInPlay = new cardSet();
 	this.marketDeck = new cardSet();
 	this.marketDeckInTrade = new cardSet();
@@ -534,7 +534,9 @@ updateDiscardPile = function(number) {
 	for (var i = 0; i < game.itemHolders.playingCards.length; ++i)  {
 		var card = game.itemHolders.playingCards[i];
 			if(card.number === number) {
-				discardDeck.addCardc(card);
+				//discardDeck.addCardc(card);
+				$scope.lastDiscard = card;
+				$scope.discardsCount=1;
 				break;
 		}
 	}
@@ -1092,7 +1094,8 @@ $scope.playerPass = function() {
 			}
 		}
 
-		if((player.cards.playingCards.length === player.maxHand) && selectedCardCount > 0) {
+		
+		if((player.cards.playingCards.length <= player.maxHand) && selectedCardCount > 0) {
 			//alert("You can only discard when you have actions remaining or need to remove cards to max hand size.");
 			discardSelectedCards = "";
 		}
@@ -1591,7 +1594,7 @@ var processGameStateErrorCallback = function (returnVal) {
 		$scope.game.questsInPlay = new cardSet();
 		$scope.game.marketDeck = new cardSet();
 		$scope.activePlayer.cards =  new cardSet();
-		$scope.game.discardDeck = new cardSet();
+		//$scope.game.discardDeck = new cardSet();
 		$scope.activePlayer.questsCompleted =  new cardSet();
 		$scope.activePlayer.carts[0].cards =  new cardSet();
 		$scope.activePlayer.carts[1].cards =  new cardSet();
@@ -1599,7 +1602,7 @@ var processGameStateErrorCallback = function (returnVal) {
 		$scope.activePlayer.carts[3].cards =  new cardSet();		
 		//$scope.game.questsInPlay.origWidth=100;
 		//$scope.game.questsInPlay.origHeight=200;
-		$scope.discardsCount = $scope.game.discardDeck.playingCards.length;
+		$scope.discardsCount = 0;
 
         for (var i = 0; i < data.hand.length; ++i) {   
 			dealNumberToPlayer($scope.game.players[$scope.activePlayerId], data.hand[i]);	
