@@ -431,6 +431,8 @@ def passPlayer(game, items):
         for i in range(diff):
             dealItemCard(game.curPlayer, game)
 
+        player.hand.sort()
+
     # deal card to market
     dealItemCardToMarket(game)
 
@@ -614,14 +616,38 @@ def newItemDeck():
     shuffled = shuffle(cards)                
     return shuffled
 
+def getFirstItemCard(game):
+    decklen = len(game.itemDeck)
+    if (decklen == 0):
+        # move market to discard
+        game.discardPile.extend(game.market)
+
+        # clear the market
+        game.market = []
+
+        # shuffle discard and set it to item deck
+        game.itemDeck = shuffle(game.discardPile)
+
+        # clear discard
+        game.discardPile = []
+
+        # deal to market
+        for i in range(4):
+            dealItemCardToMarket(game)
+
+        # deal like usual
+        return getFirstItemCard(game)
+    else:
+        card = game.itemDeck[0]
+        del game.itemDeck[0]
+        return card
+
 def dealItemCard(playerIndex, game):
-    card = game.itemDeck[0]
-    del game.itemDeck[0]
+    card = getFirstItemCard(game)    
     game.players[playerIndex].hand.append(card)
 
 def dealItemCardToMarket(game):
-    card = game.itemDeck[0]
-    del game.itemDeck[0]
+    card = getFirstItemCard(game)
     game.market.append(card)
         
 def dealQuest(game):
