@@ -325,6 +325,7 @@ def getIntersection(list1, list2):
     tmp1 = list(list1)
     tmp2 = list(list2)
     ret = []
+    priorlen = len(tmp1)
     while (len(tmp1) > 0 and len(tmp2) > 0):
         for i in range(len(tmp1)):
             item1 = tmp1[i]
@@ -341,6 +342,13 @@ def getIntersection(list1, list2):
             if (found == True):
                 break
 
+        thislen = len(tmp1)
+        if (thislen == priorlen):
+            # search done
+            break
+        else:
+            priorlen = thislen
+
     ret.sort()
     return ret
 
@@ -356,16 +364,21 @@ def completeQuest(game, what, where):
     try:
         # find cart and make sure the cards exist in it
         # delete them if exists
+        logging.error("Compelete quest: removing items")
         removeItems(game, what, where)
+        logging.error("Compelete quest: done removing items")
 
         # match quest
         questFound = False
         numQuests = len(game.questsInPlay)
         for i in range(numQuests):
             q = game.questsInPlay[i]
+            logging.error("Compelete quest: checking quest {0}".format(i))
             inter = getIntersection(whats, q.items)
+            logging.error("Compelete quest: got intersection")
 
             if (inter == whats):
+                logging.error("Compelete quest: intersection matched")
                 questFound = True
                 player.questsCompleted.append(q)
                 if (q.coin):
@@ -386,6 +399,7 @@ def completeQuest(game, what, where):
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
         return False    
     
+    logging.error("Compelete quest: saving game")
     game.actionsRemaining = game.actionsRemaining -1
     game.put()
 
