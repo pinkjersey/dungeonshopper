@@ -1110,8 +1110,8 @@ $scope.playerPass = function() {
 	text = "New Market Item! - (" + card.number + ")";
 
 
-
-
+	$scope.selectedMarketTradeCount = 0;
+	$scope.sumMarketValueSelected = 0;
 	resetAllSelectedCards(player);
 	
 	//wipe out any potential market trades in progress
@@ -1587,6 +1587,7 @@ var processGameStateErrorCallback = function (returnVal) {
 		$scope.game.questsInPlay = new cardSet();
 		$scope.game.marketDeck = new cardSet();
 		$scope.activePlayer.cards =  new cardSet();
+		$scope.activePlayer.questsCompleted =  new cardSet();
 		$scope.activePlayer.carts[0].cards =  new cardSet();
 		$scope.activePlayer.carts[1].cards =  new cardSet();
 		$scope.activePlayer.carts[2].cards =  new cardSet();
@@ -1615,12 +1616,11 @@ var processGameStateErrorCallback = function (returnVal) {
 			updatePlayerCarts($scope.game.players[$scope.activePlayerId].carts[i], data.carts[i]);	
 		}
 
-        for (var i = 0; i < data.questsInPlay.length; ++i) {   
+        for (var i = 0; i < data.questsCompleted.length; ++i) {   
 			dealQuestsCompleted($scope.game.players[$scope.activePlayerId].questsCompleted, data.questsCompleted[i].items);
 		}
+			
 		
-		
-		questsCompleted
 		
 //		for (var i = 0; i < data.discardPile.length; ++i) {   
 //			updateDiscardPile($scope.game.discardDeck, data.discardPile[i]);	
