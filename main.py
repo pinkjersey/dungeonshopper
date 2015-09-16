@@ -135,6 +135,11 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
+        dst = self.request.get('dst')
+        if (dst == None or dst == ""):
+            self.error(500)
+            return        
+
         what = self.request.get('what')
         if (what == None or what == ""):
             self.error(500)
