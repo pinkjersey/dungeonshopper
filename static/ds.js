@@ -211,7 +211,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	//$scope.itemCardBack = "../images/shoppingCardBack.jpgxxx"
 	//$scope.vendorCardBack = "../images/vendorback.jpgxxx"
 	//$scope.eventActionsRemaining=0;
-	$scope.debug = true;
+	$scope.debug = false;
 	//gui variable to control item buttons
 	$scope.selectedItemsCount = 0;
 	//gui variable to control cart buttons
