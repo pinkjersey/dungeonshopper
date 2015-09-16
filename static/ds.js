@@ -529,7 +529,7 @@ dealNumberToPlayer = function(player, number) {
 	updateLog($scope.blankText);
 }
 	
-updateDiscardPile = function(discardDeck, number) {
+updateDiscardPile = function(number) {
 	var game = $scope.game;
 	for (var i = 0; i < game.itemHolders.playingCards.length; ++i)  {
 		var card = game.itemHolders.playingCards[i];
@@ -1591,6 +1591,7 @@ var processGameStateErrorCallback = function (returnVal) {
 		$scope.game.questsInPlay = new cardSet();
 		$scope.game.marketDeck = new cardSet();
 		$scope.activePlayer.cards =  new cardSet();
+		$scope.game.discardDeck = new cardSet();
 		$scope.activePlayer.questsCompleted =  new cardSet();
 		$scope.activePlayer.carts[0].cards =  new cardSet();
 		$scope.activePlayer.carts[1].cards =  new cardSet();
@@ -1598,7 +1599,7 @@ var processGameStateErrorCallback = function (returnVal) {
 		$scope.activePlayer.carts[3].cards =  new cardSet();		
 		//$scope.game.questsInPlay.origWidth=100;
 		//$scope.game.questsInPlay.origHeight=200;
-		
+		$scope.discardsCount = $scope.game.discardDeck.playingCards.length;
 
         for (var i = 0; i < data.hand.length; ++i) {   
 			dealNumberToPlayer($scope.game.players[$scope.activePlayerId], data.hand[i]);	
@@ -1623,13 +1624,10 @@ var processGameStateErrorCallback = function (returnVal) {
         for (var i = 0; i < data.questsCompleted.length; ++i) {   
 			dealQuestsCompleted($scope.game.players[$scope.activePlayerId].questsCompleted, data.questsCompleted[i].items);
 		}
-			
 		
-		
-//		for (var i = 0; i < data.discardPile.length; ++i) {   
-//			updateDiscardPile($scope.game.discardDeck, data.discardPile[i]);	
-//		}
-
+		if (data.lastDiscarded != null) {
+			updateDiscardPile(data.lastDiscarded);	
+		}
 }
 
 
