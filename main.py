@@ -246,8 +246,11 @@ class GameHandler(webapp2.RequestHandler):
         USAGE: /game?action=completeQuest&what=<itemList>where=<cartID>
         Uses the items in the cart to complete a quest. If a quest with the cards in the cart doesn't exist, it returns an error
         """
+        logging.error("Compelete quest: begin")
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
+
+        logging.error("Compelete quest: loaded quest")
 
         where = self.request.get('where')
         if (where == None or where == ""):
@@ -259,10 +262,13 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
+        logging.error("Compelete quest: running")
         result = completeQuest(game, what, where)
         if (result == False):
             self.error(500)
             return
+
+        logging.error("Compelete quest: done")
 
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
