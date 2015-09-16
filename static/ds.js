@@ -46,19 +46,9 @@ var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased,
 }
 
 
-var Game = function(numOpponents) {
-
-	//game setup variables count
-	this.firstPlayer = 0;
-	this.startingActions = 2;
-	this.startingCards = 5;
-	this.marketStart = 4;
-	this.questStart = 4;
-	
-	this.numOpponents = numOpponents;
+var Game = function() {
 
 	//all the starter empty playingCards holders	
-	//this.cards = new cardSet();
 	this.quests = new questSet();
 	this.itemHolders = new cardSet();
 	this.questsInPlay = new cardSet();
@@ -74,7 +64,17 @@ var Game = function(numOpponents) {
 	this.quests.create75CardsQuestDeck(questImageBase);
 
 	this.players = [];
-	
+	//create players
+	for (var i = 0; i < 4; ++i) {   
+		//var pName = function(i) {
+		//	if(i===0) {return $scope.p1Name;}
+		//	if(i===1) {return $scope.p2Name;}
+		//	if(i===2) {return $scope.p3Name;}
+		//	if(i===3) {return $scope.p4Name;}
+		//}
+		//$scope.game.players.push(new Player(i, $scope.playerName));
+		this.players.push(new Player(i, "Player" + i));
+	}	
 	//set initial size of the cards for the gui
 	//their are times in the code that these are changed and reset
 	//this.cards.setCardSize("60","80");
@@ -149,7 +149,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	setupNoGame();
 	
 	$scope.joinGame = function(playerName) {
-		
+		$scope.playerName = playerName;
 		$scopeNextPlayerId++;		
 /*
 		switch (playerId) {
@@ -173,8 +173,97 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		//$scopeNextPlayerId++;
 		//$scope.playerName = "Player"+($scopeNextPlayerId+1);
 		//$scope.numberOfPlayersJoined = $scopeNextPlayerId;
+		$scope.game = new Game();
+		$scope.activePlayerId = $scopeNextPlayerId;
+		$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
 		joinGame($scopeNextPlayerId);
+		$scope.displayMode = "game";
 	}
+	
+	
+	$scope.newGame = function (numberOfPlayers) {
+	$scope.numberOfPlayers = Number(numberOfPlayers);
+	$scope.game = new Game();
+	$scope.activePlayerId = 0;
+	$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
+	loadData(numberOfPlayers);
+	$scope.displayMode = "game";
+	
+}
+	
+
+	$scope.activeEvent = null;
+	$scope.playersCompletedEventCount = 0;
+	$scope.itemCardBack = "../images/shoppingCardBack.jpg"
+	$scope.vendorCardBack = "../images/vendorback.jpg"
+	//$scope.itemCardBack = "../images/shoppingCardBack.jpgxxx"
+	//$scope.vendorCardBack = "../images/vendorback.jpgxxx"
+	//$scope.eventActionsRemaining=0;
+	$scope.debug = true;
+	//gui variable to control item buttons
+	$scope.selectedItemsCount = 0;
+	//gui variable to control cart buttons
+	$scope.selectedCartItemsCount = 0;
+	//gui variable to control market buttons
+	$scope.sumMarketValueSelected = 0;
+	//gui control of the market cards selected
+	$scope.selectedMarketTradeCount = 0;
+	//used in gui to show items left in deck
+	$scope.itemsCountRemaining = 0;
+	//used in gui to show quests left in deck
+	$scope.questsCountRemaining = 0;
+	//used in gui to show discard count
+	$scope.discardsCount = 0;
+	$scope.activePlayer = null;
+	//used to show the last card discarded in the gui
+	$scope.lastDiscard = new playingCard();
+	//gui control of the quests
+	$scope.questSelected=false;
+	$scope.isActive = false;
+	$scope.selectedCartItems = "";
+	$scope.playerslog = [];
+	$scope.showLog = false;
+	$scope.showLogText = "Show Players Log";
+	$scope.blankText = "";
+	
+	//gui variable to control cart buttons
+	$scope.prevActiveCartId = -1;
+	$scope.activeCartId = -1;
+	
+	$scope.events = [
+		new Event(0,0,""),
+		new Event(1,0,""),
+		new Event(2,0,""),
+		new Event(3,0,""),
+		new Event(4,0,""),
+		new Event(5,0,""),
+		new Event(6,6,"BarbarianAttack"),
+		new Event(7,7,"BrokenItems"),
+		new Event(8,8,"CastleTaxation"),
+		new Event(9,9,"GolbinRaid"),
+		new Event(10,10,"KingsFeast"),
+		new Event(11,11,"MarketShortage"),
+		new Event(12,12,"MarketSurplus"),
+		new Event(13,13,"OrcsAttack"),
+		new Event(14,14,"SandStorm"),
+		new Event(15,15,"ThrownInTheDungeon"),
+		new Event(16,16,"Treasure"),
+		new Event(17,17,"VikingParade"),
+		new Event(18,18,"HailStorm"),
+		new Event(19,19,"HiddenRoom"),
+		]
+	
+	$scope.showLogResults = function() {
+		if(!$scope.showLog) {
+			$scope.showLogText = "Hide Players Log";
+		}else {
+			$scope.showLogText = "Show Players Log";
+		}
+		
+		$scope.showLog = !$scope.showLog;
+		
+	}
+	
 
 	var cardColor = function(card) {
 		if(card.selected) {
@@ -427,7 +516,7 @@ $scope.userClickedCartImage = function(id) {
 	}
 }
 
-
+/*
 setPlayerHighScore = function() {
 var total = 0;
 var lastTotal = 0;
@@ -479,6 +568,7 @@ for (var j = 0; j < game.players.length; ++j)  {
 	
 	}
 }
+*/
 
 updateMarketItemPoints = function(value) {
 	$scope.sumMarketValueSelected += value;
@@ -754,102 +844,7 @@ getSelectedCardSum = function(deck, selectedCardsOnly){
 }
 
 	
-$scope.newGame = function (numberOfPlayers) {
-		
-	$scope.activeEvent = null;
-	$scope.numberOfPlayers = Number(numberOfPlayers);
-	$scope.playersCompletedEventCount = 0;
-	$scope.itemCardBack = "../images/shoppingCardBack.jpg"
-	$scope.vendorCardBack = "../images/vendorback.jpg"
-	//$scope.itemCardBack = "../images/shoppingCardBack.jpgxxx"
-	//$scope.vendorCardBack = "../images/vendorback.jpgxxx"
-	//$scope.eventActionsRemaining=0;
-	$scope.debug = true;
-	//gui variable to control item buttons
-	$scope.selectedItemsCount = 0;
-	//gui variable to control cart buttons
-	$scope.selectedCartItemsCount = 0;
-	//gui variable to control market buttons
-	$scope.sumMarketValueSelected = 0;
-	//gui control of the market cards selected
-	$scope.selectedMarketTradeCount = 0;
-	//used in gui to show items left in deck
-	$scope.itemsCountRemaining = 0;
-	//used in gui to show quests left in deck
-	$scope.questsCountRemaining = 0;
-	//used in gui to show discard count
-	$scope.discardsCount = 0;
-	$scope.activePlayer = null;
-	//used to show the last card discarded in the gui
-	$scope.lastDiscard = new playingCard();
-	//gui control of the quests
-	$scope.questSelected=false;
-	$scope.isActive = false;
-	$scope.selectedCartItems = "";
-	$scope.playerslog = [];
-	$scope.showLog = false;
-	$scope.showLogText = "Show Players Log";
-	$scope.blankText = "";
-	
-	//gui variable to control cart buttons
-	$scope.prevActiveCartId = -1;
-	$scope.activeCartId = -1;
-	
-	$scope.events = [
-		new Event(0,0,""),
-		new Event(1,0,""),
-		new Event(2,0,""),
-		new Event(3,0,""),
-		new Event(4,0,""),
-		new Event(5,0,""),
-		new Event(6,6,"BarbarianAttack"),
-		new Event(7,7,"BrokenItems"),
-		new Event(8,8,"CastleTaxation"),
-		new Event(9,9,"GolbinRaid"),
-		new Event(10,10,"KingsFeast"),
-		new Event(11,11,"MarketShortage"),
-		new Event(12,12,"MarketSurplus"),
-		new Event(13,13,"OrcsAttack"),
-		new Event(14,14,"SandStorm"),
-		new Event(15,15,"ThrownInTheDungeon"),
-		new Event(16,16,"Treasure"),
-		new Event(17,17,"VikingParade"),
-		new Event(18,18,"HailStorm"),
-		new Event(19,19,"HiddenRoom"),
-		]
-	
-	$scope.showLogResults = function() {
-		if(!$scope.showLog) {
-			$scope.showLogText = "Hide Players Log";
-		}else {
-			$scope.showLogText = "Show Players Log";
-		}
-		
-		$scope.showLog = !$scope.showLog;
-		
-	}
 
-
-	$scope.game = new Game(numberOfPlayers-1);
-	$scope.activePlayerId = $scope.game.firstPlayer;
-
-		//create players
-        for (var i = 0; i < numberOfPlayers; ++i) {   
-			var pName = function(i) {
-				if(i===0) {return $scope.p1Name;}
-				if(i===1) {return $scope.p2Name;}
-				if(i===2) {return $scope.p3Name;}
-				if(i===3) {return $scope.p4Name;}
-			}
-            $scope.game.players.push(new Player(i, pName(i)));
-
-        }
-
-		$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
-		loadData(numberOfPlayers);
-		$scope.displayMode = "game";
-	
-}
 
 
 $scope.moveItemsToCart = function(id ) {
@@ -1476,9 +1471,10 @@ $scope.playerCompleteEvent = function(id) {
 		
 		$scope.playersCompletedEventCount++;
 
-		checkIfAllPlayersFinishedEvent(questCardinplay, id);
+		//checkIfAllPlayersFinishedEvent(questCardinplay, id);
 }
 
+/*
 checkIfAllPlayersFinishedEvent = function(questCardinplay, id) {
 	//when all players have finished event and clicked playerCompleteEvent
 	if ($scope.playersCompletedEventCount === $scope.numberOfPlayers) {
@@ -1504,7 +1500,7 @@ eventCycleToNextPlayer = function(game, questCardinplay) {
 	$scope.activePlayer.active = true;
 	prepareEventForPlayer(questCardinplay, $scope.activePlayer);	
 }
-
+*/
 
 //sort player cart cards
 sortPlayerCartCards = function(cart) {
@@ -1683,7 +1679,7 @@ function loadData(numPlayers) {
 }
 
 function playerRefresh() {
-     gameFactory.newGame(processGameStateCallback, processGameStateErrorCallback);
+     gameFactory.refresh(processGameStateCallback, processGameStateErrorCallback);
 }
 
 function joinGame(playerId) {
