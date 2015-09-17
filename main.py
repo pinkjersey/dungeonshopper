@@ -82,6 +82,7 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
+        self.appendToLog(game)
 
     def discard(self):
         """
@@ -112,6 +113,7 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
+        self.appendToLog(game)
 
     def move(self):
         """
@@ -154,6 +156,7 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
+        self.appendToLog(game)
 
     def buyCart(self):
         """
@@ -193,6 +196,7 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
+        self.appendToLog(game)
 
     def buyAction(self):
         """
@@ -213,6 +217,7 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
+        self.appendToLog(game)
 
     def marketTrade(self):
         """
@@ -244,7 +249,8 @@ class GameHandler(webapp2.RequestHandler):
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr) 
+        self.response.write(retstr)
+        self.appendToLog(game) 
 
     def completeQuest(self):
         """
@@ -278,7 +284,8 @@ class GameHandler(webapp2.RequestHandler):
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr) 
+        self.response.write(retstr)
+        self.appendToLog(game) 
 
     def passPlayer(self):
         """
@@ -315,6 +322,10 @@ class GameHandler(webapp2.RequestHandler):
     def refresh(self):
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
+        if (game == None):
+            self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+            self.response.headers["Content-Type"] = "application/json"
+            self.response.write("") 
 
         playerId = int(self.request.get('player'))
         if (playerId == None):
@@ -328,12 +339,15 @@ class GameHandler(webapp2.RequestHandler):
         retstr = playerState(game, playerId)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)   
+        self.response.write(retstr)        
+
+    def appendToLog(self, game):        
+        el = EventLog(playerId=game.curPlayer, event=self.request.url)
+        game.eventLog.append(el)
+        game.put()
 
     def get(self):
         """Switchboard for game actions"""
-        logging.error("in get")
-
 
         action = self.request.get('action')
         if action == None:
