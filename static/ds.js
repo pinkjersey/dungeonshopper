@@ -56,8 +56,8 @@ var Game = function() {
 	this.marketDeckInTrade = new cardSet();
 
 	//populated cardrs, itemHolders and quests
-	var questImageBase = "../images/shopping_card_master";
-//	var questImageBase = "../images/shopping_card_masterxxx";
+	var questImageBase = "../images/quest";
+//	var questImageBase = "../images/questxxx";
 	var blankMarketImageBase = "../images/"
 //	var blankMarketImageBase = "../images/xxx"
 	this.itemHolders.createBlankMarket(blankMarketImageBase);
@@ -66,22 +66,12 @@ var Game = function() {
 	this.players = [];
 	//create players
 	for (var i = 0; i < 4; ++i) {   
-		//var pName = function(i) {
-		//	if(i===0) {return $scope.p1Name;}
-		//	if(i===1) {return $scope.p2Name;}
-		//	if(i===2) {return $scope.p3Name;}
-		//	if(i===3) {return $scope.p4Name;}
-		//}
-		//$scope.game.players.push(new Player(i, $scope.playerName));
 		this.players.push(new Player(i, "Player" + i));
 	}	
 	//set initial size of the cards for the gui
 	//their are times in the code that these are changed and reset
-	//this.cards.setCardSize("60","80");
-	this.itemHolders.setCardSize("60","80");
-	this.quests.setCardSize("auto","200");	
-	this.questsInPlay.origWidth=100;
-	this.questsInPlay.origHeight=200;
+	this.quests.setCardSize("orig");	
+	this.questsInPlay.setCardSize("orig");
 
 }
 
@@ -103,8 +93,8 @@ var Event = function (index, type, name, displayMode) {
 
 
 var Player = function (id, name) {
-	var imageBase = "../images/shoppercarts_v3_";
-//	var imageBase = "../images/shoppercarts_v3_xxx";
+	var imageBase = "../images/cart";
+//	var imageBase = "../images/cart_xxx";
     this.id = id;
 	this.name = name;
 	this.turns = 0;
@@ -142,7 +132,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		//$scopeNextPlayerId = 0;
 		$scope.playerName="Player1";
 		$scopeNextPlayerId=0;		
-		$scope.numberOfPlayers =0;
+		$scope.numberOfPlayers =1;
 		$scope.game=null;
 	}	
 
@@ -151,25 +141,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.joinGame = function(playerName) {
 		$scope.playerName = playerName;
 		$scopeNextPlayerId++;		
-/*
-		switch (playerId) {
-			case 0:
-				$scope.p1Name = playerName;
-				break;
-			case 1:
-				$scope.p2Name = playerName;
-				break;
-			case 2:
-				$scope.p3Name = playerName;
-				break;
-			case 3:
-				$scope.p4Name = playerName;
-				break;
-			default:
-				$scope.p1Name = playerName;
-				break;
-		}
-		*/
+
 		//$scopeNextPlayerId++;
 		//$scope.playerName = "Player"+($scopeNextPlayerId+1);
 		//$scope.numberOfPlayersJoined = $scopeNextPlayerId;
@@ -211,7 +183,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	//$scope.itemCardBack = "../images/shoppingCardBack.jpgxxx"
 	//$scope.vendorCardBack = "../images/vendorback.jpgxxx"
 	//$scope.eventActionsRemaining=0;
-	$scope.debug = true;
+	$scope.debug = false;
 	//gui variable to control item buttons
 	$scope.selectedItemsCount = 0;
 	//gui variable to control cart buttons
@@ -230,7 +202,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	//used to show the last card discarded in the gui
 	$scope.lastDiscard = new playingCard();
 	//gui control of the quests
-	$scope.questSelected=false;
+	//$scope.questSelected=false;
 	$scope.isActive = false;
 	$scope.selectedCartItems = "";
 	$scope.playerslog = [];
@@ -319,7 +291,7 @@ $scope.userClickedMarketImage = function(i) {
 	game.marketDeckInTrade.addCard(card.number, card.image, 1);
 	var len = game.marketDeckInTrade.playingCards.length - 1;
 	game.marketDeckInTrade.playingCards[len].selected = true;
-	game.marketDeckInTrade.setCardSize("60","80");
+	//game.marketDeckInTrade.setCardSize("60","80");
 	updateMarketItemPoints(card.number);
 }
 
@@ -342,51 +314,81 @@ $scope.userClickedQuestImage = function(i) {
 	var questClicked = game.questsInPlay.playingCards[i];
 	
 	questClicked.selected = !questClicked.selected;
-	$scope.questSelected=!$scope.questSelected;
+	//$scope.questSelected=!$scope.questSelected;
 	questClicked.borderColor = cardColor(questClicked);
 	
 	//resetQuestsSize(i);
 
-		
-	if(questClicked.selected){
-		game.questsInPlay.origWidth = questClicked.cardImage.width;
-		game.questsInPlay.origHeight = questClicked.cardImage.height;
-		questClicked.cardImage.width = questClicked.cardImage.width * 2;
-		questClicked.cardImage.height = questClicked.cardImage.height * 2;
-	}
-	else {
-		questClicked.cardImage.width = game.questsInPlay.origWidth;
-		questClicked.cardImage.height = game.questsInPlay.origHeight;
-	}
-		
+	
 	for (var j = 0; j < game.questsInPlay.playingCards.length; ++j)  {
 		if(j===i){
-			continue;
+			if(questClicked.selected){
+				questClicked.setCardSize("large");
 			}
-		var card = game.questsInPlay.playingCards[j];
-		card.selected = false;
-		card.borderColor = cardColor(card);
-		card.cardImage.width = game.questsInPlay.origWidth;
-		card.cardImage.height = game.questsInPlay.origHeight;
+			else {
+				questClicked.setCardSize("orig");
+			}
+		}
+		else {
+			var card = game.questsInPlay.playingCards[j];
+			card.selected = false;
+			card.borderColor = cardColor(card);
+			card.setCardSize("orig");
+		}
 	}
+	
+
 
 }
 
-resetQuestsSize = function() {
-	for (var j = 0; j < game.questsInPlay.playingCards.length; ++j)  {
-		var card = game.questsInPlay.playingCards[j];
-		card.selected = false;
-		card.borderColor = cardColor(card);
-		card.cardImage.width = game.questsInPlay.origWidth;
-		card.cardImage.height = game.questsInPlay.origHeight;
-	}
-}
+//resetQuestsSize = function() {
+//	for (var j = 0; j < game.questsInPlay.playingCards.length; ++j)  {
+//		var card = game.questsInPlay.playingCards[j];
+//		card.selected = false;
+//		card.borderColor = cardColor(card);
+//		card.cardImage.width = game.questsInPlay.origWidth;
+//		card.cardImage.height = game.questsInPlay.origHeight;
+//	}
+//}
 
 $scope.aQuestIsReady = function() {
 	//go through eachquest
 		//go through each cart that has 3 items or more
 		//change size of quests that can be completed
 	
+}
+
+
+//returns card numbers appended to each other for deck.  ex. 1224
+getSelectedCardArrayFoQuest = function(deck){
+	var arr = [];
+	for (var i = 0; i < 5; ++i)  {
+		var card = deck.playingCards[i];
+		if(card===undefined) {
+			arr[i]=0;
+		}
+		else {
+			arr[i]=card.number;
+		}
+	}
+	
+	return arr;
+
+}
+
+
+parseSelectedCardArrayFoQuest = function(items) {
+	var s = "";
+	var num = "";
+	for (var i = 0; i < items.length; i++) {
+		num = items[i].toString();
+		s += num;
+		if(i+1 < items.length) {
+			s+=", ";
+		}
+	
+	}
+	return s;
 }
 
 $scope.playerCompleteQuest = function(id) {
@@ -408,11 +410,18 @@ $scope.playerCompleteQuest = function(id) {
 			alert("Select all items in cart/wagon first.")
 			return;
 			}
-
-
+			
 		var selectedCards = getSelectedCards(cart.cards);
-		
+		var questCards = getSelectedCardArrayFoQuest(cart.cards);
 		var items =  new Array(questClicked.item1, questClicked.item2, questClicked.item3, questClicked.item4, questClicked.item5);
+		//var itemsTrimmed = getSelectedCardsFoQuest(items);
+		//var items = questClicked.item1.toString() +questClicked.item2.toString()+questClicked.item3.toString()+questClicked.item4.toString()+questClicked.item5.toString();
+		
+		if (parseSelectedCardArrayFoQuest(questCards) === parseSelectedCardArrayFoQuest(items) ){
+			questCanBeCompleted = true;
+		}
+		
+		/*
 		for(var j = 0; j < items.length; ++j) {
 			if(items[j]===0) {
 				break;
@@ -432,7 +441,7 @@ $scope.playerCompleteQuest = function(id) {
 				}
 			}
 		}
-		
+		*/
 
 //fix me back after testing - good for testing events
 //		if($scope.debug) {
@@ -443,10 +452,10 @@ $scope.playerCompleteQuest = function(id) {
 			var r =  confirm("Confirm purchase from " + cart.name +"?");
 			if(r===true) {
 				//check if player completed quest and move it to their completed quests
-				resetQuestsSize();
+				game.questsInPlay.setCardSize("orig");
 				completeQuest(selectedCards, 'cart' + cart.id);
 				resetAllSelectedCards(player);
-				player.questsCompleted.setCardSize("auto","100");
+				player.questsCompleted.setCardSize("small");
 				updateLog(text);
 			}
 		}
@@ -556,7 +565,8 @@ updatePlayerCarts = function(playerCart, dataCart) {
 				updatePlayerCartItems(playerCart, dataCart.inCart[i]);	
 			}
 		}
-		playerCart.cards.setCardSize("38","55");
+		playerCart.cards.setCardSize("small");
+
 }
 	
 updatePlayerCartItems = function(playerCart, number) {
@@ -592,6 +602,7 @@ updateDiscardPile = function(number) {
 				break;
 		}
 	}
+	$scope.lastDiscard.setCardSize("large");	
 	updateLog($scope.blankText);
 }
 
@@ -613,7 +624,7 @@ dealNumberToMarket = function(marketDeck, number) {
 dealQuestsCompleted = function(questsCompleted, items) {
 	var game = $scope.game;
 	var text = "";
-	var questString = "../images/shopping_card_master";
+	var questString = "../images/quest";
 	var	itemString = "";
 	for (var i = 0; i < items.length; ++i)  {
 		itemString += items[i];
@@ -693,7 +704,7 @@ dealQuestCard = function(questsInPlay, items, level, type) {
 	//level4Cards.append(createQuestCard(4,False,[],0,6))
 	var game = $scope.game;
 	var text = "";
-	var questString = "../images/shopping_card_master";
+	var questString = "../images/quest";
 	var	itemString = "";
 	for (var i = 0; i < items.length; ++i)  {
 		itemString += items[i];
@@ -753,6 +764,8 @@ getSelectedCards = function(deck){
 	return selectedCards;
 
 }
+
+
 
 logSelectedCards = function(items) {
 	var s = "";
@@ -853,7 +866,7 @@ $scope.moveItemsToCart = function(id ) {
 	//when moved from player to cart
 	move(selectedCards, 'hand','cart'+id)
 		
-	cart.cards.setCardSize("38","55");
+	cart.cards.setCardSize("small");
 	resetAllSelectedCards(player);
 	updateLog(text);
 }
@@ -1101,15 +1114,16 @@ $scope.playerPass = function() {
 	var discardSelectedCards = getSelectedCards(player.cards);
 	var selectedCardCount = getSelectedCardcount(player.cards);
 	var text = "";
-	
+	var r = false;
+
 	if(player.actionsRemaining > 0)	{
 		var r = confirm("You are trying to pass with remaining actions - Continue?");
-		if (r == true) {
+		if (r === true) {
 			text += " passed with " + player.actionsRemaining +  " remaining actions.";
 			discardSelectedCards = "";
 		}
-	}	
-	else {
+	}
+	else if(player.actionsRemaining === 0)	{
 		if(player.cards.playingCards.length - selectedCardCount > player.maxHand) {	
 			alert("Too many cards, select cards to discard and pass.");
 			return;
@@ -1565,7 +1579,7 @@ var processGameStateErrorCallback = function (returnVal) {
         for (var i = 0; i < data.hand.length; ++i) {   
 			dealNumberToPlayer($scope.game.players[$scope.activePlayerId], data.hand[i]);	
 		}
-		$scope.activePlayer.cards.setCardSize("60","80");
+		//$scope.activePlayer.cards.setCardSize("60","80");
 
 		
         for (var i = 0; i < data.market.length; ++i) {   
@@ -1596,6 +1610,7 @@ var processGameStateErrorCallback = function (returnVal) {
 $scope.playerRefresh = function() {
 	if($scope.isActive===false) {
 		playerRefresh($scope.activePlayerId);
+		$scope.loadingData=false;
 	}
 }
 

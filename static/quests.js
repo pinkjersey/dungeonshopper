@@ -54,26 +54,30 @@ function questSet() {
 //questSet.prototype.defaultCardWord = 'Quest';
 //questSet.prototype.toString = function () { return '[object questSet]'; };
 
-questSet.prototype.addCard = function (level,gold,item1,item2,item3,item4,item5,vp,name,sortorder,oImage) {
+questSet.prototype.addCard = function (level,gold,item1,item2,item3,item4,item5,vp,name,sortorder,oImage,oImageSmall,oImageLarge) {
 	// Add a Quest to the deck
 	if(level===1) {
-		oImage = oImage + item1 + item2 + item3 + '.jpg'
+		oImage = oImage + item1 + item2 + item3 ;
 		}
 	if(level===2) {
-		oImage = oImage + item1 + item2 + item3 + item4 + '.jpg'
+		oImage = oImage + item1 + item2 + item3 + item4 ;
 		}
 	if(level===3) {
-		oImage = oImage + item1 + item2 + item3 + item4 + item5	 + '.jpg'
+		oImage = oImage + item1 + item2 + item3 + item4 + item5	; 
 		}
 	if(level==='4') {
-		oImage = oImage + '.jpg'
+		oImage = oImage;
 		}	
-	this.playingCards[this.playingCards.length] = new questCard(level,gold,item1,item2,item3,item4,item5,vp,name,sortorder,oImage,this);
+		
+	var oImageOrig = oImage + '.jpg'
+	var oImageSmall = oImage + '_sm.jpg'
+	var oImageLarge = oImage + '_lg.jpg'
+	this.playingCards[this.playingCards.length] = new questCard(level,gold,item1,item2,item3,item4,item5,vp,name,sortorder,oImageOrig, oImageSmall, oImageLarge, this);
 };
 
 questSet.prototype.addCardc = function (oCard) {
 	// Add a Quest to the deck
-	this.playingCards[this.playingCards.length] = new questCard(oCard.level,oCard.gold,oCard.item1,oCard.item2,oCard.item3,oCard.item4,oCard.item5,oCard.vp,oCard.name,oCard.sortorder,oCard.image,this);
+	this.playingCards[this.playingCards.length] = new questCard(oCard.level,oCard.gold,oCard.item1,oCard.item2,oCard.item3,oCard.item4,oCard.item5,oCard.vp,oCard.name,oCard.sortorder,oCard.image,oCard.imageSmall, oCard.imageLarge,this);
 };
 
 questSet.prototype.peek = function (i) {
@@ -106,10 +110,19 @@ questSet.prototype.shuffleCards = function (oTimes) {
 //	for( var i = 0, s=''; i < this.playingCards.length - 1; i++ ) { s+= this.playingCards[i].number + ' ' + this.playingCards[i].suit + '\n'; } alert(s);
 };
 
-questSet.prototype.setCardSize = function (oWidth,oHeight) {
+questSet.prototype.setCardSize = function (size) {
 	// Set a nice width for the cards - any CSS width value is allowed
 	for( var i = 0; i < this.playingCards.length; i++ ) {
-		this.playingCards[i].setCardSize(oWidth,oHeight);
+		if(size === "small") {
+			this.playingCards[i].image = this.playingCards[i].imageSmall;
+		}
+		if(size === "large") {
+			this.playingCards[i].image = this.playingCards[i].imageLarge;
+		}
+		else {
+			this.playingCards[i].image = this.playingCards[i].imageOrig;
+		}
+//		this.playingCards[i].setCardSize(oWidth,oHeight);
 	}
 };
 
@@ -300,8 +313,7 @@ var image=imageBase;
 	
 if(level===1){
 	
-	
-//	shopping_card_master111
+
 	this.addCard(level,1,1,3,9,0,0,2,'Battle of Castillon',1,image,this);
 	this.addCard(level,1,2,2,2,0,0,2,'Battle of Castillon',1,image,this);
 	this.addCard(level,1,1,5,8,0,0,3,'Battle of Castillon',1,image,this);
@@ -384,7 +396,7 @@ if(level===3){
 }
 
 if(level==='4'){
-	var image="../images/dungeonevent";
+	var image="../images/event";
 	this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',6,image+"BarbarianAttack",this);
 	this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',7,image+"BrokenItems",this);
 	this.addCard(level,0,0,0,0,0,0,0,'eventCastleTaxation',8,image+"CastleTaxation",this);
@@ -404,7 +416,7 @@ if(level==='4'){
 /****************************
  A class representing a card
 ****************************/
-function questCard(level,gold,item1,item2,item3,item4,item5,vp,name, nameId,image,oCardSet) {
+function questCard(level,gold,item1,item2,item3,item4,item5,vp,name, nameId,image,imageSmall,imageLarge , oCardSet) {
 
 	// Initialise settings
 	this.level=level;
@@ -418,11 +430,12 @@ function questCard(level,gold,item1,item2,item3,item4,item5,vp,name, nameId,imag
 	this.nameId = nameId;
 	this.selected = false;
 	this.vp = vp;
+	this.imageOrig = image;
 	this.image = image;
+	this.imageSmall = imageSmall;
+	this.imageLarge = imageLarge;
 	this.wayup = false;
 	this.cardSet = oCardSet;
-	this.cardStack = null;
-	this.positionOnStack = 0;
 	this.borderColor = 'black'
 	this.cardImage = document.createElement('img');
 	this.cardImage.style.display = 'block';
@@ -432,10 +445,19 @@ function questCard(level,gold,item1,item2,item3,item4,item5,vp,name, nameId,imag
 //questCard.prototype.toString = function () { return '[object questCard: '+this.number+']'; };
 
 
-questCard.prototype.setCardSize = function (oWidth,oHeight) {
-	// Set the width of the card image
-	this.cardImage.width = oWidth;
-	this.cardImage.height = oHeight;
-	this.cardImage.style.width = oWidth;
-	this.cardImage.style.height = oHeight;
+questCard.prototype.setCardSize = function (size) {
+if(size === "small") {
+	this.image = this.imageSmall;
+}
+if(size === "large") {
+	this.image = this.imageLarge;
+}
+else {
+	this.image = this.imageOrig;
+}
+//	// Set the width of the card image
+//	this.cardImage.width = oWidth;
+//	this.cardImage.height = oHeight;
+//	this.cardImage.style.width = oWidth;
+//	this.cardImage.style.height = oHeight;
 };
