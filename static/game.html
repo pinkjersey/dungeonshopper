@@ -1,7 +1,7 @@
 ﻿<div class="container">
 	<div class="row" >
-
-			<div  style="float:left; padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 5px;" ng-show="isActive===false">
+<!--ng-show="isActive===false"-->
+			<div  style="float:left; padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 5px;" >
 							<button class="btn btn-warning" ng-click="playerRefresh()" >Refresh</button>    
 			</div>
 			<div  style="float:right; padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 5px;" ng-show="isActive===true">
@@ -40,7 +40,7 @@
 					<button ng-disabled="player.nextCartId < cart.id" ng-if="!cart.active" class="btn btn-warning" ng-click="playerBuyCart(cart.id)" >Buy {{cart.name}} with {{cart.purchaseWith}}</button>   
 					<img ng-if="cart.active" style="border:3px solid {{cart.borderColor}}" width={{cart.width}} height={{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImage(cart.id)"></img>
 					<span class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
-						<img  style="border:2px solid {{card.borderColor}}" ng-click="userClickedCartItem(cart.id, $index)" ng-src="{{card.image}}" width = "{{card.cardImage.width}}" 	height = "{{card.cardImage.height}}" />
+						<img  style="border:2px solid {{card.borderColor}}" ng-click="userClickedCartItem(cart.id, $index)" ng-src="{{card.image}}"/>
 					</span>
 					<span ng-if="activePlayer.actionsRemaining > 0 && cart.active">
 						<button ng-disabled="loadingData===true" ng-if="cart.size - cart.cards.playingCards.length >= selectedItemsCount && cart.cardSumSelected === 0 && (selectedItemsCount+selectedCartItemsCount) > 0" class="btn btn-info" ng-click="moveItemsToCart(cart.id)" > Move to {{cart.name}}? </button>   
@@ -64,7 +64,7 @@
 			</div>
 			
 				<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in player.cards.playingCards track by $index + card.positionOnStack" >
-					<img ng-click="userClickedItemImage($index)" style="border:2px solid {{card.borderColor}}"  ng-src="{{card.image}}"	width = "{{card.cardImage.width}}" 	height = "{{card.cardImage.height}}" />
+					<img ng-click="userClickedItemImage($index)" style="border:2px solid {{card.borderColor}}"  ng-src="{{card.image}}"/>
 				</span>
 		</div>
 		<p></p>		
