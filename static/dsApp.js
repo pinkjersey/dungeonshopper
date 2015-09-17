@@ -1,2 +1,2 @@
 // JavaScript source code
-app = angular.module('dsApp', ['anguFixedHeaderTable']);
+app = angular.module('dsApp', ['anguFixedHeaderTable','ngAnimate']);

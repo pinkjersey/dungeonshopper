@@ -121,12 +121,12 @@ function cardSet() {
 
 cardSet.prototype.addCard = function (oNumber,oImage,oCount) {
 	// Add a card to the deck
-	this.playingCards[this.playingCards.length] = new playingCard(oNumber,oImage,oImageSmall, oCount);
+	this.playingCards[this.playingCards.length] = new playingCard(oNumber,oImage,oImageSmall, oImageLarge,oCount);
 };
 
 cardSet.prototype.addCardc = function (oCard) {
 	// Add a card to the deck
-	this.playingCards[this.playingCards.length] = new playingCard(oCard.number,oCard.image,oCard.imageSmall, oCard.count);
+	this.playingCards[this.playingCards.length] = new playingCard(oCard.number,oCard.image,oCard.imageSmall,oCard.imageLarge, oCard.count);
 
 };
 
@@ -198,7 +198,8 @@ cardSet.prototype.createBlankMarket = function(imageBase) {
 	   for (var a = 1; a < 11; a++) { 
 		   oImage=imageBase + a + "_card.jpg";
 		   oImageSmall=imageBase + a + "_card_sm.jpg";
-			this.addCard(a,oImage,oImageSmall, 0);
+   		   oImageLarge=imageBase + a + "_card_lg.jpg";
+			this.addCard(a,oImage,oImageSmall,oImageLarge, 0);
 		}
 
 	}
@@ -215,13 +216,14 @@ cardSet.prototype.truncate = function () {
 /****************************
  A class representing a card
 ****************************/
-function playingCard(oNumber,oImage,oImageSmall,oCount ) {
+function playingCard(oNumber,oImage,oImageSmall,oImageLarge,oCount ) {
 
 	// Initialise settings
 	this.number = oNumber;
 	this.imageOrig = oImage;
 	this.image = oImage;
 	this.imageSmall = oImageSmall;
+	this.imageLarge = oImageLarge;
 	this.count = oCount;
 	this.selected = false;
 	this.borderColor = 'black';
@@ -238,6 +240,9 @@ playingCard.prototype.setCardSize = function (size) {
 	// Set the width of the card image
 if(size === "small") {
 	this.image = this.imageSmall;
+}
+if(size === "large") {
+	this.image = this.imageLarge;
 }
 else {
 	this.image = this.imageOrig;

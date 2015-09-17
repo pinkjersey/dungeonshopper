@@ -602,6 +602,7 @@ updateDiscardPile = function(number) {
 				break;
 		}
 	}
+	$scope.lastDiscard.setCardSize("large");	
 	updateLog($scope.blankText);
 }
 
