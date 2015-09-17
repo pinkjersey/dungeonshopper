@@ -1,19 +1,18 @@
 angular.module('dsApp')
        .factory('gameFactory', function ($http) {
            return {
-               newGame: function (numberOfPlayers, callback, errorcallback) {
+               newGame: function (numberOfPlayers, playerName, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       //url: 'http://vdknycfl00222:13080/game?action=new&numPlayers=' + numberOfPlayers,
-					   url: '/game?action=new&numPlayers=' + numberOfPlayers,
+					   url: '/game?action=new&numPlayers=' + numberOfPlayers + '&name=' + playerName,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
                },
-               joinGame: function (playerId, callback, errorcallback) {
+               joinGame: function (playerId, playerName, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=join&playerId=' + playerId,
+                       url: '/game?action=join&playerId=' + playerId  + '&name=' + playerName,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);

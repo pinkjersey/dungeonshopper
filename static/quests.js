@@ -446,18 +446,16 @@ function questCard(level,gold,item1,item2,item3,item4,item5,vp,name, nameId,imag
 
 
 questCard.prototype.setCardSize = function (size) {
-if(size === "small") {
-	this.image = this.imageSmall;
-}
-if(size === "large") {
-	this.image = this.imageLarge;
-}
-else {
-	this.image = this.imageOrig;
-}
-//	// Set the width of the card image
-//	this.cardImage.width = oWidth;
-//	this.cardImage.height = oHeight;
-//	this.cardImage.style.width = oWidth;
-//	this.cardImage.style.height = oHeight;
+
+switch (size)
+	{
+		case 'small':
+			this.image = this.imageSmall;
+			break;
+		case 'large':
+			this.image = this.imageLarge;
+			break;
+		default:
+			this.image = this.imageOrig;
+	}
 };
