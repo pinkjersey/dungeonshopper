@@ -5,8 +5,8 @@ var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased,
 	this.size = size;
     this.active = active;
 	this.selected = false;
-	this.width=70;
-	this.height=100;
+	this.width=92;
+	this.height=125;
 	this.name = name;
 	this.destroyed = false;
 	this.purchaseWith = 'gold';
@@ -29,10 +29,6 @@ var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased,
 	this.borderColorInit = "#9c280b"
 	this.borderColor = this.borderColorInit;
 	this.cardSumSelected = 0;
-	
-
-
-
     this.contains = function () {
         if (this.cards.playingCards.length == 0) {
             return "Nothing";
@@ -81,7 +77,7 @@ var PlayersLog = function (id, text) {
 }
 
 var Event = function (index, type, name, displayMode) {
-	var imageBase="../images/dungeonevent";
+	var imageBase="../images/event";
 	index = index;
 	id = type;
 	name = name;
@@ -247,7 +243,24 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.showLog = !$scope.showLog;
 		
 	}
-	
+
+	var playerCardChecked = function(card) {
+		if(card.selected) {
+			card.image = card.imageChecked;
+		}
+		else {	
+			card.image = card.imageOrig;
+		}
+	}	
+
+	var cartCardChecked = function(card) {
+		if(card.selected) {
+			card.image = card.imageSmallChecked;
+		}
+		else {	
+			card.image = card.imageSmall;
+		}
+	}	
 
 	var cardColor = function(card) {
 		if(card.selected) {
@@ -284,7 +297,6 @@ $scope.userClickedMarketImage = function(i) {
 	var game = $scope.game;
 	var card = game.itemHolders.playingCards[i];
 	card.selected = !card.selected;
-
 	card.borderColor = 'black';
 	card.count--;
 	
@@ -485,6 +497,7 @@ $scope.userClickedCartItem = function(id, i) {
 	
 	card.selected = !card.selected;
 	card.borderColor = cardColor(card);
+	cartCardChecked(card);
 	resetPlayerCardsSelected(player);
 	resetCartCardsSelected(player, id);
 	
@@ -500,6 +513,7 @@ $scope.userClickedItemImage = function(id) {
 	resetCartCardsSelected(player, -1);
 	card.selected = !card.selected;
 	card.borderColor = cardColor(card);	
+	playerCardChecked(card);
 	player.cardSumSelected = getSelectedCardSum(player.cards, true);
 	$scope.selectedItemsCount = getSelectedCardcount(player.cards);
 	updatePurchaseText(player.cardSumSelected);
