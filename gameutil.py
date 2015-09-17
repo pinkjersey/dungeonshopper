@@ -28,6 +28,12 @@ def playerState(game, playerId):
     else:
         thedict["lastDiscarded"] = None
 
+    el = []
+    for e in game.eventLog:
+        el.append(e.to_dict())
+
+    thedict["eventLog"] = el
+
     jsonstr = json.dumps(thedict)
     return jsonstr   
 
@@ -487,7 +493,7 @@ def buyAction(game):
 
     return True
 
-def createNewGame(numPlayers):
+def createNewGame(numPlayers, name):
     # Temporary: delete theGame from the data store
     # later, perhaps stale games will be deleted here
     game_k = ndb.Key('Game', 'theGame')
@@ -502,7 +508,9 @@ def createNewGame(numPlayers):
 
     game.itemDeck = newItemDeck()
     for i in range (0, game.numPlayers):
-        p=Player()            
+        p=Player(name="defaultPlayer{0}".format(i))            
+        if (i == 0):
+            p.name = name
         game.players.append(p)
 
     # deal five cards

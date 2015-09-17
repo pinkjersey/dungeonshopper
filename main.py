@@ -22,7 +22,12 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        game = createNewGame(numPlayers)       
+        name = self.request.get("name")
+        if (name == None or name == ""):
+            self.error(500)
+            return
+
+        game = createNewGame(numPlayers, name)       
         retstr = playerState(game, 0)        
         #jsonstr = json.dumps([game.to_dict()])
                 
@@ -33,6 +38,10 @@ class GameHandler(webapp2.RequestHandler):
     def info(self):
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
+        if (game == None):
+            self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+            self.response.headers["Content-Type"] = "application/json"
+            self.response.write("")    
 
         jsonstr = json.dumps([game.to_dict()])
         if jsonstr == None or jsonstr == "":
@@ -45,6 +54,13 @@ class GameHandler(webapp2.RequestHandler):
     def join(self):
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
+
+        name = self.request.get("name")
+        if (name == None or name == ""):
+            self.error(500)
+            return
+
+        game.players[1].name = name
 
         retstr = playerState(game, 1)        
         #jsonstr = json.dumps([game.to_dict()])
