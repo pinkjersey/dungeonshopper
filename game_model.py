@@ -30,6 +30,10 @@ class Player(ndb.Model):
     turns = ndb.IntegerProperty(required=True, default=0)
     questsCompleted = ndb.LocalStructuredProperty(QuestCard, repeated=True)
 
+class EventLog(ndb.Model):
+    playerId = ndb.IntegerProperty(required=True)
+    event = ndb.StringProperty(required=True)
+
 class Game(ndb.Model):
     curPlayer = ndb.IntegerProperty(default=0)
     actionsRemaining = ndb.IntegerProperty(default=2)        
@@ -40,6 +44,7 @@ class Game(ndb.Model):
     questDeck = ndb.LocalStructuredProperty(QuestCard, repeated=True)
     market = ndb.IntegerProperty(repeated=True)
     questsInPlay = ndb.LocalStructuredProperty(QuestCard, repeated=True)
+    eventLog = ndb.LocalStructuredProperty(EventLog, repeated=True)
 
 
 
