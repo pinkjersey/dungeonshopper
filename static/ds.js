@@ -66,22 +66,12 @@ var Game = function() {
 	this.players = [];
 	//create players
 	for (var i = 0; i < 4; ++i) {   
-		//var pName = function(i) {
-		//	if(i===0) {return $scope.p1Name;}
-		//	if(i===1) {return $scope.p2Name;}
-		//	if(i===2) {return $scope.p3Name;}
-		//	if(i===3) {return $scope.p4Name;}
-		//}
-		//$scope.game.players.push(new Player(i, $scope.playerName));
 		this.players.push(new Player(i, "Player" + i));
 	}	
 	//set initial size of the cards for the gui
 	//their are times in the code that these are changed and reset
-	//this.cards.setCardSize("60","80");
-	//this.itemHolders.setCardSize("60","80");
 	this.quests.setCardSize("orig");	
 	this.questsInPlay.setCardSize("orig");
-	//this.questsInPlay.origHeight=200;
 
 }
 
@@ -103,8 +93,8 @@ var Event = function (index, type, name, displayMode) {
 
 
 var Player = function (id, name) {
-	var imageBase = "../images/shoppercarts_v3_";
-//	var imageBase = "../images/shoppercarts_v3_xxx";
+	var imageBase = "../images/cart";
+//	var imageBase = "../images/cart_xxx";
     this.id = id;
 	this.name = name;
 	this.turns = 0;
@@ -151,25 +141,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.joinGame = function(playerName) {
 		$scope.playerName = playerName;
 		$scopeNextPlayerId++;		
-/*
-		switch (playerId) {
-			case 0:
-				$scope.p1Name = playerName;
-				break;
-			case 1:
-				$scope.p2Name = playerName;
-				break;
-			case 2:
-				$scope.p3Name = playerName;
-				break;
-			case 3:
-				$scope.p4Name = playerName;
-				break;
-			default:
-				$scope.p1Name = playerName;
-				break;
-		}
-		*/
+
 		//$scopeNextPlayerId++;
 		//$scope.playerName = "Player"+($scopeNextPlayerId+1);
 		//$scope.numberOfPlayersJoined = $scopeNextPlayerId;
