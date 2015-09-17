@@ -47,12 +47,12 @@ function cardSet() {
 
 cardSet.prototype.addCard = function (oNumber,oImage,oCount) {
 	// Add a card to the deck
-	this.playingCards[this.playingCards.length] = new playingCard(oNumber,oImage,oImageSmall, oImageLarge,oCount);
+	this.playingCards[this.playingCards.length] = new playingCard(oNumber,oImage,oImageSmall, oImageLarge,oImageSmallChecked, oImageChecked,oCount);
 };
 
 cardSet.prototype.addCardc = function (oCard) {
 	// Add a card to the deck
-	this.playingCards[this.playingCards.length] = new playingCard(oCard.number,oCard.image,oCard.imageSmall,oCard.imageLarge, oCard.count);
+	this.playingCards[this.playingCards.length] = new playingCard(oCard.number,oCard.image,oCard.imageSmall,oCard.imageLarge,oCard.imageSmallChecked, oCard.imageChecked, oCard.count);
 
 };
 
@@ -110,7 +110,9 @@ cardSet.prototype.createBlankMarket = function(imageBase) {
 		   oImage=imageBase + a + "_card.jpg";
 		   oImageSmall=imageBase + a + "_card_sm.jpg";
    		   oImageLarge=imageBase + a + "_card_lg.jpg";
-			this.addCard(a,oImage,oImageSmall,oImageLarge, 0);
+		   oImageSmallChecked=imageBase + a + "_card_sm_checked.jpg";
+   		   oImageChecked=imageBase + a + "_card_checked.jpg";
+			this.addCard(a,oImage,oImageSmall,oImageLarge,oImageSmallChecked, oImageChecked, 0);
 		}
 
 	}
@@ -127,14 +129,16 @@ cardSet.prototype.truncate = function () {
 /****************************
  A class representing a card
 ****************************/
-function playingCard(oNumber,oImage,oImageSmall,oImageLarge,oCount ) {
+function playingCard(oNumber,oImage,oImageSmall,oImageLarge,oImageSmallChecked,oImageChecked,oCount ) {
 
 	// Initialise settings
 	this.number = oNumber;
 	this.imageOrig = oImage;
 	this.image = oImage;
 	this.imageSmall = oImageSmall;
+	this.imageSmallChecked = oImageSmallChecked;
 	this.imageLarge = oImageLarge;
+	this.imageChecked = oImageChecked;
 	this.count = oCount;
 	this.selected = false;
 	this.borderColor = 'black';
