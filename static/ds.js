@@ -97,8 +97,8 @@ var Event = function (index, type, name, displayMode) {
 
 
 var Player = function (id, name) {
-	var imageBase = "../images/cart";
-//	var imageBase = "../images/cart_xxx";
+//	var imageBase = "../images/cart";
+	var imageBase = "../images/cart_xxx";
     this.id = id;
 	this.name = name;
 	this.turns = 0;
@@ -142,16 +142,17 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 	setupNoGame();
 	
-	$scope.joinGame = function(playerName) {
+	$scope.joinGame = function(numberOfPlayers, playerName) {
 		//$scope.playerName = playerName;
 		$scopeNextPlayerId++;		
-
+		$scope.numberOfPlayers = Number(numberOfPlayers);
 		//$scopeNextPlayerId++;
 		//$scope.playerName = "Player"+($scopeNextPlayerId+1);
 		//$scope.numberOfPlayersJoined = $scopeNextPlayerId;
 		$scope.game = new Game($scopeNextPlayerId+1);
-		$scope.activePlayerId = $scopeNextPlayerId;
-		$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
+		//$scope.activePlayerId = $scopeNextPlayerId;
+		//$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
+		$scope.myId=$scopeNextPlayerId;
 		joinGame($scopeNextPlayerId, playerName);
 		//$scope.displayMode = "game";
 	}
@@ -160,20 +161,31 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.newGame = function (numberOfPlayers, playerName) {
 		$scope.numberOfPlayers = Number(numberOfPlayers);
 		$scope.game = new Game(numberOfPlayers);
-		$scope.activePlayerId = 0;
-		$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
+		//$scope.activePlayerId = 0;
+		$scope.myId = 0;
+		//$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
 		loadData(numberOfPlayers, playerName);
 		//$scope.displayMode = "game";
 		
 	}
 	
 	
+	$scope.playerRefresh = function() {
+		playerRefresh(1$scope.activePlayerId);
+		$scope.loadingData=false;
+	}
+	
    	function startInterval(params) {
         timerId = setInterval(function () { 
-		if($scope.activePlayerId != undefined) 
-			$scope.playerRefresh($scope.activePlayerId)}, params);
-    }
-	
+			if($scope.isActive===false) {
+				if($scope.activePlayerId != undefined) {
+					$scope.playerRefresh();
+				}
+			}
+
+		}	, params	)
+	}
+
     //this is the initial load
     $(document).ready(); {
         startInterval(5000);
@@ -1609,7 +1621,10 @@ updateLog = function(text) {
 
 		var text = "";
 		$scope.isActive = data.isActive;
-		$scope.numberOfPlayers = data.numPlayers;
+		//$scope.numberOfPlayers = data.numPlayers;
+		
+		$scope.activePlayer = $scope.game.players[data.curPlayer];
+		$scope.activePlayerId = data.curPlayer;
 		$scope.activePlayer.active = data.isActive;
 		var mode = function(isActive) {
 			if(isActive) {
@@ -1623,6 +1638,8 @@ updateLog = function(text) {
 		$scope.activePlayer.actionsRemaining = data.actionsRemaining;
 		$scope.activePlayer.gold = data.gold;
 		$scope.activePlayer.turns = data.turns;
+		$scope.curPlayer = data.curPlayer;
+		$scope.numPlayers = data.numPlayers;
 		$scope.activePlayer.vp = data.points;
 		$scope.activePlayer.maxHand = data.maxHand;
 		$scope.itemsCountRemaining = data.itemsCountRemaining;
@@ -1630,29 +1647,18 @@ updateLog = function(text) {
 		//$scope.activePlayerId = $scope.game.firstPlayer;	
 		$scope.game.questsInPlay = new cardSet();
 		$scope.game.marketDeck = new cardSet();
-		$scope.activePlayer.cards =  new cardSet();
+		//$scope.activePlayer.cards =  new cardSet();
 		//$scope.game.discardDeck = new cardSet();
 		$scope.activePlayer.questsCompleted =  new cardSet();
-		$scope.activePlayer.carts[0].cards =  new cardSet();
-		$scope.activePlayer.carts[1].cards =  new cardSet();
-		$scope.activePlayer.carts[2].cards =  new cardSet();
-		$scope.activePlayer.carts[3].cards =  new cardSet();		
+		//$scope.activePlayer.carts[0].cards =  new cardSet();
+		//$scope.activePlayer.carts[1].cards =  new cardSet();
+		//$scope.activePlayer.carts[2].cards =  new cardSet();
+		//$scope.activePlayer.carts[3].cards =  new cardSet();		
 		//$scope.game.questsInPlay.origWidth=100;
 		//$scope.game.questsInPlay.origHeight=200;
 		$scope.discardsCount = 0;
 		$scope.eventsLog = [];
 		$scope.game.players[$scope.activePlayerId].name = data.name;
-
-        for (var i = 0; i < data.hand.length; ++i) {   
-			dealNumberToPlayer($scope.game.players[$scope.activePlayerId], data.hand[i]);	
-		}
-		
-		if(!$scope.activePlayer.active) {
-			for (var i = 0; i < data.hand.length; ++i) {   
-				dealNumberToPlayer($scope.game.players[$scope.activePlayerId], -1);	
-			}
-		}
-		//$scope.activePlayer.cards.setCardSize("60","80");
 
 		
         for (var i = 0; i < data.market.length; ++i) {   
@@ -1664,11 +1670,30 @@ updateLog = function(text) {
 			dealQuestCard($scope.game.questsInPlay, data.questsInPlay[i].items, data.questsInPlay[i].level, data.questsInPlay.type);
 		}
 		
-		
-		for (var i = 0; i < data.carts.length; ++i) {   
-			updatePlayerCarts($scope.game.players[$scope.activePlayerId].carts[i], data.carts[i]);	
-		}
+		for (var p = 0; p < data.numPlayers; ++p) {  
 
+			$scope.game.players[p].cards = new cardSet();
+			
+			if($scope.myId === data.curPlayer && $scope.myId === p) {
+				for (var i = 0; i < data.hand.length; ++i) {   
+					dealNumberToPlayer($scope.activePlayer, data.hand[i]);	
+				}
+			}
+			else {
+				for (var i = 0; i < $scope.game.players[p].maxHand; ++i) {   
+					dealNumberToPlayer($scope.game.players[p], -1);	
+				}
+			}
+		
+			//populate carts - once we have data.player[i] working, fix me
+			if($scope.myId === data.curPlayer && $scope.myId === p) {
+				for (var i = 0; i < data.carts.length; ++i) {   
+					$scope.game.players[p].carts[i].cards =  new cardSet();
+					updatePlayerCarts($scope.game.players[p].carts[i], data.carts[i]);	
+				}
+			}
+		}
+		
         for (var i = 0; i < data.questsCompleted.length; ++i) {   
 			dealQuestsCompleted($scope.game.players[$scope.activePlayerId].questsCompleted, data.questsCompleted[i].items);
 		}
@@ -1685,12 +1710,6 @@ updateLog = function(text) {
 		 $scope.loadingData=false;
 	}
 
-$scope.playerRefresh = function() {
-	if($scope.isActive===false) {
-		playerRefresh($scope.activePlayerId);
-		$scope.loadingData=false;
-	}
-}
 
 
 function loadData(numPlayers, playerName) {
