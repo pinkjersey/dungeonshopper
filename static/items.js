@@ -151,13 +151,24 @@ function playingCard(oNumber,oImage,oImageSmall,oImageLarge,oImageSmallChecked,o
 
 playingCard.prototype.setCardSize = function (size) {
 	// Set the width of the card image
-if(size === "small") {
-	this.image = this.imageSmall;
-}
-if(size === "large") {
-	this.image = this.imageLarge;
-}
-else {
-	this.image = this.imageOrig;
-}
+switch (size)
+	{
+		case 'small':
+			this.image = this.imageSmall;
+			break;
+		case 'large':
+			this.image = this.imageLarge;
+			break;
+		case 'smallChecked':
+			this.image = this.imageSmallChecked;
+			break;
+		case 'checked':
+			this.image = this.imageChecked;
+			break;
+		case 'orig':
+			this.image = this.imageOrig;
+			break;
+		default:
+			this.image = this.imageOrig;
+	}
 };

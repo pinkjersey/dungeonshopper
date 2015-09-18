@@ -11,9 +11,9 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr ng-repeat="log in playerslog track by $index">
-							<td width="50px">{{activePlayer.name}}</td>
-							<td width="500px">{{log.text}}</td>
+						<tr ng-repeat="log in eventsLog track by $index">
+							<td width="50px">{{log.name}}</td>
+							<td width="500px">{{log.logItem}}</td>
 						</tr>
 					</tbody>
 <!--					<tfoot>	<tr><td width="50px">End Log</td><td width="500px"></td></tr></tfoot>	-->
