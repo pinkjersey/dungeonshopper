@@ -47,7 +47,7 @@ function cardSet() {
 
 cardSet.prototype.addCard = function (oNumber,oImage,oCount) {
 	// Add a card to the deck
-	this.playingCards[this.playingCards.length] = new playingCard(oNumber,oImage,oImageSmall, oImageLarge,oImageSmallChecked, oImageChecked,oCount);
+	this.playingCards[this.playingCards.length] = new playingCard(oNumber,oImage,oImageSmall,oImageLarge,oImageSmallChecked, oImageChecked,oCount);
 };
 
 cardSet.prototype.addCardc = function (oCard) {
@@ -76,16 +76,30 @@ cardSet.prototype.shuffleCards = function (oTimes) {
 	}
 };
 
+
 cardSet.prototype.setCardSize = function (size) {
 	// Set a nice width for the cards - any CSS width value is allowed
 	for( var i = 0; i < this.playingCards.length; i++ ) {
-		if(size === "small") {
+		switch(size)
+		{
+		case 'small':
 			this.playingCards[i].image = this.playingCards[i].imageSmall;
-		}
-		else {
+			break;
+		case 'large':
+			this.playingCards[i].image = this.playingCards[i].imageLarge;
+			break;
+		case 'smallChecked':
+			this.playingCards[i].image = this.playingCards[i].imageSmallChecked;
+			break;
+		case 'checked':
+			this.playingCards[i].image = this.playingCards[i].imageChecked;
+			break;
+		case 'orig':
+			this.playingCards[i].image = this.playingCards[i].imageOrig;
+			break;
+		default:
 			this.playingCards[i].image = this.playingCards[i].imageOrig;
 		}
-//		this.playingCards[i].setCardSize(oWidth,oHeight);
 	}
 };
 

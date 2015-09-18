@@ -12,16 +12,17 @@
 	<thead>
 	<tr>
 		<td>
-			<span ng-repeat="card in game.itemHolders.playingCards track by $index">
-				<span ng-show = "card.count > 0" ><big>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{card.count}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</big></span>
+			<!--<span ng-repeat="card in game.itemHolders.playingCards track by $index">-->
+				<!--<span ng-show = "card.count > 0" ><big>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{card.count}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</big></span>-->
 				<!--<marketcardcount info="card"></marketcardcount>-->
-			</span>
+			<!--</span>-->
 		</td>
 	</tr>
 	<tr>
 	<td>
-		<span ng-repeat="marketcard in game.itemHolders.playingCards track by $index">
-			<img style="border:2px solid {{marketcard.borderColor}}"  ng-src="{{marketcard.image}}" ng-show = "marketcard.count > 0" ng-click="userClickedMarketImage($index)"></img>
+		<span ng-repeat="marketcard in game.itemMarketHolders.playingCards track by $index">
+			<span ng-show = "marketcard.count > 0" ><big>{{marketcard.count}}&nbsp;</big></span>
+			<img ng-show = "marketcard.count > 0"style="border:2px solid {{marketcard.borderColor}}" ng-src="{{marketcard.image}}" ng-click="userClickedMarketImage($index)"></img>
 		</span>
 	</td>
 	</tr>
