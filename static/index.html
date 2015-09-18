@@ -27,11 +27,12 @@
 
     <div class="panel panel-info">
 		<div class="panel-heading">
-			<h2>test</h2>
+			<h2>test - {{displayMode}}</h2>
 			<span class="panel-title pull-right"><button class="btn btn-primary" ng-show="displayMode === 'game'" ng-click="noGame()">Reset</button></span>
 
         <ng-include src="'nogame.html'" ng-show="displayMode === 'nogame'"></ng-include>
         <ng-include src="'game.html'" ng-show="displayMode === 'game'"></ng-include>
+        <ng-include src="'gameSpectator.html'" ng-show="displayMode === 'gameSpectator'"></ng-include>
         <ng-include src="'gameover.html'" ng-show="displayMode === 'gameover'"></ng-include>
         <ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventTemplate'"></ng-include>
 		<ng-include src="'eventOrcsAttack.html'" ng-show="displayMode === 'eventOrcsAttack'"></ng-include>

@@ -42,7 +42,7 @@ var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased,
 }
 
 
-var Game = function() {
+var Game = function(numPlayers) {
 
 	//all the starter empty playingCards holders	
 	this.quests = new questSet();
@@ -63,7 +63,7 @@ var Game = function() {
 
 	this.players = [];
 	//create players
-	for (var i = 0; i < 4; ++i) {   
+	for (var i = 0; i < numPlayers; ++i) {   
 		this.players.push(new Player(i, "Player" + i));
 	}	
 	//set initial size of the cards for the gui
@@ -132,9 +132,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 	setupNoGame = function() {
 		$scope.displayMode = "nogame";
-		$scope.splashImage = "../images/boxtop.jpg";
+		//$scope.splashImage = "../images/boxtop.jpg";
 		//$scopeNextPlayerId = 0;
-		$scope.playerName="Player1";
+		$scope.playerName="Type Your Name";
 		$scopeNextPlayerId=0;		
 		$scope.numberOfPlayers =1;
 		$scope.game=null;
@@ -149,21 +149,21 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		//$scopeNextPlayerId++;
 		//$scope.playerName = "Player"+($scopeNextPlayerId+1);
 		//$scope.numberOfPlayersJoined = $scopeNextPlayerId;
-		$scope.game = new Game();
+		$scope.game = new Game($scopeNextPlayerId+1);
 		$scope.activePlayerId = $scopeNextPlayerId;
 		$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
 		joinGame($scopeNextPlayerId, playerName);
-		$scope.displayMode = "game";
+		//$scope.displayMode = "game";
 	}
 	
 	
 	$scope.newGame = function (numberOfPlayers, playerName) {
 		$scope.numberOfPlayers = Number(numberOfPlayers);
-		$scope.game = new Game();
+		$scope.game = new Game(numberOfPlayers);
 		$scope.activePlayerId = 0;
 		$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
 		loadData(numberOfPlayers, playerName);
-		$scope.displayMode = "game";
+		//$scope.displayMode = "game";
 		
 	}
 	
@@ -727,7 +727,7 @@ dealQuestCard = function(questsInPlay, items, level, type) {
 		}
 	}
 	if(level === 4) {
-		prepareEventForPlayer(card);
+		//prepareEventForPlayer(card);
 	}
 	updateLog(text);
 	
@@ -1606,9 +1606,20 @@ updateLog = function(text) {
 //    questDeck = ndb.LocalStructuredProperty(QuestCard, repeated=True)
 //    market = ndb.IntegerProperty(repeated=True)
 //    questsInPlay = ndb.LocalStructuredProperty(QuestCard, repeated=True)
+
 		var text = "";
 		$scope.isActive = data.isActive;
+		$scope.numberOfPlayers = data.numPlayers;
 		$scope.activePlayer.active = data.isActive;
+		var mode = function(isActive) {
+			if(isActive) {
+				return 'game';
+			}
+			else {
+				return 'gameSpectator';
+			}
+		}
+		resetDisplayMode(mode(data.isActive));
 		$scope.activePlayer.actionsRemaining = data.actionsRemaining;
 		$scope.activePlayer.gold = data.gold;
 		$scope.activePlayer.turns = data.turns;
@@ -1634,6 +1645,12 @@ updateLog = function(text) {
 
         for (var i = 0; i < data.hand.length; ++i) {   
 			dealNumberToPlayer($scope.game.players[$scope.activePlayerId], data.hand[i]);	
+		}
+		
+		if(!$scope.activePlayer.active) {
+			for (var i = 0; i < data.hand.length; ++i) {   
+				dealNumberToPlayer($scope.game.players[$scope.activePlayerId], -1);	
+			}
 		}
 		//$scope.activePlayer.cards.setCardSize("60","80");
 

@@ -45,7 +45,7 @@ function cardSet() {
 	this.playingCards = [];
 }
 
-cardSet.prototype.addCard = function (oNumber,oImage,oCount) {
+cardSet.prototype.addCard = function (oNumber,oImage,oImageSmall,oImageLarge,oImageSmallChecked, oImageChecked,oCount) {
 	// Add a card to the deck
 	this.playingCards[this.playingCards.length] = new playingCard(oNumber,oImage,oImageSmall,oImageLarge,oImageSmallChecked, oImageChecked,oCount);
 };
@@ -129,6 +129,10 @@ cardSet.prototype.createBlankMarket = function(imageBase) {
 			this.addCard(a,oImage,oImageSmall,oImageLarge,oImageSmallChecked, oImageChecked, 0);
 		}
 
+		   oImage=imageBase+"back_card.jpg";
+		
+		this.addCard(-1,oImage,oImage,oImage,oImage, oImage, 0);
+
 	}
 
 cardSet.prototype.truncate = function () {
@@ -156,6 +160,7 @@ function playingCard(oNumber,oImage,oImageSmall,oImageLarge,oImageSmallChecked,o
 	this.count = oCount;
 	this.selected = false;
 	this.borderColor = 'black';
+	//this.positionOnStack = this.number;
 	// Create the card image and placeholder
 	this.cardImage = document.createElement('img');
 	this.cardImage.style.display = 'block';
