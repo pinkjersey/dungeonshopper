@@ -10,7 +10,9 @@ def playerState(game, playerId):
         thedict["isActive"] = True
     else:
         thedict["isActive"] = False
-        
+
+    thedict["numPlayers"] = game.numPlayers
+    thedict["curPlayer"] = playerId        
     thedict["itemsCountRemaining"] = len(game.itemDeck)
     thedict["questsCountRemaining"] = len(game.questDeck)
     thedict["market"] = game.market
@@ -34,6 +36,7 @@ def playerState(game, playerId):
 
     thedict["eventLog"] = el
 
+	
     jsonstr = json.dumps(thedict)
     return jsonstr   
 
