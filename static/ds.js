@@ -97,8 +97,8 @@ var Event = function (index, type, name, displayMode) {
 
 
 var Player = function (id, name) {
-//	var imageBase = "../images/cart";
-	var imageBase = "../images/cart_xxx";
+	var imageBase = "../images/cart";
+//	var imageBase = "../images/cart_xxx";
     this.id = id;
 	this.name = name;
 	this.turns = 0;
@@ -171,7 +171,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	
 	
 	$scope.playerRefresh = function() {
-		playerRefresh(1$scope.activePlayerId);
+		$scope.dots += "...";
+		playerRefresh($scope.activePlayerId);
 		$scope.loadingData=false;
 	}
 	
@@ -226,7 +227,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.showLog = false;
 	$scope.showLogText = "Show Players Log";
 	$scope.blankText = "";
-	
+	$scope.dots="...";
 	//gui variable to control cart buttons
 	$scope.prevActiveCartId = -1;
 	$scope.activeCartId = -1;
@@ -287,6 +288,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 $scope.endGame = function() {
 	$scope.displayMode = "gameover";
+	$scope.displayModeName = "Game Over";
 }
 
 var nextCartName = function(cartId) {
@@ -1337,6 +1339,20 @@ prepareEventForPlayer = function(questCardinplay) {
 
 resetDisplayMode = function(mode) {
 	$scope.displayMode = mode;
+	switch(mode) {
+		case "game":
+			$scope.displayModeName = " - Your Turn";
+			break;
+		case "gameSpectator":
+			$scope.displayModeName = " - Game Spectating";
+			break;
+		case "gameover";
+			$scope.displayModeName = "Game Over";"
+			break;
+		default:
+			$scope.displayModeName = "";		
+			
+	}
 }
 
 $scope.playerCompleteEvent = function(id) {
@@ -1631,6 +1647,7 @@ updateLog = function(text) {
 				return 'game';
 			}
 			else {
+				//$scope.dots = "..";
 				return 'gameSpectator';
 			}
 		}
@@ -1729,6 +1746,7 @@ function joinGame(playerId, playerName) {
 
 function pass(discard) {
 	$scope.loadingData=true;
+	$scope.dots = "..";
     gameFactory.pass(discard, processGameStateCallback, processGameStateErrorCallback);
 }
 
