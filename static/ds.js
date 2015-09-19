@@ -450,7 +450,7 @@ $scope.playerCompleteQuest = function(id) {
 				game.questsInPlay.setCardSize("orig");
 				completeQuest(selectedCards, 'cart' + cart.id);
 				resetAllSelectedCards(player);
-				player.questsCompleted.setCardSize("small");
+				//player.questsCompleted.setCardSize("small");
 				updateLog(text);
 			}
 			else {
@@ -648,18 +648,19 @@ dealNumberToMarket = function(marketDeck, number) {
 dealQuestsCompleted = function(questsCompleted, items) {
 	var game = $scope.game;
 	var text = "";
-	var questString = "../images/quest";
+	//var questString = "../images/quest";
 	var	itemString = "";
 	for (var i = 0; i < items.length; ++i)  {
 		itemString += items[i];
 	}
-	questString += itemString;
-	questString += ".jpg";
+	//questString += itemString;
+	//questString += ".jpg";
 
 
 	for (var i = 0; i < game.quests.playingCards.length; ++i)  {
 		var card = game.quests.playingCards[i];
-			if(card.image === questString) {
+			//if(card.image === questString) 
+			if(card.questMatchId=== itemString) {
 				questsCompleted.playingCards.push(card);
 				break;
 		}
@@ -746,7 +747,6 @@ dealQuestCard = function(questsInPlay, items, level, type) {
 	for (var i = 0; i < game.quests.playingCards.length; ++i)  {
 		var card = game.quests.playingCards[i];
 			if(card.image === questString) {
-				card.setCardSize("orig");
 				questsInPlay.playingCards.push(card);
 				break;
 		}
@@ -1763,21 +1763,20 @@ updateLog = function(text) {
 		$scope.itemsCountRemaining = data.itemsCountRemaining;
 		$scope.questsCountRemaining = data.questsCountRemaining;
 		//$scope.activePlayerId = $scope.game.firstPlayer;	
-		$scope.game.questsInPlay = new cardSet();
-		$scope.game.marketDeck = new cardSet();
 		//$scope.activePlayer.cards =  new cardSet();
 		//$scope.game.discardDeck = new cardSet();
-		$scope.activePlayer.questsCompleted =  new cardSet();
 		//$scope.activePlayer.carts[0].cards =  new cardSet();
 		//$scope.activePlayer.carts[1].cards =  new cardSet();
 		//$scope.activePlayer.carts[2].cards =  new cardSet();
 		//$scope.activePlayer.carts[3].cards =  new cardSet();		
 		//$scope.game.questsInPlay.origWidth=100;
 		//$scope.game.questsInPlay.origHeight=200;
-		$scope.discardsCount = 0;
+		$scope.discardsCount = data.discardsCount;
 		$scope.eventsLog = [];
 		$scope.game.players[$scope.activePlayerId].name = data.name;
 
+		$scope.game.questsInPlay = new cardSet();
+		$scope.game.marketDeck = new cardSet();
 		
         for (var i = 0; i < data.market.length; ++i) {   
 			dealNumberToMarket($scope.game.marketDeck, data.market[i]);	
@@ -1787,10 +1786,13 @@ updateLog = function(text) {
         for (var i = 0; i < data.questsInPlay.length; ++i) {   
 			dealQuestCard($scope.game.questsInPlay, data.questsInPlay[i].items, data.questsInPlay[i].level, data.questsInPlay.type);
 		}
+		$scope.game.questsInPlay.setCardSize("orig");
 		
 		for (var p = 0; p < data.numPlayers; ++p) {  
 
 			$scope.game.players[p].cards = new cardSet();
+			$scope.game.players[p].questsCompleted =  new cardSet();
+
 			
 			if($scope.myId === data.curPlayer && $scope.myId === p) {
 				for (var i = 0; i < data.hand.length; ++i) {   
@@ -1810,11 +1812,20 @@ updateLog = function(text) {
 					updatePlayerCarts($scope.game.players[p].carts[i], data.carts[i]);	
 				}
 			}
+			
+			//populate quests completed - once we have data.player[i] working, fix me
+			if($scope.myId === data.curPlayer && $scope.myId === p) {
+				for (var q = 0; q < data.questsCompleted.length; ++q) {   
+					dealQuestsCompleted($scope.game.players[p].questsCompleted, data.questsCompleted[q].items);
+				}
+				$scope.game.players[p].questsCompleted.setCardSize("small");
+			}
+			
+
+			
 		}
 		
-        for (var i = 0; i < data.questsCompleted.length; ++i) {   
-			dealQuestsCompleted($scope.game.players[$scope.activePlayerId].questsCompleted, data.questsCompleted[i].items);
-		}
+
 		
 		if (data.lastDiscarded != null) {
 			updateDiscardPile(data.lastDiscarded);	

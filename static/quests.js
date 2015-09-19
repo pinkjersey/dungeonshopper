@@ -56,23 +56,31 @@ function questSet() {
 
 questSet.prototype.addCard = function (level,gold,item1,item2,item3,item4,item5,vp,name,sortorder,oImage,oImageSmall,oImageLarge) {
 	// Add a Quest to the deck
-	if(level===1) {
+	var questMatchId = "";
+
+	switch (level) {
+		case 1:
 		oImage = oImage + item1 + item2 + item3 ;
-		}
-	if(level===2) {
+		break;
+		case2:
 		oImage = oImage + item1 + item2 + item3 + item4 ;
-		}
-	if(level===3) {
+		break;
+		case3:
 		oImage = oImage + item1 + item2 + item3 + item4 + item5	; 
-		}
-	if(level==='4') {
+		break;
+		case 4:
 		oImage = oImage;
-		}	
+		break;
+		default:
 		
+	}
+
+	
 	var oImageOrig = oImage + '.jpg'
 	var oImageSmall = oImage + '_sm.jpg'
 	var oImageLarge = oImage + '_lg.jpg'
-	this.playingCards[this.playingCards.length] = new questCard(level,gold,item1,item2,item3,item4,item5,vp,name,sortorder,oImageOrig, oImageSmall, oImageLarge, this);
+	
+	this.playingCards[this.playingCards.length] = new questCard( level,gold,item1,item2,item3,item4,item5,vp,name,sortorder,oImageOrig, oImageSmall, oImageLarge, this);
 };
 
 questSet.prototype.addCardc = function (oCard) {
@@ -111,18 +119,22 @@ questSet.prototype.shuffleCards = function (oTimes) {
 };
 
 questSet.prototype.setCardSize = function (size) {
-	// Set a nice width for the cards - any CSS width value is allowed
+
 	for( var i = 0; i < this.playingCards.length; i++ ) {
-		if(size === "small") {
-			this.playingCards[i].image = this.playingCards[i].imageSmall;
-		}
-		if(size === "large") {
-			this.playingCards[i].image = this.playingCards[i].imageLarge;
-		}
-		else {
-			this.playingCards[i].image = this.playingCards[i].imageOrig;
-		}
-//		this.playingCards[i].setCardSize(oWidth,oHeight);
+		switch (size)
+			{
+				case 'orig':
+					this.playingCards[i].image = this.playingCards[i].imageOrig;
+					break;
+				case 'small':
+					this.playingCards[i].image = this.playingCards[i].imageSmall;
+					break;
+				case 'large':
+					this.playingCards[i].image = this.playingCards[i].imageLarge;
+					break;
+				default:
+					this.playingCards[i].image = this.playingCards[i].imageOrig;
+			}
 	}
 };
 
@@ -413,10 +425,20 @@ if(level==='4'){
 
 }
 
+var itemcheck = function(params) {
+	if(params!=0) {
+		return params.toString();
+	} 
+	else {
+		return "";
+	}
+}
 /****************************
  A class representing a card
 ****************************/
-function questCard(level,gold,item1,item2,item3,item4,item5,vp,name, nameId,image,imageSmall,imageLarge , oCardSet) {
+function questCard( level,gold,item1,item2,item3,item4,item5,vp, name, nameId,image,imageSmall,imageLarge , oCardSet) {
+
+
 
 	// Initialise settings
 	this.level=level;
@@ -425,9 +447,10 @@ function questCard(level,gold,item1,item2,item3,item4,item5,vp,name, nameId,imag
 	this.item3=item3;
 	this.item4=item4;
 	this.item5=item5;
+	this.questMatchId = item1.toString()+item2.toString()+item3.toString()+itemcheck(item4)+itemcheck(item5);
 	this.gold = gold;
 	this.name = name;
-	this.nameId = nameId;
+	this.nameId = nameId;  //sortorder when completed
 	this.selected = false;
 	this.vp = vp;
 	this.imageOrig = image;
@@ -449,6 +472,9 @@ questCard.prototype.setCardSize = function (size) {
 
 switch (size)
 	{
+		case 'orig':
+			this.image = this.imageOrig;
+			break;
 		case 'small':
 			this.image = this.imageSmall;
 			break;

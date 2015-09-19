@@ -35,8 +35,8 @@ def playerState(game, playerId):
         el.append(e.to_dict())
 
     thedict["eventLog"] = el
+    thedict["turns"] = player.turns
 
-	
     jsonstr = json.dumps(thedict)
     return jsonstr   
 
@@ -451,6 +451,8 @@ def passPlayer(game, items):
     if game.curPlayer == game.numPlayers:
         game.curPlayer = 0
 
+	player.turns += 1	
+		
     # save game to data store
     game.put()
 
@@ -689,14 +691,14 @@ def newQuestDeck(numPlayers):
     level1Cards.append(createQuestCard(1,True,[1,6,8],3,2))
     level1Cards.append(createQuestCard(1,True,[2,6,10],3,2))
     level1Cards.append(createQuestCard(1,True,[3,5,10],3,2))
-    level1Cards.append(createQuestCard(1,True,[4,4,4],4,2))
+    level1Cards.append(createQuestCard(1,False,[4,4,4],4,2))
     level1Cards.append(createQuestCard(1,True,[1,3,10],3,3))
     level1Cards.append(createQuestCard(1,True,[1,5,9],3,3))
     level1Cards.append(createQuestCard(1,True,[2,2,10],3,3))
     level1Cards.append(createQuestCard(1,True,[2,5,8],3,3))
     level1Cards.append(createQuestCard(1,True,[3,5,9],3,3))
     level1Cards.append(createQuestCard(1,True,[3,7,8],3,3))
-    level1Cards.append(createQuestCard(1,True,[5,5,5],4,3))
+    level1Cards.append(createQuestCard(1,False,[5,5,5],4,3))
     level1Cards.append(createQuestCard(1,True,[1,2,8],2,4))
     level1Cards.append(createQuestCard(1,True,[1,4,9],3,4))
     level1Cards.append(createQuestCard(1,True,[1,6,9],3,4))
