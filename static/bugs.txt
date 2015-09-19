@@ -1,0 +1,6 @@
+    return getFirstItemCard(game)
+  File &quot;C:\Users\Kat\Desktop\Documents\GitHub\dungeonshopper\gameutil.py&quot;, line 651, in getFirstItemCard
+    return getFirstItemCard(game)
+  File &quot;C:\Users\Kat\Desktop\Documents\GitHub\dungeonshopper\gameutil.py&quot;, line 651, in getFirstItemCard
+    return getFirstItemCard(game)
+  File &quot;C:\Users\Kat\Desktop\Documents\GitHub\dungeonshopper\gameutil.py&quot;, line 651, in getFirstItemCard

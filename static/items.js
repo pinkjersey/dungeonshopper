@@ -45,14 +45,14 @@ function cardSet() {
 	this.playingCards = [];
 }
 
-cardSet.prototype.addCard = function (oNumber,oImage,oImageSmall,oImageLarge,oImageSmallChecked, oImageChecked,oCount) {
+cardSet.prototype.addCard = function (oNumber,oName, oImage,oImageSmall,oImageLarge,oImageSmallChecked, oImageChecked,oCount) {
 	// Add a card to the deck
-	this.playingCards[this.playingCards.length] = new playingCard(oNumber,oImage,oImageSmall,oImageLarge,oImageSmallChecked, oImageChecked,oCount);
+	this.playingCards[this.playingCards.length] = new playingCard(oNumber,oName, oImage,oImageSmall,oImageLarge,oImageSmallChecked, oImageChecked,oCount);
 };
 
 cardSet.prototype.addCardc = function (oCard) {
 	// Add a card to the deck
-	this.playingCards[this.playingCards.length] = new playingCard(oCard.number,oCard.image,oCard.imageSmall,oCard.imageLarge,oCard.imageSmallChecked, oCard.imageChecked, oCard.count);
+	this.playingCards[this.playingCards.length] = new playingCard(oCard.number,oCard.oName, oCard.image,oCard.imageSmall,oCard.imageLarge,oCard.imageSmallChecked, oCard.imageChecked, oCard.count);
 
 };
 
@@ -126,12 +126,48 @@ cardSet.prototype.createBlankMarket = function(imageBase) {
    		   oImageLarge=imageBase + a + "_card_lg.jpg";
 		   oImageSmallChecked=imageBase + a + "_card_sm_checked.jpg";
    		   oImageChecked=imageBase + a + "_card_checked.jpg";
-			this.addCard(a,oImage,oImageSmall,oImageLarge,oImageSmallChecked, oImageChecked, 0);
+		   var name = "";
+		   switch (a) {
+			   case 1: 
+				   name = "Club";
+				   break;
+			   case 2:
+				   name = "Shield";
+				   break;
+			   case 3:
+				   name = "Mace";
+				   break;
+			   case 4:
+				   name = "Flail";
+				   break;
+			   case 5:
+				   name = "Sword";
+				   break;
+			   case 6:
+				   name = "Axe";
+				   break;
+			   case 7:
+				   name = "Crossbow";
+				   break;
+			   case 8:
+				   name = "Armor";
+				   break;
+			   case 9:
+				   name = "Trebuchet";
+				   break;
+			   case 10:
+				   name = "Ballista";
+				   break;
+			   default:
+				   name = "Unknown";
+				   break;
+		   }
+			this.addCard(a,name,oImage,oImageSmall,oImageLarge,oImageSmallChecked, oImageChecked, 0);
 		}
 
 		   oImage=imageBase+"back_card.jpg";
 		
-		this.addCard(-1,oImage,oImage,oImage,oImage, oImage, 0);
+		this.addCard(-1,"CardBack",oImage,oImage,oImage,oImage, oImage, 0);
 
 	}
 
@@ -147,10 +183,11 @@ cardSet.prototype.truncate = function () {
 /****************************
  A class representing a card
 ****************************/
-function playingCard(oNumber,oImage,oImageSmall,oImageLarge,oImageSmallChecked,oImageChecked,oCount ) {
+function playingCard(oNumber,oName, oImage,oImageSmall,oImageLarge,oImageSmallChecked,oImageChecked,oCount ) {
 
 	// Initialise settings
 	this.number = oNumber;
+	this.name = name;
 	this.imageOrig = oImage;
 	this.image = oImage;
 	this.imageSmall = oImageSmall;

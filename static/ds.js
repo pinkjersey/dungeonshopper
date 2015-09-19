@@ -177,7 +177,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	}
 	
    	function startInterval(params) {
-        timerId = setInterval(function () { 
+        $scope.timerId = setInterval(function () { 
 			if($scope.isActive===false) {
 				if($scope.activePlayerId != undefined) {
 					$scope.playerRefresh();
@@ -287,8 +287,16 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	}
 
 $scope.endGame = function() {
-	$scope.displayMode = "gameover";
-	$scope.displayModeName = "Game Over";
+	
+	var r =  confirm("Are you sure you want to quit?");
+		if(r===true) {
+			$scope.displayMode = "gameover";
+			$scope.displayModeName = "Game Over";
+			clearInterval($scope.timerId);
+		}
+		else {
+			return;
+		}
 }
 
 var nextCartName = function(cartId) {
@@ -444,6 +452,9 @@ $scope.playerCompleteQuest = function(id) {
 				resetAllSelectedCards(player);
 				player.questsCompleted.setCardSize("small");
 				updateLog(text);
+			}
+			else {
+				return;
 			}
 		}
 		else {
@@ -747,6 +758,46 @@ dealQuestCard = function(questsInPlay, items, level, type) {
 	
 }
 
+getSelectedCardName = function(cardNumber) {
+	var name = "";
+	switch (cardNumber) {
+			   case 1: 
+				   name = "Club";
+				   break;
+			   case 2:
+				   name = "Shield";
+				   break;
+			   case 3:
+				   name = "Mace";
+				   break;
+			   case 4:
+				   name = "Flail";
+				   break;
+			   case 5:
+				   name = "Sword";
+				   break;
+			   case 6:
+				   name = "Axe";
+				   break;
+			   case 7:
+				   name = "Crossbow";
+				   break;
+			   case 8:
+				   name = "Armor";
+				   break;
+			   case 9:
+				   name = "Trebuchet";
+				   break;
+			   case 10:
+				   name = "Ballista";
+				   break;
+			   default:
+				   name = "Unknown";
+				   break;
+		   }
+	return name;
+}
+
 //returns first selected card in deck
 getSelectedCard = function(deck){
 	for (var i = 0; i < deck.playingCards.length; ++i)  {
@@ -944,8 +995,14 @@ $scope.playerCartFish = function (id) {
 		
 		var cardNumber = getSelectedCard(cart.cards);
 		text = "fished for a card.  Discarded a " + cardNumber + ".";
-		fish(cardNumber, 'cart' + cart.id);
-
+		
+		var r =  confirm("Discard the " + getSelectedCardName(cardNumber) + "? Fish for a new card?");
+		if(r===true) {
+			fish(cardNumber, 'cart' + cart.id);
+		}
+		else {
+			return;
+		}
 
 		updateLog(text);
 
@@ -976,7 +1033,16 @@ $scope.playerFish = function (id) {
 
 	text = "fished for a card.  Discarded a " + cardNumber + ".";
 	//call backend fish
-	fish(cardNumber, 'hand');
+
+	var r =  confirm("Discard the " + getSelectedCardName(cardNumber) + "? Fish for a new card?");
+	if(r===true) {
+		fish(cardNumber, 'hand');
+	}
+	else {
+		return;
+	}
+
+
 	resetAllSelectedCards(player);
 	updateLog(text);
 }
@@ -1002,7 +1068,15 @@ $scope.playerDiscardFromCart = function (id) {
 	//if cart cards are selected, move between carts else its player items to cart
 	if($scope.selectedCartItemsCount > 0) {
 		text = "discarded cards " + logSelectedCards(selectedCards) + " from " + 'cart'+id + ".";
-		discard(selectedCards, 'cart'+id)
+
+		var r =  confirm("Are you sure you want discard?");
+		if(r===true) {
+			discard(selectedCards, 'cart'+id)
+		}
+		else {
+			return;
+		}
+
 		updateLog(text);
 		resetCartCardsSelected(player,-1);
 		return;
@@ -1032,7 +1106,14 @@ $scope.playerDiscard = function () {
 	
 	//actually did a discard
 	text = "discarded card(s) " + logSelectedCards(selectedCards) + " from hand.";
-	discard(selectedCards, 'hand');
+	var r =  confirm("Are you sure you want discard?");
+	if(r===true) {
+		discard(selectedCards, 'hand');
+	}
+	else {
+		return;
+	}
+
 	resetAllSelectedCards(player);
 	updateLog(text);
 }
@@ -1118,7 +1199,14 @@ $scope.playerBuyAction = function() {
 	var player = $scope.activePlayer;
 	var text = "";
 	if(player.gold >= 2) {
-		buyAction();
+		var r =  confirm("This will cost you 2 gold!  Confirm?");
+		if(r===true) {
+			buyAction();
+		}
+		else {
+			return;
+		}
+		
 		text = "Bouught one Action for 2 gold.";
 	}
 	else {
@@ -1144,6 +1232,9 @@ $scope.playerPass = function() {
 		if (r === true) {
 			text += " passed with " + player.actionsRemaining +  " remaining actions.";
 			discardSelectedCards = "";
+		}
+		else {
+			return;
 		}
 	}
 	else if(player.actionsRemaining === 0)	{
@@ -1231,9 +1322,19 @@ $scope.playerMarketTrade = function() {
 		return;
 	}
 	
+	text = "Market trade with " + logSelectedCards(selectedItemCards) + ' for ' + logSelectedCards(selectedMarketCards);
+	
 	//move player items to market
-	marketTrade(selectedItemCards, selectedMarketCards);
-	text = "Market trade with " + logSelectedCards(selectedItemCards) + ' for ' + logSelectedCards(selectedMarketCards) + ".";
+	
+		var r =  confirm(text + "?");
+		if(r===true) {
+			marketTrade(selectedItemCards, selectedMarketCards);
+		}
+		else {
+			return;
+		}
+
+	
 
 	//move market items to player
 	$scope.selectedMarketTradeCount = 0;
@@ -1346,8 +1447,8 @@ resetDisplayMode = function(mode) {
 		case "gameSpectator":
 			$scope.displayModeName = " - Game Spectating";
 			break;
-		case "gameover";
-			$scope.displayModeName = "Game Over";"
+		case "gameover":
+			$scope.displayModeName = "Game Over";
 			break;
 		default:
 			$scope.displayModeName = "";		
