@@ -659,6 +659,7 @@ def getFirstItemCard(game):
 def dealItemCard(playerIndex, game):
     card = getFirstItemCard(game)    
     game.players[playerIndex].hand.append(card)
+    game.players[playerIndex].hand.sort()
 
 def dealItemCardToMarket(game):
     card = getFirstItemCard(game)

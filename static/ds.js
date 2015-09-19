@@ -1648,6 +1648,28 @@ sortPlayerCards = function() {
 	$scope.activePlayer.cards.playingCards.sort(function (a,b) {return a.number-b.number});
 }
 
+var convertToName = function(params) {
+	switch(params) {
+		case "hand":
+			return "player's hand";
+			break;
+		case "cart0":
+			return "wheelbarrow";
+			break;
+		case "cart1":
+			return "hand cart";
+			break;
+		case "cart2":
+			return "horse cart";
+			break;
+		case "cart3":
+			return "war wagon";
+			break;
+		default:
+			return "";
+	}
+}
+
 //"eventLog": [{"event": "http://localhost:8080/game?action=discard&what=3&where=hand", "playerId": 0}]
 logEvent = function(eventsLog, playerName, logItem) {
 	if(logItem!="") {
@@ -1655,13 +1677,101 @@ logEvent = function(eventsLog, playerName, logItem) {
 		var index = logItem.indexOf(pattern) + pattern.length;
 				
 		var array = logItem.substring(index).split("&");
+		var logEntry = "";
 		
 		for (var i = 0; i < array.length; ++i) {   
-			var action = array[i].split("=");
-			
-			//switch(action[0])
-			
-		}
+			var logActions = array[i].split("=");
+				for (var j = 0; j < logActions.length; ++j) {   
+					switch(logActions[j]) {
+						case "action":
+							logEntry+="";
+							break;
+						case "discard":
+							logEntry+=" discarded";
+							break;
+						case "fish":
+							logEntry+=" fished " ;
+							break;
+						case "what":
+							logEntry+=" item(s) " ;
+							break;
+						case "where":
+							logEntry+=" from " ;
+							break;
+						case "dst":
+							logEntry+=" to the ";
+							break;
+						case "move":
+							logEntry+=" moved " ;
+							break;
+						case "src":
+							logEntry+=" from the " ;
+							break;
+						case "handItems":
+							logEntry+=convertToName("hand") + " item(s) ";
+							break;
+						case "hand":
+							logEntry+=convertToName("hand");
+							break;
+						case "pass":
+							logEntry+=" passed ";
+							break;
+						case "cart":
+							logEntry+=" the ";
+							break;
+						case "cart0":
+							logEntry+=convertToName("cart0");
+							break;
+						case "cart1":
+							logEntry+=convertToName("cart1");
+							break;
+						case "cart2":
+							logEntry+=convertToName("cart2");
+							break;
+						case "cart3":
+							logEntry+=convertToName("cart3");
+							break;
+						case "buyCart":
+							logEntry+= "bought ";
+							break;
+						case "items":
+							if(logActions[j+1]!="") {
+								logEntry+= " with item(s) ";
+							}
+							else {
+								logEntry+= "";
+							}
+								
+							break;
+						case "withGold":
+							if(logActions[j+1]!="0") {
+								logEntry+= " with gold the ";
+							}
+							else {
+								logEntry+= "";
+							}
+
+							break;
+						case "marketTrade":
+							logEntry+= " did a market trade from ";
+							break;
+						case "marketItems":
+							logEntry+= " for market item(s) ";
+							break;
+						case "completeQuest":
+							logEntry+= " completed a quest ";
+							break;
+						case "withGold":
+							logEntry+= " with gold the ";
+							break;
+						case "0":
+							logEntry+= "";
+							break;
+						default:
+							logEntry+=logActions[j];
+					}
+				}
+			}
 		
 		/*
 action=buyCart&withGold=0&items=0&cart=cart1
@@ -1678,8 +1788,8 @@ action=fish&what=7&where=hand
 action=move&what=23&src=hand&dst=cart1
 action=move&what=45&src=hand&dst=cart2
 */
-		
-		$scope.eventsLog.push(new EventsLog($scope.eventsLog.length, playerName, logItem.substring(index)));
+		//logItem.substring(index)
+		$scope.eventsLog.push(new EventsLog($scope.eventsLog.length, playerName, logEntry + '.'));
 	}
 }
 
