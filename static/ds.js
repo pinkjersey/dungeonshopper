@@ -59,7 +59,7 @@ var Game = function(numPlayers) {
 //	var blankMarketImageBase = "../images/xxx"
 	this.itemHolders.createBlankMarket(blankMarketImageBase);
 	this.itemMarketHolders.createBlankMarket(blankMarketImageBase);
-	this.quests.create75CardsQuestDeck(questImageBase);
+	this.quests.createQuestDeck(questImageBase);
 
 	this.players = [];
 	//create players
@@ -644,31 +644,6 @@ dealNumberToMarket = function(marketDeck, number) {
 	updateLog(text);
 }
 
-
-dealQuestsCompleted = function(questsCompleted, items) {
-	var game = $scope.game;
-	var text = "";
-	//var questString = "../images/quest";
-	var	itemString = "";
-	for (var i = 0; i < items.length; ++i)  {
-		itemString += items[i];
-	}
-	//questString += itemString;
-	//questString += ".jpg";
-
-
-	for (var i = 0; i < game.quests.playingCards.length; ++i)  {
-		var card = game.quests.playingCards[i];
-			//if(card.image === questString) 
-			if(card.questMatchId=== itemString) {
-				questsCompleted.playingCards.push(card);
-				break;
-		}
-	}
-	updateLog(text);
-	
-}
-
 //	'eventBarbarianAttack',6,image+"BarbarianAttack",this);
 //	'eventBrokenItems',7,image+"BrokenItems",this);
 //	'eventCastleTaxation',8,image+"CastleTaxation",this);
@@ -720,42 +695,68 @@ getEvent = function (questCardInPlay) {
 }
 
 
-dealQuestCard = function(questsInPlay, items, level, type) {
-	//gui
-	
-	//this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',6,image+"BarbarianAttack",this);
 
-	//backend
-	//level4Cards.append(createQuestCard(4,False,[],0,6))
+
+dealQuestsCompleted = function(questsCompleted, items) {
 	var game = $scope.game;
 	var text = "";
-	var questString = "../images/quest";
 	var	itemString = "";
 	for (var i = 0; i < items.length; ++i)  {
 		itemString += items[i];
-	}
-	if(level < 4) {
-		questString += itemString;
-		questString += ".jpg";
-	}
-	else {
-		//questString = $scope.events[type].image;
-		//$scope.activeEvent = $scope.events[type].displayMode;
 	}
 
 
 	for (var i = 0; i < game.quests.playingCards.length; ++i)  {
 		var card = game.quests.playingCards[i];
-			if(card.image === questString) {
-				questsInPlay.playingCards.push(card);
+			if(card.questMatchId=== itemString) {
+				questsCompleted.playingCards.push(card);
 				break;
 		}
 	}
+	updateLog(text);
+	
+}
+
+
+
+dealQuestCard = function(questsInPlay, items, level, type) {
+	var game = $scope.game;
+	var text = "";
+	var	itemString = "";
+	for (var i = 0; i < items.length; ++i)  {
+		itemString += items[i];
+	}
+	if(level < 4) {
+		for (var i = 0; i < game.quests.playingCards.length; ++i)  {
+		var card = game.quests.playingCards[i];
+			if(card.questMatchId=== itemString) {
+				questsInPlay.playingCards.push(card);
+				break;
+			}	
+		}
+		//var typeMatch = getEvent(type);
+//		questString += itemString;
+//		questString += ".jpg";
+	}
+	else {
+		for (var i = 0; i < game.quests.playingCards.length; ++i)  {
+		var card = game.quests.playingCards[i];
+			if(card.nameId=== type) {
+				questsInPlay.playingCards.push(card);
+				break;
+			}	
+		}
+
+	//questString = $scope.events[type].image;
+		//$scope.activeEvent = $scope.events[type].displayMode;
+	}
+
+
+	
 	if(level === 4) {
 		//prepareEventForPlayer(card);
 	}
 	updateLog(text);
-	
 }
 
 getSelectedCardName = function(cardNumber) {
@@ -1894,7 +1895,7 @@ updateLog = function(text) {
 		setMarketCounts();
 
         for (var i = 0; i < data.questsInPlay.length; ++i) {   
-			dealQuestCard($scope.game.questsInPlay, data.questsInPlay[i].items, data.questsInPlay[i].level, data.questsInPlay.type);
+			dealQuestCard($scope.game.questsInPlay, data.questsInPlay[i].items, data.questsInPlay[i].level, data.questsInPlay[i].type);
 		}
 		$scope.game.questsInPlay.setCardSize("orig");
 		

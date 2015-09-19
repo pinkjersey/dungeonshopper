@@ -669,7 +669,12 @@ def dealQuest(game):
     quest = game.questDeck[0]
     del game.questDeck[0]
     game.questsInPlay.append(quest)
-
+	
+    quest = game.questDeck[0]	
+    if (quest.level==4):
+        del game.questDeck[0]
+        game.questsInPlay.append(quest)
+	
 def newQuestDeck(numPlayers):
     level1Cards = []
     level2Cards = []

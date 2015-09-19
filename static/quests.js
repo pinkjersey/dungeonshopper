@@ -58,17 +58,17 @@ questSet.prototype.addCard = function (level,gold,item1,item2,item3,item4,item5,
 	// Add a Quest to the deck
 	var questMatchId = "";
 
-	switch (level) {
-		case 1:
+	switch (level.toString()) {
+		case "1":
 		oImage = oImage + item1 + item2 + item3 ;
 		break;
-		case2:
+		case "2":
 		oImage = oImage + item1 + item2 + item3 + item4 ;
 		break;
-		case3:
+		case "3":
 		oImage = oImage + item1 + item2 + item3 + item4 + item5	; 
 		break;
-		case 4:
+		case "4":
 		oImage = oImage;
 		break;
 		default:
@@ -152,7 +152,7 @@ questSet.prototype.setCardSize = function (size) {
 //};
 
 
-questSet.prototype.create75CardsQuestDeck = function (questImageBase) {
+questSet.prototype.createQuestDeck = function (questImageBase) {
 	// Create quest deck
 	
 	var level1 = new questSet();
@@ -407,7 +407,7 @@ if(level===3){
 	this.addCard(level,0,3,4,7,8,9,6,'Siege of Harfleur',5,image,this);
 }
 
-if(level==='4'){
+if(level===4){
 	var image="../images/event";
 	this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',6,image+"BarbarianAttack",this);
 	this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',7,image+"BrokenItems",this);
