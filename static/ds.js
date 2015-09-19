@@ -314,6 +314,7 @@ $scope.userClickedMarketImage = function(i) {
 	card.selected = !card.selected;
 	card.borderColor = 'black';
 	card.count--;
+	card.setCountImage(card.count);
 	card.setCardSize("orig");
 	
 	game.marketDeckInTrade.addCardc(card);
@@ -330,6 +331,7 @@ $scope.userClickedMarketTradeImage = function(i) {
 	var marketCard = game.itemMarketHolders.playingCards[card.number-1];
 	//increase the number above the market card holder
 	marketCard.count++;
+	marketCard.setCountImage(marketCard.count);
 	
 	marketCard.selected = !marketCard.selected;
 	game.marketDeckInTrade.playingCards[i] = null;
@@ -565,12 +567,11 @@ updateMarketItemPoints = function(value) {
 	
 	if(value > 0) {
 		$scope.selectedMarketTradeCount++;
-
 	}
 	else {
 		$scope.selectedMarketTradeCount--;
 	}
-
+	
 }
 
 
@@ -620,8 +621,7 @@ updateDiscardPile = function(number) {
 		var card = game.itemHolders.playingCards[i];
 		card.setCardSize("large");
 			if(card.number === number) {
-				$scope.lastDiscard = card;
-				$scope.discardsCount=1;
+				$scope.lastDiscard = card;				
 				break;
 		}
 	}
@@ -1365,12 +1365,15 @@ setMarketCounts = function() {
             var marketCard = $scope.game.marketDeck.playingCards[i];
 			if(marketCard===null)
 			{continue;}
+			else {
 				if(marketCard.number === j) {
 					cardCount++
 				}
 			}
-			//update the item card and the count
-			$scope.game.itemMarketHolders.playingCards[j-1].count = cardCount;
+		}
+		//update the item card and the count
+		$scope.game.itemMarketHolders.playingCards[j-1].count = cardCount;
+		$scope.game.itemMarketHolders.playingCards[j-1].setCountImage(cardCount);
 	}
 
 }

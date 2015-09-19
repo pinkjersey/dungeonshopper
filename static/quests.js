@@ -54,7 +54,7 @@ function questSet() {
 //questSet.prototype.defaultCardWord = 'Quest';
 //questSet.prototype.toString = function () { return '[object questSet]'; };
 
-questSet.prototype.addCard = function (level,gold,item1,item2,item3,item4,item5,vp,name,sortorder,oImage,oImageSmall,oImageLarge) {
+questSet.prototype.addCard = function (level,gold,item1,item2,item3,item4,item5,vp,name,nameId,oImage,oImageSmall,oImageLarge) {
 	// Add a Quest to the deck
 	var questMatchId = "";
 
@@ -80,12 +80,12 @@ questSet.prototype.addCard = function (level,gold,item1,item2,item3,item4,item5,
 	var oImageSmall = oImage + '_sm.jpg'
 	var oImageLarge = oImage + '_lg.jpg'
 	
-	this.playingCards[this.playingCards.length] = new questCard( level,gold,item1,item2,item3,item4,item5,vp,name,sortorder,oImageOrig, oImageSmall, oImageLarge, this);
+	this.playingCards[this.playingCards.length] = new questCard( level,gold,item1,item2,item3,item4,item5,vp,name,nameId,oImageOrig, oImageSmall, oImageLarge, this);
 };
 
 questSet.prototype.addCardc = function (oCard) {
 	// Add a Quest to the deck
-	this.playingCards[this.playingCards.length] = new questCard(oCard.level,oCard.gold,oCard.item1,oCard.item2,oCard.item3,oCard.item4,oCard.item5,oCard.vp,oCard.name,oCard.sortorder,oCard.image,oCard.imageSmall, oCard.imageLarge,this);
+	this.playingCards[this.playingCards.length] = new questCard(oCard.level,oCard.gold,oCard.item1,oCard.item2,oCard.item3,oCard.item4,oCard.item5,oCard.vp,oCard.name,oCard.nameId,oCard.image,oCard.imageSmall, oCard.imageLarge,this);
 };
 
 questSet.prototype.peek = function (i) {

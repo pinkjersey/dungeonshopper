@@ -195,6 +195,7 @@ function playingCard(oNumber,oName, oImage,oImageSmall,oImageLarge,oImageSmallCh
 	this.imageLarge = oImageLarge;
 	this.imageChecked = oImageChecked;
 	this.count = oCount;
+	this.countImg =  "";
 	this.selected = false;
 	this.borderColor = 'black';
 	//this.positionOnStack = this.number;
@@ -204,6 +205,10 @@ function playingCard(oNumber,oName, oImage,oImageSmall,oImageLarge,oImageSmallCh
 
 	}
 
+playingCard.prototype.setCountImage = function (oCount) {
+	
+	this.countImg = "../images/" + oCount +  "_count_card.jpg";
+}
 
 playingCard.prototype.setCardSize = function (size) {
 	// Set the width of the card image

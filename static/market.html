@@ -13,22 +13,24 @@
 		<thead>
 		<tr>
 			<td>
-				<!--<span ng-repeat="card in game.itemHolders.playingCards track by $index">-->
-					<!--<span ng-show = "card.count > 0" ><big>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{card.count}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</big></span>-->
-					<!--<marketcardcount info="card"></marketcardcount>-->
-				<!--</span>-->
-			</td>
+				<span ng-repeat="marketcard in game.itemMarketHolders.playingCards track by $index">
+					<span> 
+						<img ng-show = "marketcard.count > 0" ng-src="{{marketcard.countImg}}" style="border:2px solid {{marketcard.borderColor}}" ng-click="userClickedMarketImage($index)"></img>
+					</span>
+				</span>
+			<td>
 		</tr>
-		<tr>
+<tr>
 		<td>
 			<span ng-repeat="marketcard in game.itemMarketHolders.playingCards track by $index">
-				<span ng-show = "marketcard.count > 0" ><big>{{marketcard.count}}&nbsp;</big></span>
-				<img ng-show = "marketcard.count > 0"style="border:2px solid {{marketcard.borderColor}}" ng-src="{{marketcard.image}}" ng-click="userClickedMarketImage($index)"></img>
+				<img ng-show = "marketcard.count > 0" style="border:2px solid {{marketcard.borderColor}}" ng-src="{{marketcard.image}}" ng-click="userClickedMarketImage($index)"></img>
 			</span>
 		</td>
-		</tr>
+</tr>
+
+
 		<tr ng-show="isActive===true">
-			<td> <span  ng-show="sumMarketValueSelected > 0"><b>Items Selected for trade:<b></span>
+			<td> <span  ng-show="sumMarketValueSelected > 0"><b>Items selected for trade:<b></span>
 				<span ng-repeat="tradecard in game.marketDeckInTrade.playingCards track by $index">
 					<img style="border:2px solid {{tradecard.borderColor}}" ng-src="{{tradecard.image}}" ng-click="userClickedMarketTradeImage($index)"></img>
 				</span>

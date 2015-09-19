@@ -670,10 +670,11 @@ def dealQuest(game):
     del game.questDeck[0]
     game.questsInPlay.append(quest)
 	
-    quest = game.questDeck[0]	
-    if (quest.level==4):
+    #added by gary to try and simulate getting a new quest after an event
+    nextQuest = game.questDeck[0]	
+    if (nextQuest.level==4):
         del game.questDeck[0]
-        game.questsInPlay.append(quest)
+        game.questsInPlay.append(nextQuest)
 	
 def newQuestDeck(numPlayers):
     level1Cards = []
@@ -779,7 +780,8 @@ def newQuestDeck(numPlayers):
     level4Cards = shuffle(level4Cards)
 
     if numPlayers == "1":
-        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
+        #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
+		createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,2,1,1,2,4,4)
     elif numPlayers == "2":
         createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,7,1,4,1,2,4,2,2)
     elif numPlayers == "3":
