@@ -40,7 +40,7 @@ var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased,
         return ret;
    }
 }
-
+ 
 
 var Game = function(numPlayers) {
 
