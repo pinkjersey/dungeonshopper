@@ -372,28 +372,35 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	}
 
 
-	checkIfQuestIsReady = function() {
+	var checkIfQuestIsReady = function () {
 		var game = $scope.game;
 		var player = $scope.activePlayer;
 		var questCanBeCompleted = false;
 
 
 		for (var i = 0; i < player.carts.length; ++i) {
+			if(questCanBeCompleted === true){
+					break;
+				}
 			var selectedCards = getSelectedCardArrayForQuest(player.carts[i].cards);
 			for (var j = 0; j < game.questsInPlay.playingCards.length; ++j) {
-				var questClicked = game.questsInPlay.playingCards[j];
-				var items =  new Array(questClicked.item1, questClicked.item2, questClicked.item3, questClicked.item4, questClicked.item5);
+				var questFound = game.questsInPlay.playingCards[j];
+				var items =  new Array(questFound.item1, questFound.item2, questFound.item3, questFound.item4, questFound.item5);
 				
 				if (parseSelectedCardArrayFoQuest(selectedCards) === parseSelectedCardArrayFoQuest(items) ){
 					questCanBeCompleted = true;
+					break;
 				}
 
-				if (questCanBeCompleted === true) {
-					alert("A quest can be completed!")
-					return;
-				}
 			}
 		}
+		
+		if (questCanBeCompleted === true) {
+			alert("A quest can be completed!")
+			//return questFound;
+		}
+
+		
 	}
 
 	//returns card numbers appended to each other for deck.  ex. 1224
