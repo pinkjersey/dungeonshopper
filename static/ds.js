@@ -133,6 +133,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		setupNoGame();
 	}
 
+
 	//setup splash screen
 	setupNoGame = function() {
 		$scope.displayMode = "nogame";
@@ -235,6 +236,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	//gui variable to control cart buttons
 	$scope.prevActiveCartId = -1;
 	$scope.activeCartId = -1;
+	$scope.borderPXselected = "border:3px solid red";
+	$scope.borderPX = "border:1px solid black";
+	$scope.borderPXorg = "border:1px solid white";
 	
 	$scope.events = [
 		new Event(0,0,""),
@@ -270,10 +274,12 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 	var cardColor = function(card) {
 		if(card.selected) {
-		return 'red';
+			return $scope.borderPXselected;
+		//return 'red';
 		}
 		else {
-		return 'black';
+			return $scope.borderPXorig;
+		//return 'black';
 		}
 	}
 
@@ -316,7 +322,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		var game = $scope.game;
 		var card = game.itemMarketHolders.playingCards[i];
 		card.selected = !card.selected;
-		card.borderColor = 'black';
+		//card.borderColor = cardColor(card);
 		card.count--;
 		card.setCountImage(card.count);
 		card.setCardSize("orig");
@@ -339,6 +345,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		marketCard.setCountImage(marketCard.count);
 		
 		marketCard.selected = !marketCard.selected;
+		//marketCard.borderColor = cardColor(marketCard);
 		game.marketDeckInTrade.playingCards[i] = null;
 		game.marketDeckInTrade.truncate();
 		updateMarketItemPoints(-card.number);
@@ -351,7 +358,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		var questClicked = game.questsInPlay.playingCards[i];
 		questClicked.selected = !questClicked.selected;
 		questClicked.borderColor = cardColor(questClicked);
-		
+
 		for (var j = 0; j < game.questsInPlay.playingCards.length; ++j)  {
 			if(j===i){
 				if(questClicked.selected){
@@ -396,8 +403,11 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 		
 		if (questCanBeCompleted === true) {
-			alert("A quest can be completed!")
+			//alert("A quest can be completed!")
 			//return questFound;
+			questFound.borderColor = 'border:10px solid green';
+//			$scope.borderPX = 'border:3px solid green';
+
 		}
 
 		

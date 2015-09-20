@@ -197,7 +197,7 @@ function playingCard(oNumber,oName, oImage,oImageSmall,oImageLarge,oImageSmallCh
 	this.count = oCount;
 	this.countImg =  "";
 	this.selected = false;
-	this.borderColor = 'black';
+	this.borderColor = 'border:1px solid black';
 	//this.positionOnStack = this.number;
 	// Create the card image and placeholder
 	this.cardImage = document.createElement('img');
