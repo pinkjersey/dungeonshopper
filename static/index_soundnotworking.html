@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html >
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" ng-app="dsApp">
+<head>
+    <meta charset="utf-8" />
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.js"></script>
+	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.3/angular-animate.js"></script>
+    <link rel="stylesheet" href="http://cdn.jsdelivr.net/animatecss/2.1.0/animate.min.css"/>
+    <script type="text/javascript" src="//cdn.rawgit.com/cornflourblue/angu-fixed-header-table/master/angu-fixed-header-table.js"></script>
+    <script type="text/javascript" src="https://code.createjs.com/soundjs-0.6.1.min.js"></script>
+	<link rel="stylesheet" href="custom.css">
+    <script type="text/javascript" src="dsApp.js" ></script>
+    <script type="text/javascript" src="factory.js" ></script>
+    <script type="text/javascript" src="items.js"></script>
+    <script type="text/javascript" src="quests.js"></script>
+    <script type="text/javascript" src="ds.js" ></script>
+  
+  <script>
+      var soundID = "glass";
+
+      function loadSound () {
+        createjs.Sound.registerSound("glass.mp3", soundID);
+      }
+
+      function playSound () {
+        createjs.Sound.play(soundID);
+      }
+    </script>
+
+	
+</head>
+
+
+<body ng-controller="dsCtrl" onload="loadSound();">
+
+<button onclick="playSound('glass');" class="playSound">Play Sound</button>
+    <div class="panel panel-info">
+		<div class="panel-heading">
+			<h2>Dungeon Shopper {{displayModeName}}</h2>
+			<span class="panel-title pull-right"><button class="btn btn-primary" ng-show="displayMode === 'game'" ng-click="noGame()">Reset</button></span>
+
+        <ng-include src="'nogame.html'" ng-show="displayMode === 'nogame'"></ng-include>
+        <ng-include src="'game.html'" ng-show="displayMode === 'game'"></ng-include>
+        <ng-include src="'gameSpectator.html'" ng-show="displayMode === 'gameSpectator'"></ng-include>
+        <ng-include src="'gameover.html'" ng-show="displayMode === 'gameover'"></ng-include>
+        <ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventTemplate'"></ng-include>
+		<ng-include src="'eventOrcsAttack.html'" ng-show="displayMode === 'eventOrcsAttack'"></ng-include>
+		<ng-include src="'eventTreasure.html'" ng-show="displayMode === 'eventTreasure'"></ng-include>
+		<ng-include src="'eventBrokenItems.html'" ng-show="displayMode === 'eventBrokenItems'"></ng-include>
+<!--    <ng-include src="'eventBarbarianAttack.html'" ng-show="displayMode === 'eventBarbarianAttack'"></ng-include>
+		<ng-include src="'eventCastleTaxation.html'" ng-show="displayMode === 'eventCastleTaxation'"></ng-include>
+		<ng-include src="'eventGolbinRaid.html'" ng-show="displayMode === 'eventGolbinRaid'"></ng-include>
+		<ng-include src="'eventKingsFeast.html'" ng-show="displayMode === 'eventKingsFeast'"></ng-include>
+		<ng-include src="'eventMarketShortage.html'" ng-show="displayMode === 'eventMarketShortage'"></ng-include>
+		<ng-include src="'eventMarketSurplus.html'" ng-show="displayMode === 'eventMarketSurplus'"></ng-include>
+
+		<ng-include src="'eventSandStorm.html'" ng-show="displayMode === 'eventSandStorm'"></ng-include>
+		<ng-include src="'eventHailStorm.html'" ng-show="displayMode === 'eventHailStorm'"></ng-include>
+		<ng-include src="'eventHiddenRoom.html'" ng-show="displayMode === 'eventHiddenRoom'"></ng-include>
+		<ng-include src="'eventThrownInTheDungeon.html'" ng-show="displayMode === 'eventThrownInTheDungeon'"></ng-include>
+		<ng-include src="'eventVikingParade.html'" ng-show="displayMode === 'eventVikingParade'"></ng-include>-->
+		</div>
+	</div>
+    <ng-include src="'playerLog.html'" ng-show="displayMode != 'nogame'"></ng-include>
+    <ng-include src="'quests.html'" ng-show="displayMode != 'nogame'"></ng-include>
+    <ng-include src="'market.html'" ng-show="displayMode != 'nogame'"></ng-include>
+    <ng-include src="'playerCompletedQuests.html'" ng-show="displayMode != 'nogame'"></ng-include>
+    <ng-include src="'gameFooter.html'" ng-show="displayMode != 'nogame'"></ng-include>
+</body>
+</html>
