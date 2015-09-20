@@ -15,7 +15,7 @@
 			<td>
 				<span ng-repeat="marketcard in game.itemMarketHolders.playingCards track by $index">
 					<span> 
-						<img ng-show = "marketcard.count > 0" ng-src="{{marketcard.countImg}}" style="{{marketcard.borderColor}}" ng-click="userClickedMarketImage($index)"></img>
+						<img ng-show = "marketcard.count > 0" ng-src="{{marketcard.countImg}}" ng-click="userClickedMarketImage($index)"></img>
 					</span>
 				</span>
 			<td>

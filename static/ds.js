@@ -392,6 +392,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			var selectedCards = getSelectedCardArrayForQuest(player.carts[i].cards);
 			for (var j = 0; j < game.questsInPlay.playingCards.length; ++j) {
 				var questFound = game.questsInPlay.playingCards[j];
+				if(questFound.level===4) {
+					continue;
+				}
 				var items =  new Array(questFound.item1, questFound.item2, questFound.item3, questFound.item4, questFound.item5);
 				
 				if (parseSelectedCardArrayFoQuest(selectedCards) === parseSelectedCardArrayFoQuest(items) ){
