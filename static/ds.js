@@ -372,15 +372,32 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	}
 
 
-	$scope.aQuestIsReady = function() {
-		//go through eachquest
-			//go through each cart that has 3 items or more
-			//change size of quests that can be completed
-		
+	checkIfQuestIsReady = function() {
+		var game = $scope.game;
+		var player = $scope.activePlayer;
+		var questCanBeCompleted = false;
+
+
+		for (var i = 0; i < player.carts.length; ++i) {
+			var selectedCards = getSelectedCardArrayForQuest(player.carts[i].cards);
+			for (var j = 0; j < game.questsInPlay.playingCards.length; ++j) {
+				var questClicked = game.questsInPlay.playingCards[j];
+				var items =  new Array(questClicked.item1, questClicked.item2, questClicked.item3, questClicked.item4, questClicked.item5);
+				
+				if (parseSelectedCardArrayFoQuest(selectedCards) === parseSelectedCardArrayFoQuest(items) ){
+					questCanBeCompleted = true;
+				}
+
+				if (questCanBeCompleted === true) {
+					alert("A quest can be completed!")
+					return;
+				}
+			}
+		}
 	}
 
 	//returns card numbers appended to each other for deck.  ex. 1224
-	getSelectedCardArrayFoQuest = function(deck){
+	getSelectedCardArrayForQuest = function(deck){
 		var arr = [];
 		for (var i = 0; i < 5; ++i)  {
 			var card = deck.playingCards[i];
@@ -428,8 +445,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			return;
 			}
 			
-		var selectedCards = getSelectedCards(cart.cards);
-		var questCards = getSelectedCardArrayFoQuest(cart.cards);
+		var selectedCards = getSelectedCards(cart.cards, true);
+		var questCards = getSelectedCardArrayForQuest(cart.cards);
 		var items =  new Array(questClicked.item1, questClicked.item2, questClicked.item3, questClicked.item4, questClicked.item5);
 		//var itemsTrimmed = getSelectedCardsFoQuest(items);
 		//var items = questClicked.item1.toString() +questClicked.item2.toString()+questClicked.item3.toString()+questClicked.item4.toString()+questClicked.item5.toString();
@@ -804,19 +821,23 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	}
 
 	//returns card numbers appended to each other for deck.  ex. 1224
-	getSelectedCards = function(deck){
+	getSelectedCards = function(deck, selectedCardsOnly){
 		var selectedCards = "";
 		var cardNumber = "";
 		for (var i = 0; i < deck.playingCards.length; ++i)  {
 			var card = deck.playingCards[i];
-			if(card.selected) {
-				cardNumber = card.number;
-				if(card.number===10) {
-					cardNumber = 0;
+			if(selectedCardsOnly){
+				if(card.selected) {
+					cardNumber = card.number;
+					if(card.number===10) {
+						cardNumber = 0;
+					}
+					selectedCards+=cardNumber;
 				}
+			}
+			else {
 				selectedCards+=cardNumber;
 			}
-			continue;			
 		}
 		
 		return selectedCards;
@@ -887,8 +908,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		var game = $scope.game;
 		var player = $scope.activePlayer;
 		var total = player.cardSumSelected;
-		var selectedCards = getSelectedCards(player.cards);
-		var selectedCartCards = getSelectedCards(player.carts[id].cards);
+		var selectedCards = getSelectedCards(player.cards, true);
+		var selectedCartCards = getSelectedCards(player.carts[id].cards, true);
 		var selectedCardCount = getSelectedCardcount(player.cards);
 		var selectedCartCount = getSelectedCardcount(player.carts[id].cards);
 		//$scope.activeCartId = id;
@@ -900,7 +921,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}	
 		
 		if($scope.prevActiveCartId >= 0) {
-			$scope.selectedCartItems = getSelectedCards(player.carts[$scope.prevActiveCartId].cards);
+			$scope.selectedCartItems = getSelectedCards(player.carts[$scope.prevActiveCartId].cards, true);
 		}
 		
 		//if cart cards are selected, move between carts else its player items to cart
@@ -928,6 +949,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		resetAllSelectedCards(player);
 		//updateLog(text);
 		play("swords");
+		//checkIfQuestIsReady();
 	}
 
 	moveItemsBetweenCarts = function(prevId, id, selectedCartItems ) {
@@ -956,7 +978,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		
 		cart.cards.setCardSize("small");
 		resetAllSelectedCards(player);
-		//updateLog(text);
+		//checkIfQuestIsReady();
 		
 
 	}  
@@ -1048,7 +1070,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		var game = $scope.game;
 		var player = $scope.activePlayer;
 		var cart = player.carts[id];
-		var selectedCards = getSelectedCards(cart.cards);
+		var selectedCards = getSelectedCards(cart.cards, true);
 
 		if(player.actionsRemaining === 0)	{
 			alert("You have no actions.");
@@ -1085,7 +1107,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		var game = $scope.game;
 		var player = $scope.activePlayer;
 		var selectedCardCount = getSelectedCardcount(player.cards);
-		var selectedCards = getSelectedCards(player.cards);
+		var selectedCards = getSelectedCards(player.cards, true);
 
 		//if you have actions, discard selected cards, if not but have too many cards, discard anyway	
 		var  cardCount = 0;
@@ -1123,7 +1145,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		var game = $scope.game;
 		var player = $scope.activePlayer;
 		var total = player.cardSumSelected;
-		var selectedCards = getSelectedCards(player.cards);
+		var selectedCards = getSelectedCards(player.cards, true);
 		var selectedCardCount = getSelectedCardcount(player.cards);
 		var purchasedStatus = false;
 		var purchaseType = null;
@@ -1223,7 +1245,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		//make sure you discard down to max cards or you can't pass
 		var game = $scope.game;
 		var player = $scope.activePlayer;
-		var discardSelectedCards = getSelectedCards(player.cards);
+		var discardSelectedCards = getSelectedCards(player.cards, true);
 		var selectedCardCount = getSelectedCardcount(player.cards);
 		//var text = "";
 		var r = false;
@@ -1291,8 +1313,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		var text = "";
 		var game = $scope.game;
 		var player = $scope.activePlayer;
-		var selectedItemCards = getSelectedCards(player.cards);
-		var selectedMarketCards = getSelectedCards(game.marketDeckInTrade);
+		var selectedItemCards = getSelectedCards(player.cards, true);
+		var selectedMarketCards = getSelectedCards(game.marketDeckInTrade, true);
 		var selectedCardCount = getSelectedCardcount(player.cards);
 		$scope.selectedItemsCount = selectedCardCount;
 		
@@ -1910,6 +1932,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 		
 		 $scope.loadingData=false;
+		 checkIfQuestIsReady();
 	}
 
 
