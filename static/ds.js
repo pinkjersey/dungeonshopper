@@ -472,6 +472,7 @@ $scope.playerCompleteQuest = function(id) {
 				//check if player completed quest and move it to their completed quests
 				game.questsInPlay.setCardSize("orig");
 				completeQuest(selectedCards, 'cart' + cart.id);
+				questClicked.selected = false;
 				resetAllSelectedCards(player);
 				//player.questsCompleted.setCardSize("small");
 				//updateLog(text);
@@ -1885,6 +1886,7 @@ var processGameStateErrorCallback = function (returnVal) {
 //    market = ndb.IntegerProperty(repeated=True)
 //    questsInPlay = ndb.LocalStructuredProperty(QuestCard, repeated=True)
 
+
 		var text = "";
 		$scope.isActive = data.isActive;
 		//$scope.numberOfPlayers = data.numPlayers;
@@ -1983,6 +1985,13 @@ var processGameStateErrorCallback = function (returnVal) {
 
 		for (var i = 0; i < data.eventLog.length; ++i) {   
 			logEvent($scope.eventsLog, data.name, data.eventLog[i].event);
+		}
+		
+		if(data.gameOver===true)	{
+			$scope.displayMode = "gameover";
+			$scope.displayModeName = "Game Over";
+			$scope.loadingData=false;
+			return;
 		}
 		
 		 $scope.loadingData=false;

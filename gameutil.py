@@ -37,6 +37,13 @@ def playerState(game, playerId):
     thedict["eventLog"] = el
     thedict["turns"] = player.turns
 
+    questLen = len(game.questDeck)
+    questsLen = len(game.questsInPlay)	
+    if(questLen==0 and questsLen==4):
+        thedict["gameOver"] = True
+    else:
+        thedict["gameOver"] = False
+
     jsonstr = json.dumps(thedict)
     return jsonstr   
 
@@ -666,15 +673,16 @@ def dealItemCardToMarket(game):
     game.market.append(card)
         
 def dealQuest(game):
-    quest = game.questDeck[0]
-    del game.questDeck[0]
-    game.questsInPlay.append(quest)
-	
-    #added by gary to try and simulate getting a new quest after an event
-    nextQuest = game.questDeck[0]	
-    if (nextQuest.level==4):
+    decklen = len(game.questDeck)
+    if(decklen == 0):
+        return
+    else:
+        quest = game.questDeck[0]
         del game.questDeck[0]
-        game.questsInPlay.append(nextQuest)
+        game.questsInPlay.append(quest)
+        #added by gary to try and simulate getting a new quest after an event
+        if(quest.level==4):
+            dealQuest(game)
 	
 def newQuestDeck(numPlayers):
     level1Cards = []
@@ -780,8 +788,8 @@ def newQuestDeck(numPlayers):
     level4Cards = shuffle(level4Cards)
 
     if numPlayers == "1":
-        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
-		#createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,2,1,1,2,4,4)
+        #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
+		createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,0,0,0,0,0,0)
     elif numPlayers == "2":
         createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,7,1,4,1,2,4,2,2)
     elif numPlayers == "3":

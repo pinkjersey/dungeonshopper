@@ -80,10 +80,12 @@
 		<ng-include src="'eventVikingParade.html'" ng-show="displayMode === 'eventVikingParade'"></ng-include>-->
 		</div>
 	</div>
-    <ng-include src="'playerLog.html'" ng-show="displayMode != 'nogame'"></ng-include>
-    <ng-include src="'quests.html'" ng-show="displayMode != 'nogame'"></ng-include>
-    <ng-include src="'market.html'" ng-show="displayMode != 'nogame'"></ng-include>
-    <ng-include src="'playerCompletedQuests.html'" ng-show="displayMode != 'nogame'"></ng-include>
-    <ng-include src="'gameFooter.html'" ng-show="displayMode != 'nogame'"></ng-include>
+	<span ng-show="displayMode != 'nogame' && displayMode != 'gameover'">
+		<ng-include src="'playerLog.html'"></ng-include>
+		<ng-include src="'quests.html'"></ng-include>
+		<ng-include src="'market.html'"></ng-include>
+		<ng-include src="'playerCompletedQuests.html'"></ng-include>
+		<ng-include src="'gameFooter.html'" ></ng-include>
+	</span>
 </body>
 </html>
