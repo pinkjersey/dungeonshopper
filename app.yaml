@@ -32,6 +32,10 @@ handlers:
   static_dir: images
   login: admin
 
+- url: /sounds
+  static_dir: sounds
+  login: admin
+
 - url: /
   static_files: static/index.html
   upload: static/index\.html
