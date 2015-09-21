@@ -85,7 +85,7 @@ class GameHandler(webapp2.RequestHandler):
             return
 
         what = self.request.get('what')
-        if (where == None or where == ""):
+        if (what == None or what == ""):
             self.error(500)
             return
 
@@ -93,12 +93,12 @@ class GameHandler(webapp2.RequestHandler):
         if (result == False):
             self.error(500)
             return
-
+        self.appendToLog(game)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
-        self.appendToLog(game)
+
 
     def discard(self):
         """
@@ -116,7 +116,7 @@ class GameHandler(webapp2.RequestHandler):
             return
 
         what = self.request.get('what')
-        if (where == None or where == ""):
+        if (what == None or what == ""):
             self.error(500)
             return
 
@@ -124,12 +124,12 @@ class GameHandler(webapp2.RequestHandler):
         if (result == False):
             self.error(500)
             return
-
+        self.appendToLog(game)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
-        self.appendToLog(game)
+
 
     def move(self):
         """
@@ -167,12 +167,12 @@ class GameHandler(webapp2.RequestHandler):
         if (result == False):
             self.error(500)
             return
-
+        self.appendToLog(game)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
-        self.appendToLog(game)
+
 
     def buyCart(self):
         """
@@ -207,12 +207,12 @@ class GameHandler(webapp2.RequestHandler):
         if (result == False):
             self.error(500)
             return
-
+        self.appendToLog(game)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
-        self.appendToLog(game)
+
 
     def buyAction(self):
         """
@@ -228,12 +228,12 @@ class GameHandler(webapp2.RequestHandler):
         if (result == False):
             self.error(500)
             return
-
+        self.appendToLog(game)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
-        self.appendToLog(game)
+
 
     def marketTrade(self):
         """
@@ -261,12 +261,12 @@ class GameHandler(webapp2.RequestHandler):
         if (result == False):
             self.error(500)
             return
-
+        self.appendToLog(game)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
-        self.appendToLog(game) 
+
 
     def completeQuest(self):
         """
@@ -297,6 +297,7 @@ class GameHandler(webapp2.RequestHandler):
 
         logging.error("Compelete quest: done")
 
+        self.appendToLog(game)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
@@ -330,6 +331,7 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
+        self.appendToLog(game)			
         retstr = playerState(game, priorPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"

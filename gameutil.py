@@ -35,8 +35,15 @@ def playerState(game, playerId):
         el.append(e.to_dict())
 
     thedict["eventLog"] = el
+    thedict["turns"] = player.turns
 
-	
+    questLen = len(game.questDeck)
+    questsLen = len(game.questsInPlay)	
+    if(questLen==0 and questsLen==4):
+        thedict["gameOver"] = True
+    else:
+        thedict["gameOver"] = False
+
     jsonstr = json.dumps(thedict)
     return jsonstr   
 
@@ -451,6 +458,8 @@ def passPlayer(game, items):
     if game.curPlayer == game.numPlayers:
         game.curPlayer = 0
 
+	player.turns += 1	
+		
     # save game to data store
     game.put()
 
@@ -657,16 +666,24 @@ def getFirstItemCard(game):
 def dealItemCard(playerIndex, game):
     card = getFirstItemCard(game)    
     game.players[playerIndex].hand.append(card)
+    game.players[playerIndex].hand.sort()
 
 def dealItemCardToMarket(game):
     card = getFirstItemCard(game)
     game.market.append(card)
         
 def dealQuest(game):
-    quest = game.questDeck[0]
-    del game.questDeck[0]
-    game.questsInPlay.append(quest)
-
+    decklen = len(game.questDeck)
+    if(decklen == 0):
+        return
+    else:
+        quest = game.questDeck[0]
+        del game.questDeck[0]
+        game.questsInPlay.append(quest)
+        #added by gary to try and simulate getting a new quest after an event
+        if(quest.level==4):
+            dealQuest(game)
+	
 def newQuestDeck(numPlayers):
     level1Cards = []
     level2Cards = []
@@ -689,14 +706,14 @@ def newQuestDeck(numPlayers):
     level1Cards.append(createQuestCard(1,True,[1,6,8],3,2))
     level1Cards.append(createQuestCard(1,True,[2,6,10],3,2))
     level1Cards.append(createQuestCard(1,True,[3,5,10],3,2))
-    level1Cards.append(createQuestCard(1,True,[4,4,4],4,2))
+    level1Cards.append(createQuestCard(1,False,[4,4,4],4,2))
     level1Cards.append(createQuestCard(1,True,[1,3,10],3,3))
     level1Cards.append(createQuestCard(1,True,[1,5,9],3,3))
     level1Cards.append(createQuestCard(1,True,[2,2,10],3,3))
     level1Cards.append(createQuestCard(1,True,[2,5,8],3,3))
     level1Cards.append(createQuestCard(1,True,[3,5,9],3,3))
     level1Cards.append(createQuestCard(1,True,[3,7,8],3,3))
-    level1Cards.append(createQuestCard(1,True,[5,5,5],4,3))
+    level1Cards.append(createQuestCard(1,False,[5,5,5],4,3))
     level1Cards.append(createQuestCard(1,True,[1,2,8],2,4))
     level1Cards.append(createQuestCard(1,True,[1,4,9],3,4))
     level1Cards.append(createQuestCard(1,True,[1,6,9],3,4))
@@ -771,7 +788,8 @@ def newQuestDeck(numPlayers):
     level4Cards = shuffle(level4Cards)
 
     if numPlayers == "1":
-        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
+        #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
+		createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,0,0,0,4,4)
     elif numPlayers == "2":
         createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,7,1,4,1,2,4,2,2)
     elif numPlayers == "3":

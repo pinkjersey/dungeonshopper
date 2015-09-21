@@ -1,0 +1,12 @@
+    return getFirstItemCard(game)
+  File &quot;C:\Users\Kat\Desktop\Documents\GitHub\dungeonshopper\gameutil.py&quot;, line 651, in getFirstItemCard
+    return getFirstItemCard(game)
+  File &quot;C:\Users\Kat\Desktop\Documents\GitHub\dungeonshopper\gameutil.py&quot;, line 651, in getFirstItemCard
+    return getFirstItemCard(game)
+  File &quot;C:\Users\Kat\Desktop\Documents\GitHub\dungeonshopper\gameutil.py&quot;, line 651, in getFirstItemCard
+  
+    File "C:\Program Files\Google\google_appengine\google\appengine\ext\ndb\model.py", line 1194, in _opt_call_from_base_type
+
+    if isinstance(value, _BaseValue):
+
+RuntimeError: maximum recursion depth exceeded while calling a Python object

@@ -54,30 +54,38 @@ function questSet() {
 //questSet.prototype.defaultCardWord = 'Quest';
 //questSet.prototype.toString = function () { return '[object questSet]'; };
 
-questSet.prototype.addCard = function (level,gold,item1,item2,item3,item4,item5,vp,name,sortorder,oImage,oImageSmall,oImageLarge) {
+questSet.prototype.addCard = function (level,gold,item1,item2,item3,item4,item5,vp,name,nameId,oImage,oImageSmall,oImageLarge) {
 	// Add a Quest to the deck
-	if(level===1) {
+	var questMatchId = "";
+
+	switch (level.toString()) {
+		case "1":
 		oImage = oImage + item1 + item2 + item3 ;
-		}
-	if(level===2) {
+		break;
+		case "2":
 		oImage = oImage + item1 + item2 + item3 + item4 ;
-		}
-	if(level===3) {
+		break;
+		case "3":
 		oImage = oImage + item1 + item2 + item3 + item4 + item5	; 
-		}
-	if(level==='4') {
+		break;
+		case "4":
 		oImage = oImage;
-		}	
+		break;
+		default:
 		
+	}
+
+	
 	var oImageOrig = oImage + '.jpg'
 	var oImageSmall = oImage + '_sm.jpg'
 	var oImageLarge = oImage + '_lg.jpg'
-	this.playingCards[this.playingCards.length] = new questCard(level,gold,item1,item2,item3,item4,item5,vp,name,sortorder,oImageOrig, oImageSmall, oImageLarge, this);
+	
+	this.playingCards[this.playingCards.length] = new questCard( level,gold,item1,item2,item3,item4,item5,vp,name,nameId,oImageOrig, oImageSmall, oImageLarge, this);
 };
 
 questSet.prototype.addCardc = function (oCard) {
 	// Add a Quest to the deck
-	this.playingCards[this.playingCards.length] = new questCard(oCard.level,oCard.gold,oCard.item1,oCard.item2,oCard.item3,oCard.item4,oCard.item5,oCard.vp,oCard.name,oCard.sortorder,oCard.image,oCard.imageSmall, oCard.imageLarge,this);
+	this.playingCards[this.playingCards.length] = new questCard(oCard.level,oCard.gold,oCard.item1,oCard.item2,oCard.item3,oCard.item4,oCard.item5,oCard.vp,oCard.name,oCard.nameId,oCard.image,oCard.imageSmall, oCard.imageLarge,this);
 };
 
 questSet.prototype.peek = function (i) {
@@ -111,18 +119,22 @@ questSet.prototype.shuffleCards = function (oTimes) {
 };
 
 questSet.prototype.setCardSize = function (size) {
-	// Set a nice width for the cards - any CSS width value is allowed
+
 	for( var i = 0; i < this.playingCards.length; i++ ) {
-		if(size === "small") {
-			this.playingCards[i].image = this.playingCards[i].imageSmall;
-		}
-		if(size === "large") {
-			this.playingCards[i].image = this.playingCards[i].imageLarge;
-		}
-		else {
-			this.playingCards[i].image = this.playingCards[i].imageOrig;
-		}
-//		this.playingCards[i].setCardSize(oWidth,oHeight);
+		switch (size)
+			{
+				case 'orig':
+					this.playingCards[i].image = this.playingCards[i].imageOrig;
+					break;
+				case 'small':
+					this.playingCards[i].image = this.playingCards[i].imageSmall;
+					break;
+				case 'large':
+					this.playingCards[i].image = this.playingCards[i].imageLarge;
+					break;
+				default:
+					this.playingCards[i].image = this.playingCards[i].imageOrig;
+			}
 	}
 };
 
@@ -140,7 +152,7 @@ questSet.prototype.setCardSize = function (size) {
 //};
 
 
-questSet.prototype.create75CardsQuestDeck = function (questImageBase) {
+questSet.prototype.createQuestDeck = function (questImageBase) {
 	// Create quest deck
 	
 	var level1 = new questSet();
@@ -395,7 +407,7 @@ if(level===3){
 	this.addCard(level,0,3,4,7,8,9,6,'Siege of Harfleur',5,image,this);
 }
 
-if(level==='4'){
+if(level===4){
 	var image="../images/event";
 	this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',6,image+"BarbarianAttack",this);
 	this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',7,image+"BrokenItems",this);
@@ -413,10 +425,20 @@ if(level==='4'){
 
 }
 
+var itemcheck = function(params) {
+	if(params!=0) {
+		return params.toString();
+	} 
+	else {
+		return "";
+	}
+}
 /****************************
  A class representing a card
 ****************************/
-function questCard(level,gold,item1,item2,item3,item4,item5,vp,name, nameId,image,imageSmall,imageLarge , oCardSet) {
+function questCard( level,gold,item1,item2,item3,item4,item5,vp, name, nameId,image,imageSmall,imageLarge , oCardSet) {
+
+
 
 	// Initialise settings
 	this.level=level;
@@ -425,9 +447,10 @@ function questCard(level,gold,item1,item2,item3,item4,item5,vp,name, nameId,imag
 	this.item3=item3;
 	this.item4=item4;
 	this.item5=item5;
+	this.questMatchId = item1.toString()+item2.toString()+item3.toString()+itemcheck(item4)+itemcheck(item5);
 	this.gold = gold;
 	this.name = name;
-	this.nameId = nameId;
+	this.nameId = nameId;  //sortorder when completed
 	this.selected = false;
 	this.vp = vp;
 	this.imageOrig = image;
@@ -449,6 +472,9 @@ questCard.prototype.setCardSize = function (size) {
 
 switch (size)
 	{
+		case 'orig':
+			this.image = this.imageOrig;
+			break;
 		case 'small':
 			this.image = this.imageSmall;
 			break;

@@ -1,8 +1,8 @@
 <div>
 	<br></br>
-	<div ng-show="activePlayer.questsCompleted.playingCards.length > 0" >My Completed Quests:</div>
+	<div ng-show="activePlayer.questsCompleted.playingCards.length > 0" >{{activePlayer.name}}'s Completed Quests:</div>
 	<span ng-repeat="questcard in activePlayer.questsCompleted.playingCards track by $index">
-		<img width = "80" height = "100" ng-src="{{questcard.image}}"></img>
+		<img ng-src="{{questcard.image}}"></img>
 	</span>
 	<br></br>
 </div>
