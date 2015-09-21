@@ -649,6 +649,9 @@ def getFirstItemCard(game):
         # shuffle discard and set it to item deck
         game.itemDeck = shuffle(game.discardPile)
 
+        if (len(game.itemDeck) > 4):
+            raise ValueError("Newly created itemdeck has a size less than 5")
+
         # clear discard
         game.discardPile = []
 
