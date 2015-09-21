@@ -3,6 +3,16 @@ import json
 import logging
 from game_model import *
 
+def createOtherPlayer(player):
+    dict = player.to_dict()
+    hand = dict["hand"]
+    sz = len(hand)
+    for i in range(sz):
+        hand[i] = -1
+
+    dict["hand"] = hand
+    return dict
+
 def playerState(game, playerId):
     player = game.players[playerId]
     thedict = player.to_dict()
@@ -17,11 +27,18 @@ def playerState(game, playerId):
     thedict["itemsCountRemaining"] = len(game.itemDeck)
     thedict["questsCountRemaining"] = len(game.questDeck)
     thedict["market"] = game.market
+    
     questlist = []
     for q in game.questsInPlay:
-        questlist.append(q.to_dict())
-        
+        questlist.append(q.to_dict())        
     thedict["questsInPlay"] = questlist
+
+    otherPlayers = []
+    for p in game.players:
+        if (p != player):
+            otherPlayers.append(createOtherPlayer(p))
+    thedict["otherPlayers"] = otherPlayers
+
     thedict["actionsRemaining"] = game.actionsRemaining
 
     discardLen = len(game.discardPile)
