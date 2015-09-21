@@ -126,7 +126,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	//plays audio files
 	play = function (soundId) {
 		var audio = document.getElementById(soundId);
-		audio.play();
+		//audio.play();
 	};
 
 	$scope.noGame = function () {
@@ -137,7 +137,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	//setup splash screen
 	setupNoGame = function() {
 		$scope.displayMode = "nogame";
-		$scope.splashImage = "../images/boxtop.jpg";
+		//$scope.splashImage = "../images/boxtop.jpg";
 		//$scopeNextPlayerId = 0;
 		$scope.playerName="Type Your Name";
 		$scopeNextPlayerId=0;		
@@ -238,7 +238,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.activeCartId = -1;
 	$scope.borderPXselected = "border:3px solid red";
 	$scope.borderPX = "border:1px solid black";
-	$scope.borderPXorg = "border:1px solid white";
+	$scope.borderPXorig = "border:1px solid white";
 	
 	$scope.events = [
 		new Event(0,0,""),
@@ -410,8 +410,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		if (questCanBeCompleted === true) {
 			questFound.borderColor = 'border:10px solid green';
 			$scope.userClickedCartImage(cartId);
-			selectCartCards(cartId, cartWithItems);
-			
+		
 		}
 	}
 	
@@ -450,9 +449,16 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			if(questFound.level===4) {
 				continue;
 			}
-			var arr2 =  new Array(questFound.item1, questFound.item2, questFound.item3, questFound.item4, questFound.item5);
+			var arr2 = new Array(questFound.item1, questFound.item2, questFound.item3, questFound.item4, questFound.item5);
 			
-			var r = getIntersect(arr1, arr2);
+	
+			for(var i = arr2.length - 1; i >= 0; i--) {
+				if(arr2[i] === 0) {
+				   arr2.splice(i, 1);
+				}
+			}						
+						
+			var r = getIntersect(arr2, arr1);
 	
 			//remove trailing zeros from arrays and it will match.
 
@@ -464,13 +470,22 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		
 		if (questCanBeCompleted === true) {
 			questFound.borderColor = 'border:10px solid green';
-			//selectHandCards(r));
+			selectHandCards(arr2);
+
+			
 		}
 	}
 	
 	selectHandCards = function(cardArray) {
 		var cards = new Array(cardArray);
-		for (var d=0;d<$scope.game.activePlayer.cards.playingCards.length; ++d) {
+		for (var a=0; a < cardArray.length; ++a) {
+			questNumber = cardArray[a];
+			for (var d=0;d<$scope.activePlayer.cards.playingCards.length; ++d) {
+				if(questNumber = $scope.activePlayer.cards.playingCards[d]) {
+					$scope.userClickedItemImage[d];
+					break;
+				}
+			}
 		}
 	}
 
@@ -1958,6 +1973,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
         for (var i = 0; i < data.questsInPlay.length; ++i) {   
 			dealQuestCard($scope.game.questsInPlay, data.questsInPlay[i].items, data.questsInPlay[i].level, data.questsInPlay[i].type);
+			var card = $scope.game.questsInPlay.playingCards[i];
+			card.borderColor = cardColor(card);
 		}
 		$scope.game.questsInPlay.setCardSize("orig");
 		
