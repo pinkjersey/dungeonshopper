@@ -60,10 +60,19 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        game.players[1].name = name
+        playerId = self.request.get("playerId")
+        if (playerId == None or playerId == ""):
+            self.error(500)
+            return
 
-        retstr = playerState(game, 1)        
-        #jsonstr = json.dumps([game.to_dict()])
+        iPlayerId = int(playerId)
+        if (iPlayerId < 1 or iPlayerId > 3):
+            self.error(500)
+            return
+
+        game.players[iPlayerId].name = name
+        game.put()
+        retstr = playerState(game, iPlayerId)        
                 
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
