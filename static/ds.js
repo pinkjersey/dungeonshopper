@@ -399,6 +399,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				
 				if (parseSelectedCardArrayFoQuest(selectedCards) === parseSelectedCardArrayFoQuest(items) ){
 					questCanBeCompleted = true;
+					var cartWithItems = player.carts[i].cards;
+					var cartId = i;
 					break;
 				}
 
@@ -406,14 +408,70 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 		
 		if (questCanBeCompleted === true) {
-			//alert("A quest can be completed!")
-			//return questFound;
 			questFound.borderColor = 'border:10px solid green';
-//			$scope.borderPX = 'border:3px solid green';
+			$scope.userClickedCartImage(cartId);
+			selectCartCards(cartId, cartWithItems);
+			
+		}
+	}
+	
+	function getIntersect(arr1, arr2) {
+				var r = [], o = {}, l = arr2.length, i, v;
+				for (i = 0; i < l; i++) {
+					o[arr2[i]] = true;
+				}
+				l = arr1.length;
+				for (i = 0; i < l; i++) {
+					v = arr1[i];
+					if (v in o) {
+						r.push(v);
+					}
+				}
+				return r;
+			}
 
+	var checkIfHaveCardsForQuest = function () {
+		var game = $scope.game;
+		var player = $scope.activePlayer;
+		var questCanBeCompleted = false;
+
+		var arr1 = [];
+		for (var j = 0; j < player.cards.playingCards.length; ++j) {
+			card = player.cards.playingCards[j];
+			arr1[j]= card.number;
+		}
+		
+		if(arr1[0] === "") {
+			return;
 		}
 
+		for (var j = 0; j < game.questsInPlay.playingCards.length; ++j) {
+			var questFound = game.questsInPlay.playingCards[j];
+			if(questFound.level===4) {
+				continue;
+			}
+			var arr2 =  new Array(questFound.item1, questFound.item2, questFound.item3, questFound.item4, questFound.item5);
+			
+			var r = getIntersect(arr1, arr2);
+	
+			//remove trailing zeros from arrays and it will match.
+
+			if (parseSelectedCardArrayFoQuest(arr2) === parseSelectedCardArrayFoQuest(r) ){
+				questCanBeCompleted = true;
+				break;
+			}
+		}
 		
+		if (questCanBeCompleted === true) {
+			questFound.borderColor = 'border:10px solid green';
+			//selectHandCards(r));
+		}
+	}
+	
+	selectHandCards = function(cardArray) {
+		var cards = new Array(cardArray);
+		for (var d=0;d<$scope.game.activePlayer.cards.playingCards.length; ++d) {
+		}
 	}
 
 	//returns card numbers appended to each other for deck.  ex. 1224
@@ -1953,6 +2011,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		
 		 $scope.loadingData=false;
 		 checkIfQuestIsReady();
+		 checkIfHaveCardsForQuest();
 	}
 
 
