@@ -37,9 +37,9 @@ def playerState(game, playerId):
     thedict["eventLog"] = el
     thedict["turns"] = player.turns
 
-    questLen = len(game.questDeck)
-    questsLen = len(game.questsInPlay)	
-    if(questLen==0 and questsLen==4):
+    questsLeftLen = len(game.questDeck)
+    questsInPlayLen = len(game.questsInPlay)	
+    if(questsLeftLen==0 and questsInPlayLen==4):
         thedict["gameOver"] = True
     else:
         thedict["gameOver"] = False
