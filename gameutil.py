@@ -38,9 +38,9 @@ def playerState(game, playerId):
     thedict["eventLog"] = el
     thedict["turns"] = player.turns
 
-    questLen = len(game.questDeck)
-    questsLen = len(game.questsInPlay)	
-    if(questLen==0 and questsLen==4):
+    questsLeftLen = len(game.questDeck)
+    questsInPlayLen = len(game.questsInPlay)	
+    if(questsLeftLen==0 and questsInPlayLen==4):
         thedict["gameOver"] = True
     else:
         thedict["gameOver"] = False
@@ -649,6 +649,9 @@ def getFirstItemCard(game):
 
         # shuffle discard and set it to item deck
         game.itemDeck = shuffle(game.discardPile)
+
+        if (len(game.itemDeck) > 4):
+            raise ValueError("Newly created itemdeck has a size less than 5")
 
         # clear discard
         game.discardPile = []

@@ -60,10 +60,19 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        game.players[1].name = name
+        playerId = self.request.get("playerId")
+        if (playerId == None or playerId == ""):
+            self.error(500)
+            return
 
-        retstr = playerState(game, 1)        
-        #jsonstr = json.dumps([game.to_dict()])
+        iPlayerId = int(playerId)
+        if (iPlayerId < 1 or iPlayerId > 3):
+            self.error(500)
+            return
+
+        game.players[iPlayerId].name = name
+        game.put()
+        retstr = playerState(game, iPlayerId)        
                 
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
@@ -372,41 +381,47 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        if action == "new":
-            return self.newGame()
+        try:
+            if action == "new":
+                return self.newGame()
 
-        if action == "join":
-            return self.join()
+            if action == "join":
+                return self.join()
 
-        if action == "info":
-            return self.info()
+            if action == "info":
+                return self.info()
 
-        if action == "fish":
-            return self.fish()
+            if action == "fish":
+                return self.fish()
 
-        if action == "discard":
-            return self.discard()
+            if action == "discard":
+                return self.discard()
 
-        if action == "move":
-            return self.move()
+            if action == "move":
+                return self.move()
 
-        if action == "buyCart":
-            return self.buyCart()
+            if action == "buyCart":
+                return self.buyCart()
 
-        if action == "buyAction":
-            return self.buyAction()
+            if action == "buyAction":
+                return self.buyAction()
 
-        if action == "pass":
-            return self.passPlayer()
+            if action == "pass":
+                return self.passPlayer()
 
-        if action == "marketTrade":
-            return self.marketTrade()
+            if action == "marketTrade":
+                return self.marketTrade()
 
-        if action == "completeQuest":
-            return self.completeQuest()
+            if action == "completeQuest":
+                return self.completeQuest()
 
-        if action == "refresh":
-            return self.refresh()
+            if action == "refresh":
+                return self.refresh()
+
+        except ValueError as e:
+            logging.error("Exception ({0}): {1}".format(e.errno, e.strerror))
+            self.error(500)
+            return
 
         logging.error("Invalid action")
         self.error(500)
