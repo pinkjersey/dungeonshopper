@@ -11,19 +11,24 @@ def createOtherPlayer(player):
     #    hand[i] = -1
 
     #dict["hand"] = hand
+
+    #dict["playerId"] = playerId
+
     return dict
 
 def playerState(game, playerId):
+    game.players[playerId].playerId = playerId
     player = game.players[playerId]
+    player.playerId = playerId
     thedict = player.to_dict()
-	
+
     if game.curPlayer == playerId:
         thedict["isActive"] = True
     else:
         thedict["isActive"] = False
 
     thedict["numPlayers"] = game.numPlayers
-    thedict["curPlayer"] = playerId        
+    thedict["curPlayer"] = playerId
     thedict["itemsCountRemaining"] = len(game.itemDeck)
     thedict["questsCountRemaining"] = len(game.questDeck)
     thedict["market"] = game.market
@@ -538,9 +543,10 @@ def createNewGame(numPlayers, name):
 
     game.itemDeck = newItemDeck()
     for i in range (0, game.numPlayers):
-        p=Player(name="defaultPlayer{0}".format(i))            
+        p=Player(name="defaultPlayer{0}".format(i))
         if (i == 0):
             p.name = name
+            p.playerId = 0
         game.players.append(p)
 
     # deal five cards

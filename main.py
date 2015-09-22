@@ -71,6 +71,7 @@ class GameHandler(webapp2.RequestHandler):
             return
 
         game.players[iPlayerId].name = name
+        
         game.put()
         retstr = playerState(game, iPlayerId)        
                 

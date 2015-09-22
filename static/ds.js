@@ -159,7 +159,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			$scope.questImageBase = "../images/quest";
 			$scope.blankMarketImageBase = "../images/"
 			$scope.cartImageBase = "../images/cart";
-			$scope.splashImage = "../images/boxtop.jpg";
+			//$scope.splashImage = "../images/boxtop.jpg";
 			$scope.itemCardBack = "../images/shoppingCardBack.jpg";
 			$scope.vendorCardBack = "../images/vendorback.jpg";
 		}
@@ -1944,7 +1944,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	function getObjectResults(data) {
 		var text = "";
 		var game = $scope.game;
-		var players = game.players;
+		// players = game.players;
 		//this controls the buttons to return if you are not active
 		//already doing so much in angular js buttons, did not want to add this as well
 		$scope.isActive = data.isActive;
@@ -1960,7 +1960,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			}
 		}
 		
-		players = [];
+		$scope.game.players = [];
 		var o = 1;
 		//fill in other players data into game.scope.players
 		for (var p = 0; p < data.numPlayers; ++p) {  
@@ -1969,9 +1969,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		
 			//current player
 			if(p===0) {
-				players.push(new Player(game, p, data.name));
-				players[p].active = true;
-				$scope.activePlayer = players[p];
+				$scope.game.players.push(new Player(game, data.curPlayer, data.name));
+				$scope.game.players[p].active = true;
+				$scope.activePlayer = $scope.game.players[p];
 				var activePlayer = $scope.activePlayer;
 				
 				activePlayer.actionsRemaining = data.actionsRemaining;
@@ -1999,25 +1999,25 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			else {
 				for (var z = 0; z < data.otherPlayers.length; ++z) {
 					
-					players.push(new Player(game, o, data.otherPlayers[z].name));
-					players[o].cards = new cardSet();
-					players[o].questsCompleted =  new cardSet();
+					$scope.game.players.push(new Player(game, o, data.otherPlayers[z].name));
+					$scope.game.players[o].cards = new cardSet();
+					$scope.game.players[o].questsCompleted =  new cardSet();
 			
 					for (var i = 0; i < data.otherPlayers[z].hand.length; ++i) {   
 						//dealNumberToPlayer($scope.game.players[o], data.otherPlayers[z].hand[i]);	
-						dealNumberToPlayer(players[o], -1);	
+						dealNumberToPlayer($scope.game.players[o], -1);	
 					}
 
 					//populate carts
 					for (var c = 0; c < data.carts.length; ++c) {   
-						players[o].carts[c].cards =  new cardSet();
-						updatePlayerCarts(players[o].carts[c], data.otherPlayers[z].carts[c]);	
+						$scope.game.players[o].carts[c].cards =  new cardSet();
+						updatePlayerCarts($scope.game.players[o].carts[c], data.otherPlayers[z].carts[c]);	
 					}
 					
 					for (var q = 0; q < data.otherPlayers[z].questsCompleted.length; ++q) {   
-						dealQuestsCompleted(players[o].questsCompleted, data.otherPlayers[z].questsCompleted[q].items);
+						dealQuestsCompleted($scope.game.players[o].questsCompleted, data.otherPlayers[z].questsCompleted[q].items);
 					}
-					players[o].questsCompleted.setCardSize("small");
+					$scope.game.players[o].questsCompleted.setCardSize("small");
 					o++;
 				}
 			}
@@ -2051,7 +2051,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		
 
 		for (var i = 0; i < data.eventLog.length; ++i) {   
-			logEvent($scope.eventsLog, players[data.eventLog[i].playerId].name, data.eventLog[i].event);
+		//0 is always the active player
+			logEvent($scope.eventsLog, getPlayerName(data.curPlayer), data.eventLog[i].event);
 		}
 		
 		if(data.gameOver===true)	{
@@ -2063,7 +2064,15 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		 checkIfQuestIsReady();
 		 checkIfHaveCardsForQuest();
 	}
-
+	
+var getPlayerName = function(playerId) {
+	
+	for (var p = 0; p < $scope.game.players.length; ++p) {  
+		if(p.id = playerId) {
+			return $scope.game.players[playerId].name;
+		}
+	}
+}
 
 function loadData(numPlayers, playerName) {
 	$scope.loadingData=true;
