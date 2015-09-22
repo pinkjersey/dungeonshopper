@@ -33,7 +33,7 @@
 		<br></br>
 
 		<div class="container-fluid">
-			<div class="row" ng-disabled="loadingData===true">
+			<div class="row" ng-disabled="loadingData">
 				<div class="col-sm-3" ng-repeat="cart in activePlayer.carts track by $index" >
 					<div ng-disabled="activePlayer.nextCartId < cart.id" ng-if="!cart.active"><b>Gold Cost:</b> {{cart.goldCost}}<span style="color:red;"> / </span><b>Item Cost:</b> {{cart.itemCost}}</div>
 					<button ng-disabled="activePlayer.nextCartId < cart.id" ng-if="!cart.active" class="btn btn-warning" ng-click="playerBuyCart(cart.id)" >Buy {{cart.name}} with {{cart.purchaseWith}}</button>   
@@ -47,7 +47,7 @@
 						<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerCartFish($index)" ng-if="cart.cardSumSelected > 0 && selectedCartItemsCount===1" >Fish </button>    
 					</span>	
 
-					<div ng-show="debug">	
+					<div ng-show="debug==true">	
 					<p>Selected ItemCount: {{selectedItemsCount}}</p>
 					<p>Cart active? {{cart.active}}</p>
 					<p>Cart Sum Selected: {{cart.cardSumSelected}}</p>
