@@ -60,13 +60,13 @@
 	<source src="../sounds/swords.mp3"></source>
 </audio>
 <audio id="questComplete">
-	<source src="..sounds/questComplete.mp3"></source>
+	<source src="../sounds/questComplete.mp3"></source>
 </audio>
 <audio id="fish">
 	<source src="../sounds/fish.mp3"></source>
 </audio>
 <audio id="button">
-	<source src="..sounds/button.mp3"></source>
+	<source src="../sounds/button.mp3"></source>
 </audio>
 <audio id="cards">
 	<source src="../sounds/cards.mp3"></source>
@@ -84,7 +84,7 @@
 
     <div class="panel panel-info">
 		<div class="panel-heading">
-			<h2>test {{tdisplayModeName}}</h2>
+			<h2>Dungeon Shopper {{displayModeName}}</h2>
 			<span class="panel-title pull-right"><button class="btn btn-primary" ng-show="displayMode === 'game'" ng-click="noGame()">Reset</button></span>
 
         <ng-include src="'nogame.html'" ng-show="displayMode === 'nogame'"></ng-include>
@@ -109,12 +109,12 @@
 		<ng-include src="'eventVikingParade.html'" ng-show="displayMode === 'eventVikingParade'"></ng-include>-->
 		</div>
 	</div>
-	<span ng-show="displayMode != 'nogame' && displayMode != 'gameover'">
+	<div ng-show="displayMode != 'nogame' && displayMode != 'gameover'">
 		<ng-include src="'playerLog.html'"></ng-include>
-		<ng-include src="'quests.html'"></ng-include>
-		<ng-include src="'market.html'"></ng-include>
-		<ng-include src="'playerCompletedQuests.html'"></ng-include>
-		<ng-include src="'gameFooter.html'" ></ng-include>
-	</span>
+		<div><ng-include src="'quests.html'"></ng-include></div>
+		<div><ng-include src="'market.html'"></ng-include></div>
+		<div><ng-include src="'playerCompletedQuests.html'"></ng-include></div>
+		<div><ng-include src="'gameFooter.html'" ></ng-include></div>
+	</div>
 </body>
 </html>

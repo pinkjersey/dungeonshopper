@@ -5,12 +5,12 @@ from game_model import *
 
 def createOtherPlayer(player):
     dict = player.to_dict()
-    hand = dict["hand"]
-    sz = len(hand)
-    for i in range(sz):
-        hand[i] = -1
+    #hand = dict["hand"]
+    #sz = len(hand)
+    #for i in range(sz):
+    #    hand[i] = -1
 
-    dict["hand"] = hand
+    #dict["hand"] = hand
     return dict
 
 def playerState(game, playerId):
