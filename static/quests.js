@@ -135,6 +135,8 @@ questSet.prototype.setCardSize = function (size) {
 				default:
 					this.playingCards[i].image = this.playingCards[i].imageOrig;
 			}
+			
+			this.playingCards[i].borderColor = 'black';
 	}
 };
 
