@@ -42,7 +42,7 @@ var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased,
 }
  
 
-var Game = function(numPlayers) {
+var Game = function(numPlayers, blankMarketImageBase, questImageBase, cartImageBase) {
 
 	//all the starter empty playingCards holders	
 	this.quests = new questSet();
@@ -51,29 +51,26 @@ var Game = function(numPlayers) {
 	this.questsInPlay = new cardSet();
 	this.marketDeck = new cardSet();
 	this.marketDeckInTrade = new cardSet();
-
+	this.cartImageBase = cartImageBase;
 	//populated cardrs, itemHolders and quests
-	var questImageBase = "../images/quest";
-//	var questImageBase = "../images/questxxx";
-	var blankMarketImageBase = "../images/"
-//	var blankMarketImageBase = "../images/xxx"
 	this.itemHolders.createBlankMarket(blankMarketImageBase);
 	this.itemMarketHolders.createBlankMarket(blankMarketImageBase);
 	this.quests.createQuestDeck(questImageBase);
 
 	this.players = [];
 	//create players
-	for (var i = 0; i < numPlayers; ++i) {   
-		this.players.push(new Player(i, "Player" + i));
-	}	
+	//for (var i = 0; i < numPlayers; ++i) {   
+	//	this.players.push(new Player(i, "Player" + i));
+	//}	
 	//set initial size of the cards for the gui
 	//their are times in the code that these are changed and reset
 	this.quests.setCardSize("orig");	
 	this.questsInPlay.setCardSize("orig");
-
+	this.autoSelectCart=false;
+	this.autoSelectHand=false;
 }
 
-var EventsLog = function (id, name, logItem) {
+var PlayersLog = function (id, name, logItem) {
 	this.id = id;
 	this.name = name;
 	this.logItem = logItem;
@@ -85,20 +82,18 @@ var PlayersLog = function (id, text) {
 }
 
 var Event = function (index, type, name, displayMode) {
-	var imageBase="../images/event";
+	var eventImageBase="../images/event";
 	index = index;
 	id = type;
 	name = name;
 	displayMode = 'event' + name;
-	image = imageBase + name + 'jpg';
+	image = eventImageBase + name + 'jpg';
 }
 
 
 
 
-var Player = function (id, name) {
-	var imageBase = "../images/cart";
-//	var imageBase = "../images/cart_xxx";
+var Player = function (game, id, name) {
     this.id = id;
 	this.name = name;
 	this.turns = 0;
@@ -114,15 +109,19 @@ var Player = function (id, name) {
 	this.nextCartId = 0;
 	this.nextCartName = 'Hand Cart';
 	this.winner=false;
-    this.carts = [new Cart(0, 3, 1, 0, 5,'Wheelbarrow', imageBase + '0.jpg', imageBase + '0_not_purchased.jpg'), 
-				  new Cart(1, 3, 0, 1, 10, 'Hand Cart', imageBase + '1.jpg', imageBase + '1_not_purchased.jpg'), 
-				  new Cart(2, 4, 0, 2, 15, 'Horse Wagon', imageBase + '2.jpg', imageBase + '2_not_purchased.jpg'), 
-			      new Cart(3, 5, 0, 3, 20, 'War Wagon', imageBase + '3.jpg', imageBase + '3_not_purchased.jpg')]
+    this.carts = [new Cart(0, 3, 1, 0, 5,'Wheelbarrow', game.cartImageBase + '0.jpg', game.cartImageBase + '0_not_purchased.jpg'), 
+				  new Cart(1, 3, 0, 1, 10, 'Hand Cart', game.cartImageBase + '1.jpg', game.cartImageBase + '1_not_purchased.jpg'), 
+				  new Cart(2, 4, 0, 2, 15, 'Horse Wagon', game.cartImageBase + '2.jpg', game.cartImageBase + '2_not_purchased.jpg'), 
+			      new Cart(3, 5, 0, 3, 20, 'War Wagon', game.cartImageBase + '3.jpg', game.cartImageBase + '3_not_purchased.jpg')]
 				  ;
 }
 	
 app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory) {
 
+	$scope.hideImagesBool = false;
+	$scope.debug = false;
+	$scope.autoSelectHand = true;
+	$scope.autoSelectCart = true;
 	//plays audio files
 	play = function (soundId) {
 		var audio = document.getElementById(soundId);
@@ -133,44 +132,88 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		setupNoGame();
 	}
 
+	$scope.debugCheck = function () {
+		$scope.debug = !$scope.debug;
+	}		
+
+	
+	$scope.autoSelectCartCheck = function () {
+		$scope.autoSelectCart = !$scope.autoSelectCart;
+	}	
+	
+	$scope.autoSelectHandCheck = function () {
+		$scope.autoSelectHand = !$scope.autoSelectHand;
+	}	
+
+	$scope.hideImagesCheck = function () {
+		$scope.hideImagesBool = !$scope.hideImagesBool;
+	}	
+	//$scope.hideImagesCheck = function () {
+//		if($scope.hideImagesBool === true) {
+//			$scope.hideImagesBool = false;
+//		}
+//		else {
+//			$scope.hideImagesBool = true;
+//		}
+//	}
+	
+	hideImages = function(hide) {
+		if(hide) {
+			$scope.questImageBase = "../images/questxxx";
+			$scope.blankMarketImageBase = "../images/xxx"
+			$scope.cartImageBase = "../images/cart_xxx";
+			$scope.splashImage = "../images/boxtopxxx.jpg";
+			$scope.itemCardBack = "../images/shoppingCardBack.jpgxxx";
+			$scope.vendorCardBack = "../images/vendorback.jpgxxx";
+		}
+		else {
+			$scope.questImageBase = "../images/quest";
+			$scope.blankMarketImageBase = "../images/"
+			$scope.cartImageBase = "../images/cart";
+			//$scope.splashImage = "../images/boxtop.jpg";
+			$scope.itemCardBack = "../images/shoppingCardBack.jpg";
+			$scope.vendorCardBack = "../images/vendorback.jpg";
+		}
+	}
+
 
 	//setup splash screen
 	setupNoGame = function() {
 		$scope.displayMode = "nogame";
-		//$scope.splashImage = "../images/boxtop.jpg";
+		$scope.playerId = "";
 		//$scopeNextPlayerId = 0;
-		$scope.playerName="Type Your Name";
-		$scopeNextPlayerId=0;		
+		$scope.playerName="";
+//		$scopeNextPlayerId=0;		
 		$scope.numberOfPlayers =1;
 		$scope.game=null;
+		hideImages($scope.hideImagesBool);
 	}	
 
 	setupNoGame();
 	
-	$scope.joinGame = function(numberOfPlayers, playerName) {
-		//$scope.playerName = playerName;
-		$scopeNextPlayerId++;		
+	$scope.joinGame = function(numberOfPlayers, playerName, playerId) {
+		
+//		$scopeNextPlayerId++;		
 		$scope.numberOfPlayers = Number(numberOfPlayers);
 		//$scopeNextPlayerId++;
 		//$scope.playerName = "Player"+($scopeNextPlayerId+1);
 		//$scope.numberOfPlayersJoined = $scopeNextPlayerId;
-		$scope.game = new Game($scopeNextPlayerId+1);
 		//$scope.activePlayerId = $scopeNextPlayerId;
 		//$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
-		$scope.myId=$scopeNextPlayerId;
-		joinGame($scopeNextPlayerId, playerName);
+//		$scope.myId=$scopeNextPlayerId;
+		hideImages($scope.hideImagesBool);
+		$scope.game = new Game(numberOfPlayers, $scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
+		joinGame(playerId, playerName);
 		//$scope.displayMode = "game";
 	}
 	
 	
 	$scope.newGame = function (numberOfPlayers, playerName) {
 		$scope.numberOfPlayers = Number(numberOfPlayers);
-		$scope.game = new Game(numberOfPlayers);
-		//$scope.activePlayerId = 0;
 		$scope.myId = 0;
-		//$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
+		hideImages($scope.hideImagesBool);
+		$scope.game = new Game(numberOfPlayers, $scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		loadData(numberOfPlayers, playerName);
-		//$scope.displayMode = "game";
 		play("cards");
 	}
 
@@ -200,12 +243,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 	$scope.activeEvent = null;
 	$scope.playersCompletedEventCount = 0;
-	$scope.itemCardBack = "../images/shoppingCardBack.jpg";
-	$scope.vendorCardBack = "../images/vendorback.jpg";
-	//$scope.itemCardBack = "../images/shoppingCardBack.jpgxxx";
-	//$scope.vendorCardBack = "../images/vendorback.jpgxxx";
 	//$scope.eventActionsRemaining=0;;
-	$scope.debug = false;
 	//gui variable to control item buttons
 	$scope.selectedItemsCount = 0;
 	//gui variable to control cart buttons
@@ -239,6 +277,22 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.borderPXselected = "border:3px solid red";
 	$scope.borderPX = "border:1px solid black";
 	$scope.borderPXorig = "border:1px solid black";
+	$scope.showHideVar = "Show";
+	$scope.showMyCompletedQuests = false;
+	
+	$scope.showMyCompletedQuestsClick = function () {
+		$scope.showMyCompletedQuests = !$scope.showMyCompletedQuests;
+		$scope.showHideVar = $scope.showHide();
+	}
+
+	$scope.showHide	= function() {
+		if($scope.showMyCompletedQuests) {
+				return "Hide";
+			}
+			else {
+				return "Show";
+			}
+	}
 	
 	$scope.events = [
 		new Event(0,0,""),
@@ -409,7 +463,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		
 		if (questCanBeCompleted === true) {
 			questFound.borderColor = 'border:10px solid green';
-			$scope.userClickedCartImage(cartId);
+			if($scope.autoSelectCart) {
+				$scope.userClickedCartImage(cartId);
+			}
 		
 		}
 	}
@@ -469,7 +525,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 			if (parseSelectedCardArrayFoQuest(quest) === parseSelectedCardArrayFoQuest(r) ){
 				questFound.borderColor = 'border:10px solid green';
-				selectHandCards(r);
+				if($scope.autoSelectHand) {
+					selectHandCards(r);
+				}
 				//reset hand to original cards to see if you can complete more than one
 			}
 		}
@@ -534,7 +592,6 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 		var cart = player.carts[$scope.activeCartId];
 
-		//if(!$scope.debug) {  //good for testing events
 		if($scope.selectedCartItemsCount < 3 || cart.cards.playingCards.length != $scope.selectedCartItemsCount) {
 			alert("Select all items in cart/wagon first.");
 			return;
@@ -680,13 +737,13 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 
 	//update game from DATA response
-	updatePlayerCarts = function(playerCart, dataCart) {
+	updatePlayerCarts = function(player, playerCart, dataCart) {
 		playerCart.active = dataCart.purchased;
 		playerCart.destroyed = dataCart.destroyed;
 		if(playerCart.active) {
 			playerCart.image = playerCart.imagePurchased;
-			$scope.activePlayer.nextCartId ++;
-			$scope.activePlayer.nextCartName = nextCartName(playerCart.id);
+			player.nextCartId ++;
+			player.nextCartName = nextCartName(player.nextCartId);
 			for (var i = 0; i < dataCart.inCart.length; ++i) {   
 				updatePlayerCartItems(playerCart, dataCart.inCart[i]);	
 			}
@@ -1270,6 +1327,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 						//text = "bought " + "cart" + cartId + " with items " + logSelectedCards(selectedCards) + ".";
 						buyCart('cart'+cartId, 0, selectedCards);
 					}
+					else {
+						return;
+					}
 
 			}
 			else
@@ -1279,6 +1339,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					if (r == true) {
 						//text = "bought " + "cart" + cartId + " with " + player.carts[cartId].goldCost + " gold.";
 						buyCart('cart'+cartId, 1, "");
+					}
+					else {
+						return;
 					}
 
 				}
@@ -1352,13 +1415,6 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				discardSelectedCards = "";
 			}
 			
-	//		text = "passed";
-	//		if (discardSelectedCards != "") {
-	//			text += " and discarded cards " + logSelectedCards(discardSelectedCards) + ".";
-	//		}
-	//		else {
-	//			text += ".";
-	//		}
 		}
 		
 		
@@ -1772,7 +1828,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 	}
 
-	//"eventLog": [{"event": "http://localhost:8080/game?action=discard&what=3&where=hand", "playerId": 0}]
+	//"playerLog": [{"event": "http://localhost:8080/game?action=discard&what=3&where=hand", "playerId": 0}]
 	logEvent = function(eventsLog, playerName, logItem) {
 		if(logItem!="") {
 			var pattern = "/game?";
@@ -1891,7 +1947,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	action=move&what=45&src=hand&dst=cart2
 	*/
 			//logItem.substring(index)
-			$scope.eventsLog.push(new EventsLog($scope.eventsLog.length, playerName, logEntry + '.'));
+			$scope.eventsLog.push(new PlayersLog($scope.eventsLog.length, playerName, logEntry + '.'));
 		}
 	}
 
@@ -1915,7 +1971,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 	function getObjectResults(data) {
 		var text = "";
-		
+		var game = $scope.game;
+		// players = game.players;
 		//this controls the buttons to return if you are not active
 		//already doing so much in angular js buttons, did not want to add this as well
 		$scope.isActive = data.isActive;
@@ -1934,84 +1991,86 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.game.players = [];
 		var o = 1;
 		//fill in other players data into game.scope.players
-		for (var p = 0; p < data.numPlayers; ++p) {  
+		//for (var p = 0; p < data.numPlayers-1; ++p) {  
 
 //	this.bonus = 0;
 		
 			//current player
-			if(p===0) {
-				$scope.game.players.push(new Player(p, data.name));
-				$scope.game.players[p].active = true;
-				$scope.activePlayer = $scope.game.players[p];
-				$scope.activePlayer.actionsRemaining = data.actionsRemaining;
-				$scope.activePlayer.gold = data.gold;
-				$scope.activePlayer.turns = data.turns;
-				$scope.activePlayer.vp = data.points;
-				$scope.activePlayer.maxHand = data.maxHand;
-				$scope.activePlayer.active = data.isActive;
-				$scope.activePlayerId = data.curPlayer;
-				
-				for (var i = 0; i < data.hand.length; ++i) {   
-					dealNumberToPlayer($scope.activePlayer, data.hand[i]);	
-				}
-			
-				//populate carts
-				for (var c = 0; c < data.carts.length; ++c) {   
-					$scope.activePlayer.carts[c].cards =  new cardSet();
-					updatePlayerCarts($scope.activePlayer.carts[c], data.carts[c]);	
-				}
-				
-				for (var q = 0; q < data.questsCompleted.length; ++q) {   
-					dealQuestsCompleted($scope.activePlayer.questsCompleted, data.questsCompleted[q].items);
-				}
-			}
-			else {
-				for (var z = 0; z < data.otherPlayers.length; ++z) {
-					
-					$scope.game.players.push(new Player(o, data.otherPlayers[z].name));
-					$scope.game.players[o].cards = new cardSet();
-					$scope.game.players[o].questsCompleted =  new cardSet();
-			
-					for (var i = 0; i < data.otherPlayers[z].hand.length; ++i) {   
-						//dealNumberToPlayer($scope.game.players[o], data.otherPlayers[z].hand[i]);	
-						dealNumberToPlayer($scope.game.players[o], -1);	
-					}
-
-					//populate carts
-					for (var c = 0; c < data.carts.length; ++c) {   
-						$scope.game.players[o].carts[c].cards =  new cardSet();
-						updatePlayerCarts($scope.game.players[o].carts[c], data.otherPlayers[z].carts[c]);	
-					}
-					
-					for (var q = 0; q < data.otherPlayers[z].questsCompleted.length; ++q) {   
-						dealQuestsCompleted($scope.game.players[o].questsCompleted, data.otherPlayers[z].questsCompleted[q].items);
-					}
-					$scope.game.players[o].questsCompleted.setCardSize("small");
-					o++;
-				}
-			}
+		var p=0;
+		$scope.game.players.push(new Player(game, data.curPlayer, data.name));
+		$scope.game.players[p].active = data.isActive;
+		$scope.activePlayer = $scope.game.players[p];
+		var activePlayer = $scope.activePlayer;
+		
+		activePlayer.actionsRemaining = data.actionsRemaining;
+		activePlayer.gold = data.gold;
+		activePlayer.turns = data.turns;
+		activePlayer.vp = data.points;
+		activePlayer.maxHand = data.maxHand;
+		activePlayer.active = data.isActive;
+		$scope.activePlayerId = data.curPlayer;
+		
+		for (var i = 0; i < data.hand.length; ++i) {   
+			dealNumberToPlayer(activePlayer, data.hand[i]);	
 		}
+	
+		//initialize to zero before going through carts
+		$scope.activePlayer.nextCartId=0;
+		//populate carts
+		for (var c = 0; c < data.carts.length; ++c) {   
+			activePlayer.carts[c].cards =  new cardSet();
+			updatePlayerCarts(activePlayer, activePlayer.carts[c], data.carts[c]);	
+		}
+		
+		for (var q = 0; q < data.questsCompleted.length; ++q) {   
+			dealQuestsCompleted(activePlayer.questsCompleted, data.questsCompleted[q].items);
+		}
+
+		for (var z = 0; z < data.otherPlayers.length; ++z) {
+			$scope.game.players.push(new Player(game, o, data.otherPlayers[z].name));
+			$scope.game.players[o].cards = new cardSet();
+			$scope.game.players[o].questsCompleted =  new cardSet();
+	
+			for (var i = 0; i < data.otherPlayers[z].hand.length; ++i) {   
+				//dealNumberToPlayer($scope.game.players[o], data.otherPlayers[z].hand[i]);	
+				dealNumberToPlayer($scope.game.players[o], -1);	
+			}
+
+			//populate carts
+			for (var c = 0; c < data.carts.length; ++c) {   
+				$scope.game.players[o].carts[c].cards =  new cardSet();
+				updatePlayerCarts($scope.game.players[o], $scope.game.players[o].carts[c], data.otherPlayers[z].carts[c]);	
+			}
+			
+			for (var q = 0; q < data.otherPlayers[z].questsCompleted.length; ++q) {   
+				dealQuestsCompleted($scope.game.players[o].questsCompleted, data.otherPlayers[z].questsCompleted[q].items);
+			}
+			$scope.game.players[o].questsCompleted.setCardSize("small");
+			o++;
+		}
+	
+
 		
 		resetDisplayMode(mode(data.isActive));
 		$scope.itemsCountRemaining = data.itemsCountRemaining;
 		$scope.questsCountRemaining = data.questsCountRemaining;
 		$scope.discardsCount = data.discardsCount;
 		$scope.eventsLog = [];
-		$scope.game.questsInPlay = new cardSet();
-		$scope.game.marketDeck = new cardSet();
+		game.questsInPlay = new cardSet();
+		game.marketDeck = new cardSet();
 		
 		
         for (var i = 0; i < data.market.length; ++i) {   
-			dealNumberToMarket($scope.game.marketDeck, data.market[i]);	
+			dealNumberToMarket(game.marketDeck, data.market[i]);	
 		}
 		setMarketCounts();
 
         for (var i = 0; i < data.questsInPlay.length; ++i) {   
-			dealQuestCard($scope.game.questsInPlay, data.questsInPlay[i].items, data.questsInPlay[i].level, data.questsInPlay[i].type);
-			var card = $scope.game.questsInPlay.playingCards[i];
+			dealQuestCard(game.questsInPlay, data.questsInPlay[i].items, data.questsInPlay[i].level, data.questsInPlay[i].type);
+			var card = game.questsInPlay.playingCards[i];
 			card.borderColor = cardColor(card);
 		}
-		$scope.game.questsInPlay.setCardSize("orig");
+		game.questsInPlay.setCardSize("orig");
 
 
 		if (data.lastDiscarded != null) {
@@ -2019,8 +2078,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 		
 
-		for (var i = 0; i < data.eventLog.length; ++i) {   
-			logEvent($scope.eventsLog, $scope.game.players[data.eventLog[i].playerId].name, data.eventLog[i].event);
+		for (var i = 0; i < data.playerLog.length; ++i) {   
+		//0 is always the active player
+			logEvent($scope.eventsLog, getPlayerName(data.playerLog[i].playerId), data.playerLog[i].event);
 		}
 		
 		if(data.gameOver===true)	{
@@ -2032,7 +2092,16 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		 checkIfQuestIsReady();
 		 checkIfHaveCardsForQuest();
 	}
-
+	
+var getPlayerName = function(playerId) {
+	
+	for (var p = 0; p < $scope.game.players.length; ++p) {  
+//		var curPlayer = Number($scope.game.players[p].id)
+		if( $scope.game.players[p].id === playerId) {
+			return $scope.game.players[p].name;
+		}
+	}
+}
 
 function loadData(numPlayers, playerName) {
 	$scope.loadingData=true;
@@ -2047,6 +2116,11 @@ function playerRefresh(playerId) {
 function joinGame(playerId, playerName) {
 	$scope.loadingData=true;
     gameFactory.joinGame(playerId, playerName, processGameStateCallback, processGameStateErrorCallback);
+}
+
+function completeEvent(eventId) {
+	$scope.loadingData=true;
+    gameFactory.joinGame(eventId, processGameStateCallback, processGameStateErrorCallback);
 }
 
 function pass(discard) {

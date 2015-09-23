@@ -5,7 +5,39 @@
 			<br></br>
 			<p>Enter your name: <input type="text" ng-model="playerName"></input></p>
 			<p>Number of players: <input type="text" ng-model="numberOfPlayers"></input></p>
+			<p>Player ID: <input type="text" ng-model="playerId"></input></p>
 			<br></br>
-            <button ng-show="numberOfPlayers > 0" class="btn btn-primary" ng-click="newGame(numberOfPlayers, playerName)" ng-cloak>Start Game</button>            
-			<button class="btn btn-primary" ng-click="joinGame(numberOfPlayers,playerName)" ng-cloak>Join Game</button>
+			<br></br>
+			<div class="col-xs-12 col-sm-10 col-sm-offset-1">
+				<form>
+					
+					<!-- NAME INPUT -->
+					<label>Options</label>
+					<div class="form-group">
+					<ul>
+						<li class="checkbox">
+							<input type="checkbox" ng-click="debugCheck()" ng-model="debug"> Debug mode
+						</li>
+						<li class="checkbox">
+							<input type="checkbox" ng-click="hideImagesCheck()" ng-model="hideImagesBool"> Hide Images?
+						</li>
+						<li class="checkbox">
+							<input type="checkbox" ng-click="autoSelectCartCheck()" ng-model="autoSelectCart"> Auto-select cart items when quest(s) can be completed?
+						</li>
+						<li class="checkbox">
+							<input type="checkbox" ng-click="autoSelectHandCheck()" ng-model="autoSelectHand"> Auto-select hand items when quest(s) can be completed?
+						</li>
+						</ul>
+					</div>
+					
+					<!-- =============================================== -->
+					<!-- ALL OUR CHECKBOXES AND RADIO BOXES WILL GO HERE -->
+					<!-- =============================================== -->
+					
+					<!-- SUBMIT BUTTON (DOESNT DO ANYTHING) -->
+					<button ng-show="numberOfPlayers > 0" class="btn btn-danger btn-lg" ng-click="newGame(numberOfPlayers, playerName)" ng-cloak>Start Game</button>            
+					<button class="btn btn-primary" ng-click="joinGame(numberOfPlayers,playerName, playerId)" ng-cloak>Join Game</button>
+						
+				</form>
+			</div>
 </div>

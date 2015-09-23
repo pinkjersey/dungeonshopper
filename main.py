@@ -71,6 +71,7 @@ class GameHandler(webapp2.RequestHandler):
             return
 
         game.players[iPlayerId].name = name
+        
         game.put()
         retstr = playerState(game, iPlayerId)        
                 
@@ -313,6 +314,37 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(retstr)
         self.appendToLog(game) 
 
+    def completeEvent(self):
+        """
+        USAGE: /game?action=completeEvent&eventId=<eventId>
+        Complete an event. 
+        """
+        logging.error("Compelete Event: begin")
+        game_k = ndb.Key('Game', 'theGame')
+        game = game_k.get()
+
+        logging.error("Compelete event: loaded event")
+
+        eventId = self.request.get('eventId')
+        if (eventId == None or eventId == ""):
+            self.error(500)
+            return
+
+        logging.error("Compelete eventId: running")
+        result = completeEvent(game, eventId)
+        if (result == False):
+            self.error(500)
+            return
+
+        logging.error("Compelete event: done")
+
+        self.appendToLog(game)
+        retstr = playerState(game, game.curPlayer)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(retstr)
+        self.appendToLog(game)
+		
     def passPlayer(self):
         """
         USAGE: /game?action=passPlayer&items=<items to discard>
@@ -369,8 +401,8 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(retstr)        
 
     def appendToLog(self, game):        
-        el = EventLog(playerId=game.curPlayer, event=self.request.url)
-        game.eventLog.append(el)
+        el = PlayerLog(playerId=game.curPlayer, event=self.request.url)
+        game.playerLog.append(el)
         game.put()
 
     def get(self):
@@ -414,6 +446,9 @@ class GameHandler(webapp2.RequestHandler):
 
             if action == "completeQuest":
                 return self.completeQuest()
+
+            if action == "completeEvent":
+                return self.completeEvent()
 
             if action == "refresh":
                 return self.refresh()

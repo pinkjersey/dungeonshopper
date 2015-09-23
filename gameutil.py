@@ -3,30 +3,38 @@ import json
 import logging
 from game_model import *
 
-def createOtherPlayer(player):
+def createOtherPlayer(player, curPlayer, playerId):
     dict = player.to_dict()
     #hand = dict["hand"]
     #sz = len(hand)
     #for i in range(sz):
     #    hand[i] = -1
-
     #dict["hand"] = hand
+    #dict["playerId"] = playerId
+
+    if curPlayer != player.playerId:
+        dict["isActive"] = True		
+    else:
+        dict["isActive"] = False	
+	
     return dict
 
 def playerState(game, playerId):
+    game.players[playerId].playerId = playerId
     player = game.players[playerId]
+    player.playerId = playerId
     thedict = player.to_dict()
-	
+
+    thedict["numPlayers"] = game.numPlayers
+    thedict["curPlayer"] = playerId
+    thedict["itemsCountRemaining"] = len(game.itemDeck)
+    thedict["questsCountRemaining"] = len(game.questDeck)
+    thedict["market"] = game.market
+
     if game.curPlayer == playerId:
         thedict["isActive"] = True
     else:
         thedict["isActive"] = False
-
-    thedict["numPlayers"] = game.numPlayers
-    thedict["curPlayer"] = playerId        
-    thedict["itemsCountRemaining"] = len(game.itemDeck)
-    thedict["questsCountRemaining"] = len(game.questDeck)
-    thedict["market"] = game.market
     
     questlist = []
     for q in game.questsInPlay:
@@ -36,7 +44,7 @@ def playerState(game, playerId):
     otherPlayers = []
     for p in game.players:
         if (p != player):
-            otherPlayers.append(createOtherPlayer(p))
+            otherPlayers.append(createOtherPlayer(p, game.curPlayer, playerId))
     thedict["otherPlayers"] = otherPlayers
 
     thedict["actionsRemaining"] = game.actionsRemaining
@@ -49,10 +57,10 @@ def playerState(game, playerId):
         thedict["lastDiscarded"] = None
 
     el = []
-    for e in game.eventLog:
+    for e in game.playerLog:
         el.append(e.to_dict())
 
-    thedict["eventLog"] = el
+    thedict["playerLog"] = el
     thedict["turns"] = player.turns
 
     questsLeftLen = len(game.questDeck)
@@ -538,9 +546,10 @@ def createNewGame(numPlayers, name):
 
     game.itemDeck = newItemDeck()
     for i in range (0, game.numPlayers):
-        p=Player(name="defaultPlayer{0}".format(i))            
+        p=Player(name="defaultPlayer{0}".format(i))
         if (i == 0):
             p.name = name
+            p.playerId = 0
         game.players.append(p)
 
     # deal five cards
@@ -702,7 +711,7 @@ def dealQuest(game):
         del game.questDeck[0]
         game.questsInPlay.append(quest)
         #added by gary to try and simulate getting a new quest after an event
-        if(quest.level==4):
+        if(quest.level==4 and game.eventCompletedCount==game.numPlayers):
             dealQuest(game)
 	
 def newQuestDeck(numPlayers):
@@ -789,6 +798,20 @@ def newQuestDeck(numPlayers):
     level3Cards.append(createQuestCard(3,False,[1,2,2,4,4],5,5))
     level3Cards.append(createQuestCard(3,True,[1,3,5,6,9],5,5))
     level3Cards.append(createQuestCard(3,False,[3,4,7,8,9],6,5))
+    
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    
     level4Cards.append(createQuestCard(4,False,[],0,6))
     level4Cards.append(createQuestCard(4,False,[],0,7))
     level4Cards.append(createQuestCard(4,False,[],0,8))
