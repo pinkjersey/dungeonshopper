@@ -72,11 +72,16 @@
 				
 				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-if="activePlayer.actionsRemaining > 0 && activePlayer.cardSumSelected === sumMarketValueSelected && activePlayer.cardSumSelected < 11 && activePlayer.cardSumSelected > 0" ng-click="playerMarketTrade()" >Trade {{activePlayer.cardSumSelected}} item points?</button>    														
 			</span>
+		<div>
+		<br></br>
+		<div ng-show="player.questsCompleted.playingCards.length > 0" >{{player.name}}'s Completed Quests:</div>
+			<span ng-repeat="questcard in player.questsCompleted.playingCards track by $index">
+				<img style="{{card.borderColor}}" ng-src="{{questcard.image}}"></img>
+			</span>
+			<br></br>
 		</div>
 	</div>
-<!--</div>-->
-
-
+</div>
 
 				
 
