@@ -1,0 +1,50 @@
+<br></br>
+<div class="row" ng-repeat="player in otherPlayers">
+	<div class="panel panel-primary" ng-show="showPlayerData">  
+		<div class="panel-heading">  
+			<div class="panel-body">
+				<table class="table table-condensed">
+					<tr>
+						<th><big>{{player.name}}</big></th>
+						<th><big>Actions Remaining {{player.actionsRemaining}}</big></th>
+						<th><big>VP: {{player.vp}}</big></th>
+						<th><big>Bonus: {{player.bonus}}</big></th>
+						<th><big>Gold: {{player.gold}}</big></th>								
+						<th><big>Total: {{player.gold + player.vp + player.bonus}}</big></th>								
+						<th><big>Turns: {{player.turns}}</big></th>
+					</tr>
+				</table>
+			</div>
+		</div>
+
+		<br></br>
+
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-3" ng-repeat="cart in player.carts track by $index" >
+					<img ng-if="cart.active" style="{{cart.borderColor}}" width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}"/>
+										
+					<span class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index">
+						<img style="{{card.borderColor}}" ng-src="{{card.image}}"/>
+					</span>
+				</div>	
+			</div>
+			<p></p>		
+			<!--added card.positionOnStack variable to the index to make it unique or cards would not render as they are dupes-->
+			<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in player.cards.playingCards track by $index + card.positionOnStack" >
+				<img style="{{card.borderColor}}"  ng-src="{{card.image}}" />
+			</span>
+
+		</div>
+		<div>
+		<br></br>
+			<div ng-show="player.questsCompleted.playingCards.length > 0" >{{player.name}}'s Completed Quests:</div>
+			<span ng-repeat="questcard in player.questsCompleted.playingCards track by $index">
+				<img style="{{card.borderColor}}" ng-src="{{questcard.image}}"></img>
+			</span>
+			<br></br>
+		</div>
+		
+
+	</div>
+</div>

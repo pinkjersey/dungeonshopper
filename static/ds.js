@@ -118,6 +118,7 @@ var Player = function (game, id, name) {
 	
 app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory) {
 
+
 	$scope.hideImagesBool = false;
 	$scope.debug = false;
 	$scope.autoSelectHand = true;
@@ -148,14 +149,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.hideImagesCheck = function () {
 		$scope.hideImagesBool = !$scope.hideImagesBool;
 	}	
-	//$scope.hideImagesCheck = function () {
-//		if($scope.hideImagesBool === true) {
-//			$scope.hideImagesBool = false;
-//		}
-//		else {
-//			$scope.hideImagesBool = true;
-//		}
-//	}
+
 	
 	hideImages = function(hide) {
 		if(hide) {
@@ -185,6 +179,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.playerName="";
 //		$scopeNextPlayerId=0;		
 		$scope.numberOfPlayers =1;
+		$scope.playerId = 0;
 		$scope.game=null;
 		hideImages($scope.hideImagesBool);
 	}	
@@ -242,7 +237,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
     }
 
 	$scope.activeEvent = null;
-	$scope.playersCompletedEventCount = 0;
+	//$scope.playersCompletedEventCount = 0;
 	//$scope.eventActionsRemaining=0;;
 	//gui variable to control item buttons
 	$scope.selectedItemsCount = 0;
@@ -266,7 +261,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.isActive = false;
 	$scope.selectedCartItems = "";
 	$scope.playerslog = [];
-	$scope.eventsLog = [];
+	$scope.playersLog = [];
 	$scope.showLog = false;
 	$scope.showLogText = "Show Players Log";
 	$scope.blankText = "";
@@ -278,8 +273,16 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.borderPX = "border:1px solid black";
 	$scope.borderPXorig = "border:1px solid black";
 	$scope.showHideVar = "Show";
+	$scope.showPlayerData = false;
 	$scope.showMyCompletedQuests = false;
 	
+
+	
+	$scope.showPlayerDataClick = function () {
+		$scope.showPlayerData = !$scope.showPlayerData;
+		$scope.showHideVar = $scope.showHide();
+	}
+
 	$scope.showMyCompletedQuestsClick = function () {
 		$scope.showMyCompletedQuests = !$scope.showMyCompletedQuests;
 		$scope.showHideVar = $scope.showHide();
@@ -294,6 +297,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			}
 	}
 	
+	//event id, event type, event name
 	$scope.events = [
 		new Event(0,0,""),
 		new Event(1,0,""),
@@ -490,7 +494,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	var checkIfHaveCardsForQuest = function () {
 		var game = $scope.game;
 		var player = $scope.activePlayer;
-		//var questCanBeCompleted = false;
+		var questCanBeCompleted = false;
 
 		var hand = [];
 		for (var j = 0; j < player.cards.playingCards.length; ++j) {
@@ -507,6 +511,10 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 		
 		for (var j = 0; j < game.questsInPlay.playingCards.length; ++j) {
+			if(questCanBeCompleted === true){
+					break;
+				}			
+		
 			hand = backupArr1;
 			var questFound = game.questsInPlay.playingCards[j];
 			if(questFound.level===4) {
@@ -524,15 +532,22 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	
 
 			if (parseSelectedCardArrayFoQuest(quest) === parseSelectedCardArrayFoQuest(r) ){
-				questFound.borderColor = 'border:10px solid green';
-				if($scope.autoSelectHand) {
-					selectHandCards(r);
-				}
-				//reset hand to original cards to see if you can complete more than one
+				questCanBeCompleted = true;
 			}
 		}
-		
+			
+		if (questCanBeCompleted === true) {	
+			questFound.borderColor = 'border:10px solid green';
+			if($scope.autoSelectHand) {
+				selectHandCards(r);
+				foundHandSetMatch = true;
+			}
+			//reset hand to original cards to see if you can complete more than one
+		}
+	
 	}
+		
+	
 	
 	selectHandCards = function(cardArray) {
 		var nextItem = 0;
@@ -896,29 +911,26 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					break;
 				}	
 			}
-			//var typeMatch = getEvent(type);
-	//		questString += itemString;
-	//		questString += ".jpg";
+
 		}
 		else {
 			for (var i = 0; i < game.quests.playingCards.length; ++i)  {
 			var card = game.quests.playingCards[i];
-				if(card.nameId=== type) {
+				if(card.nameId === type) {
 					questsInPlay.playingCards.push(card);
 					break;
 				}	
 			}
 
-		//questString = $scope.events[type].image;
-			//$scope.activeEvent = $scope.events[type].displayMode;
+			$scope.activeEvent = $scope.events[type].displayMode;
 		}
 
 
 		
 		if(level === 4) {
-			//prepareEventForPlayer(card);
+			prepareEventForPlayer(card);
 		}
-		//updateLog(text);
+
 	}
 
 	getSelectedCardName = function(cardNumber) {
@@ -1591,7 +1603,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 		
 		$scope.displayMode = $scope.activeEvent;
-
+		$scope.displayModeName = " - Event! - Your Turn"
 	}
 
 
@@ -1720,7 +1732,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					break;
 				case 'eventTreasure':
 					//give active player a gold
-					getGold(player, 1);
+					//getGold(player, 1);
 					break;
 				case 'eventVikingParade':
 					break;
@@ -1728,7 +1740,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					resetDisplayMode('game');
 			}
 			
-			$scope.playersCompletedEventCount++;
+			completeEvent(id);
+			//$scope.playersCompletedEventCount++;
+			
 
 			}
 
@@ -1829,7 +1843,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	}
 
 	//"playerLog": [{"event": "http://localhost:8080/game?action=discard&what=3&where=hand", "playerId": 0}]
-	logEvent = function(eventsLog, playerName, logItem) {
+	logPlayerAction = function(playersLog, playerName, logItem) {
 		if(logItem!="") {
 			var pattern = "/game?";
 			var index = logItem.indexOf(pattern) + pattern.length;
@@ -1947,7 +1961,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	action=move&what=45&src=hand&dst=cart2
 	*/
 			//logItem.substring(index)
-			$scope.eventsLog.push(new PlayersLog($scope.eventsLog.length, playerName, logEntry + '.'));
+			$scope.playersLog.push(new PlayersLog($scope.playersLog.length, playerName, logEntry + '.'));
 		}
 	}
 
@@ -1987,7 +2001,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				return 'gameSpectator';
 			}
 		}
-		
+
+		$scope.otherPlayers = [];		
 		$scope.game.players = [];
 		var o = 1;
 		//fill in other players data into game.scope.players
@@ -2046,6 +2061,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				dealQuestsCompleted($scope.game.players[o].questsCompleted, data.otherPlayers[z].questsCompleted[q].items);
 			}
 			$scope.game.players[o].questsCompleted.setCardSize("small");
+			$scope.otherPlayers[z] = $scope.game.players[o];
 			o++;
 		}
 	
@@ -2055,7 +2071,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.itemsCountRemaining = data.itemsCountRemaining;
 		$scope.questsCountRemaining = data.questsCountRemaining;
 		$scope.discardsCount = data.discardsCount;
-		$scope.eventsLog = [];
+		$scope.playersLog = [];
 		game.questsInPlay = new cardSet();
 		game.marketDeck = new cardSet();
 		
@@ -2080,7 +2096,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 		for (var i = 0; i < data.playerLog.length; ++i) {   
 		//0 is always the active player
-			logEvent($scope.eventsLog, getPlayerName(data.playerLog[i].playerId), data.playerLog[i].event);
+			logPlayerAction($scope.playersLog, getPlayerName(data.playerLog[i].playerId), data.playerLog[i].event);
 		}
 		
 		if(data.gameOver===true)	{

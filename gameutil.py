@@ -12,7 +12,7 @@ def createOtherPlayer(player, curPlayer, playerId):
     #dict["hand"] = hand
     #dict["playerId"] = playerId
 
-    if curPlayer != player.playerId:
+    if curPlayer == playerId:
         dict["isActive"] = True		
     else:
         dict["isActive"] = False	
