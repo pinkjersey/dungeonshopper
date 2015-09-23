@@ -6,28 +6,29 @@ Awaiting others to pass..{{dots}}
 
 <div class="container" >
 	<div class="row" >
-
-			<div  style="pull:right; padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 5px;" >
-							<button class="btn btn-warning" ng-click="playerRefresh()" >Refresh</button>    
+			<div  style="float:right; padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 5px;" ng-show="isActive===false">
 							<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="endGame()">Quit</button>
+			</div>
+			<div  style="float:right; padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 5px;" >
+							<button class="btn btn-warning" ng-click="playerRefresh()" >Refresh</button>    
 			</div>
 	</div>
 </div>
 
 
-<div class="row" ng-repeat="player in game.players" >
+
 	<div class="panel panel-primary">  
 		<div class="panel-heading">  
 			<div class="panel-body">
 				<table class="table table-condensed">
 					<tr>
-						<th><big>{{player.name}}</big></th>
-						<th><big>Actions Remaining {{player.actionsRemaining}}</big></th>
-						<th><big>VP: {{player.vp}}</big></th>
-						<th><big>Bonus: {{player.bonus}}</big></th>
-						<th><big>Gold: {{player.gold}}</big></th>								
-						<th><big>Total: {{player.gold + player.vp + player.bonus}}</big></th>								
-						<th><big>Turns: {{player.turns}}</big></th>
+						<th><big>{{activePlayer.name}}</big></th>
+						<th><big>Actions Remaining {{activePlayer.actionsRemaining}}</big></th>
+						<th><big>VP: {{activePlayer.vp}}</big></th>
+						<th><big>Bonus: {{activePlayer.bonus}}</big></th>
+						<th><big>Gold: {{activePlayer.gold}}</big></th>								
+						<th><big>Total: {{activePlayer.gold + activePlayer.vp + activePlayer.bonus}}</big></th>								
+						<th><big>Turns: {{activePlayer.turns}}</big></th>
 					</tr>
 				</table>
 			</div>
@@ -37,7 +38,7 @@ Awaiting others to pass..{{dots}}
 
 		<div class="container-fluid">
 			<div class="row">
-				<div class="col-sm-3" ng-repeat="cart in player.carts track by $index" >
+				<div class="col-sm-3" ng-repeat="cart in activePlayer.carts track by $index" >
 					<img ng-if="cart.active" style="{{cart.borderColor}}" width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}"/>
 										
 					<span class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index">
@@ -47,15 +48,15 @@ Awaiting others to pass..{{dots}}
 			</div>
 			<p></p>		
 			<!--added card.positionOnStack variable to the index to make it unique or cards would not render as they are dupes-->
-			<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in player.cards.playingCards track by $index + card.positionOnStack" >
+			<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in activePlayer.cards.playingCards track by $index + card.positionOnStack" >
 				<img style="{{card.borderColor}}"  ng-src="{{card.image}}" />
 			</span>
 
 		</div>
 		<div>
 		<br></br>
-			<div ng-show="player.questsCompleted.playingCards.length > 0" >{{player.name}}'s Completed Quests:</div>
-			<span ng-repeat="questcard in player.questsCompleted.playingCards track by $index">
+			<div ng-show="activePlayer.questsCompleted.playingCards.length > 0" >{{activePlayer.name}}'s Completed Quests:</div>
+			<span ng-repeat="questcard in activePlayer.questsCompleted.playingCards track by $index">
 				<img style="{{card.borderColor}}" ng-src="{{questcard.image}}"></img>
 			</span>
 			<br></br>
@@ -63,7 +64,13 @@ Awaiting others to pass..{{dots}}
 		
 
 	</div>
-</div>
+
+
+
+<button class="btn btn-warning" ng-click="showPlayerDataClick()" >{{showHideVar}} Other Player Info?</button>
+<br></br>
+<div><ng-include src="'otherPlayers.html'" ></ng-include></div>
+
 
 
 
