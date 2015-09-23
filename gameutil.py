@@ -27,9 +27,9 @@ def playerState(game, playerId):
 
     thedict["numPlayers"] = game.numPlayers
     thedict["curPlayer"] = playerId
-    #thedict["itemsCountRemaining"] = len(game.itemDeck)
-    #thedict["questsCountRemaining"] = len(game.questDeck)
-    #thedict["market"] = game.market
+    thedict["itemsCountRemaining"] = len(game.itemDeck)
+    thedict["questsCountRemaining"] = len(game.questDeck)
+    thedict["market"] = game.market
 
     if game.curPlayer == playerId:
         thedict["isActive"] = True
@@ -39,7 +39,7 @@ def playerState(game, playerId):
     questlist = []
     for q in game.questsInPlay:
         questlist.append(q.to_dict())        
-    #thedict["questsInPlay"] = questlist
+    thedict["questsInPlay"] = questlist
 
     otherPlayers = []
     for p in game.players:
@@ -47,10 +47,10 @@ def playerState(game, playerId):
             otherPlayers.append(createOtherPlayer(p, game.curPlayer, playerId))
     thedict["otherPlayers"] = otherPlayers
 
-    #thedict["actionsRemaining"] = game.actionsRemaining
+    thedict["actionsRemaining"] = game.actionsRemaining
 
     discardLen = len(game.discardPile)
-    #thedict["discardsCount"] = discardLen    
+    thedict["discardsCount"] = discardLen    
     if discardLen > 0:
         thedict["lastDiscarded"] = game.discardPile[discardLen-1]
     else:
