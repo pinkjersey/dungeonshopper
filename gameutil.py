@@ -57,10 +57,10 @@ def playerState(game, playerId):
         thedict["lastDiscarded"] = None
 
     el = []
-    for e in game.eventLog:
+    for e in game.playerLog:
         el.append(e.to_dict())
 
-    thedict["eventLog"] = el
+    thedict["playerLog"] = el
     thedict["turns"] = player.turns
 
     questsLeftLen = len(game.questDeck)
@@ -711,7 +711,7 @@ def dealQuest(game):
         del game.questDeck[0]
         game.questsInPlay.append(quest)
         #added by gary to try and simulate getting a new quest after an event
-        if(quest.level==4):
+        if(quest.level==4 and game.eventCompletedCount==game.numPlayers):
             dealQuest(game)
 	
 def newQuestDeck(numPlayers):
@@ -798,6 +798,20 @@ def newQuestDeck(numPlayers):
     level3Cards.append(createQuestCard(3,False,[1,2,2,4,4],5,5))
     level3Cards.append(createQuestCard(3,True,[1,3,5,6,9],5,5))
     level3Cards.append(createQuestCard(3,False,[3,4,7,8,9],6,5))
+    
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    
     level4Cards.append(createQuestCard(4,False,[],0,6))
     level4Cards.append(createQuestCard(4,False,[],0,7))
     level4Cards.append(createQuestCard(4,False,[],0,8))

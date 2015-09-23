@@ -74,8 +74,10 @@
 			</span>
 		<div>
 		<br></br>
-		<div ng-show="player.questsCompleted.playingCards.length > 0" >{{player.name}}'s Completed Quests:</div>
-			<span ng-repeat="questcard in player.questsCompleted.playingCards track by $index">
+		<button ng-show="activePlayer.questsCompleted.playingCards.length > 0" ng-disabled="loadingData===true" class="btn btn-warning" ng-click="showMyCompletedQuestsClick()" >{{showHideVar}} {{activePlayer.name}}'s completed quests?</button>
+		<br></br>
+		<div ng-show="showMyCompletedQuests">
+			<span ng-repeat="questcard in activePlayer.questsCompleted.playingCards track by $index">
 				<img style="{{card.borderColor}}" ng-src="{{questcard.image}}"></img>
 			</span>
 			<br></br>

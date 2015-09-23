@@ -70,7 +70,7 @@ var Game = function(numPlayers, blankMarketImageBase, questImageBase, cartImageB
 	this.autoSelectHand=false;
 }
 
-var EventsLog = function (id, name, logItem) {
+var PlayersLog = function (id, name, logItem) {
 	this.id = id;
 	this.name = name;
 	this.logItem = logItem;
@@ -277,6 +277,22 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.borderPXselected = "border:3px solid red";
 	$scope.borderPX = "border:1px solid black";
 	$scope.borderPXorig = "border:1px solid black";
+	$scope.showHideVar = "Show";
+	$scope.showMyCompletedQuests = false;
+	
+	$scope.showMyCompletedQuestsClick = function () {
+		$scope.showMyCompletedQuests = !$scope.showMyCompletedQuests;
+		$scope.showHideVar = $scope.showHide();
+	}
+
+	$scope.showHide	= function() {
+		if($scope.showMyCompletedQuests) {
+				return "Hide";
+			}
+			else {
+				return "Show";
+			}
+	}
 	
 	$scope.events = [
 		new Event(0,0,""),
@@ -1812,7 +1828,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 	}
 
-	//"eventLog": [{"event": "http://localhost:8080/game?action=discard&what=3&where=hand", "playerId": 0}]
+	//"playerLog": [{"event": "http://localhost:8080/game?action=discard&what=3&where=hand", "playerId": 0}]
 	logEvent = function(eventsLog, playerName, logItem) {
 		if(logItem!="") {
 			var pattern = "/game?";
@@ -1931,7 +1947,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	action=move&what=45&src=hand&dst=cart2
 	*/
 			//logItem.substring(index)
-			$scope.eventsLog.push(new EventsLog($scope.eventsLog.length, playerName, logEntry + '.'));
+			$scope.eventsLog.push(new PlayersLog($scope.eventsLog.length, playerName, logEntry + '.'));
 		}
 	}
 
@@ -2062,9 +2078,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 		
 
-		for (var i = 0; i < data.eventLog.length; ++i) {   
+		for (var i = 0; i < data.playerLog.length; ++i) {   
 		//0 is always the active player
-			logEvent($scope.eventsLog, getPlayerName(data.eventLog[i].playerId), data.eventLog[i].event);
+			logEvent($scope.eventsLog, getPlayerName(data.playerLog[i].playerId), data.playerLog[i].event);
 		}
 		
 		if(data.gameOver===true)	{
@@ -2100,6 +2116,11 @@ function playerRefresh(playerId) {
 function joinGame(playerId, playerName) {
 	$scope.loadingData=true;
     gameFactory.joinGame(playerId, playerName, processGameStateCallback, processGameStateErrorCallback);
+}
+
+function completeEvent(eventId) {
+	$scope.loadingData=true;
+    gameFactory.joinGame(eventId, processGameStateCallback, processGameStateErrorCallback);
 }
 
 function pass(discard) {
