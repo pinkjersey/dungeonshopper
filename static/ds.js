@@ -68,6 +68,12 @@ var Game = function(numPlayers, blankMarketImageBase, questImageBase, cartImageB
 	this.questsInPlay.setCardSize("orig");
 	this.autoSelectCart=false;
 	this.autoSelectHand=false;
+
+	//event id, event type, event name
+	
+
+
+
 }
 
 var PlayersLog = function (id, name, logItem) {
@@ -76,18 +82,14 @@ var PlayersLog = function (id, name, logItem) {
 	this.logItem = logItem;
 }
 
-var PlayersLog = function (id, text) {
-	this.id = id;
-	this.text = text;
-}
 
-var Event = function (index, type, name, displayMode) {
+var Event = function (index, type, name ) {
 	var eventImageBase="../images/event";
 	index = index;
 	id = type;
 	name = name;
 	displayMode = 'event' + name;
-	image = eventImageBase + name + 'jpg';
+	image = eventImageBase + name + '.jpg';
 }
 
 
@@ -118,11 +120,12 @@ var Player = function (game, id, name) {
 	
 app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory) {
 
-
+	$scope.knight = "../images/knight.gif";
 	$scope.hideImagesBool = false;
 	$scope.debug = false;
 	$scope.autoSelectHand = true;
 	$scope.autoSelectCart = true;
+	//$scope.events = [];
 	//plays audio files
 	play = function (soundId) {
 		var audio = document.getElementById(soundId);
@@ -164,11 +167,13 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			$scope.questImageBase = "../images/quest";
 			$scope.blankMarketImageBase = "../images/"
 			$scope.cartImageBase = "../images/cart";
-			//$scope.splashImage = "../images/boxtop.jpg";
+			$scope.splashImage = "../images/boxtop.jpg";
 			$scope.itemCardBack = "../images/shoppingCardBack.jpg";
 			$scope.vendorCardBack = "../images/vendorback.jpg";
 		}
 	}
+
+	
 
 
 	//setup splash screen
@@ -199,6 +204,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		hideImages($scope.hideImagesBool);
 		$scope.game = new Game(numberOfPlayers, $scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		joinGame(playerId, playerName);
+		$scope.titleImg = "../images/title_small.jpg"
+		//$scope.events = prepEvents();
 		//$scope.displayMode = "game";
 	}
 	
@@ -210,6 +217,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.game = new Game(numberOfPlayers, $scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		loadData(numberOfPlayers, playerName);
 		play("cards");
+		$scope.titleImg = "../images/title_small.jpg"
+		//$scope.events = prepEvents();
 	}
 
 	//refresh data from backend if anything is stuck
@@ -261,7 +270,6 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.isActive = false;
 	$scope.selectedCartItems = "";
 	$scope.playerslog = [];
-	$scope.playersLog = [];
 	$scope.showLog = false;
 	$scope.showLogText = "Show Players Log";
 	$scope.blankText = "";
@@ -272,23 +280,57 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.borderPXselected = "border:3px solid red";
 	$scope.borderPX = "border:1px solid black";
 	$scope.borderPXorig = "border:1px solid black";
-	$scope.showHideVar = "Show";
-	$scope.showPlayerData = false;
+	$scope.showOtherPlayerData = false;
 	$scope.showMyCompletedQuests = false;
+	$scope.showHideVar = "Show";
+	$scope.showHideQuestVar = "Show";
 	
-
-	
-	$scope.showPlayerDataClick = function () {
-		$scope.showPlayerData = !$scope.showPlayerData;
-		$scope.showHideVar = $scope.showHide();
+	/*
+	function prepEvents() {
+	 	var events = [];
+		events.push(new Event(events.length,0,"unknown"));
+		events.push(new Event(events.length,0,"unknown"));
+		events.push(new Event(events.length,0,"unknown"));
+		events.push(new Event(events.length,0,"unknown"));
+		events.push(new Event(events.length,0,"unknown"));
+		events.push(new Event(events.length,0,"unknown"));
+		events.push(new Event(events.length,6,"BarbarianAttack"));
+		events.push(new Event(events.length,7,"BrokenItems"));
+		events.push(new Event(events.length,8,"CastleTaxation"));
+		events.push(new Event(events.length,9,"GolbinRaid"));
+		events.push(new Event(events.length,10,"KingsFeast"));
+		events.push(new Event(events.length,11,"MarketShortage"));
+		events.push(new Event(events.length,12,"MarketSurplus"));
+		events.push(new Event(events.length,13,"OrcsAttack"));
+		events.push(new Event(events.length,14,"SandStorm"));
+		events.push(new Event(events.length,15,"ThrownInTheDungeon"));
+		events.push(new Event(events.length,16,"Treasure"));
+		events.push(new Event(events.length,17,"VikingParade"));
+		events.push(new Event(events.length,18,"HailStorm"));
+		events.push(new Event(events.length,19,"HiddenRoom"));
+		return events;
+	}
+	*/
+	$scope.showOtherPlayerDataClick = function () {
+		$scope.showOtherPlayerData = !$scope.showOtherPlayerData;
+		$scope.showHideVar = showHide();
 	}
 
 	$scope.showMyCompletedQuestsClick = function () {
 		$scope.showMyCompletedQuests = !$scope.showMyCompletedQuests;
-		$scope.showHideVar = $scope.showHide();
+		$scope.showHideQuestVar = showHideQuests();
 	}
 
-	$scope.showHide	= function() {
+	
+	showHide = function() {
+		if($scope.showOtherPlayerData)	{
+				return "Hide";
+			}
+			else {
+				return "Show";
+			}
+	}
+	showHideQuests = function() {
 		if($scope.showMyCompletedQuests) {
 				return "Hide";
 			}
@@ -297,29 +339,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			}
 	}
 	
-	//event id, event type, event name
-	$scope.events = [
-		new Event(0,0,""),
-		new Event(1,0,""),
-		new Event(2,0,""),
-		new Event(3,0,""),
-		new Event(4,0,""),
-		new Event(5,0,""),
-		new Event(6,6,"BarbarianAttack"),
-		new Event(7,7,"BrokenItems"),
-		new Event(8,8,"CastleTaxation"),
-		new Event(9,9,"GolbinRaid"),
-		new Event(10,10,"KingsFeast"),
-		new Event(11,11,"MarketShortage"),
-		new Event(12,12,"MarketSurplus"),
-		new Event(13,13,"OrcsAttack"),
-		new Event(14,14,"SandStorm"),
-		new Event(15,15,"ThrownInTheDungeon"),
-		new Event(16,16,"Treasure"),
-		new Event(17,17,"VikingParade"),
-		new Event(18,18,"HailStorm"),
-		new Event(19,19,"HiddenRoom"),
-		]
+
 	
 	$scope.showLogResults = function() {
 		if(!$scope.showLog) {
@@ -332,12 +352,10 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 	var cardColor = function(card) {
 		if(card.selected) {
-			return $scope.borderPXselected;
-		//return 'red';
+			return $scope.borderPXselected; //red
 		}
 		else {
-			return $scope.borderPXorig;
-		//return 'black';
+			return $scope.borderPXorig; //black
 		}
 	}
 
@@ -834,36 +852,50 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	//	'eventTreasure',16,image+"Treasure",this);	
 	//	'eventVikingParade',17,image+"VikingParade",this);	
 
-	getEvent = function (questCardInPlay) {
-		switch (questCardInPlay.type)
+	getEvent = function (type) {
+		switch (type)
 		{
 				case 6:
+					return 'eventBarbarianAttack';
 					break;
 				case 7:
+					return 'eventBrokenItems';
 					break;
 				case 8:
+					return 'eventCastleTaxation';
 					break;
 				case 9:
+					return 'eventGolbinRaid';
 					break;
 				case 10:
+					return 'eventKingsFeast';
 					break;
 				case 11:
+					return 'eventMarketShortage';
 					break;
 				case 12:
+					return 'eventMarketSurplus';
 					break;
 				case 13:
+					return 'eventOrcsAttack';
 					break;
 				case 14:
+					return 'eventSandStorm';
 					break;
 				case 15:
+					return 'eventThrownInTheDungeon';
 					break;
 				case 16:
+					return 'eventTreasure';
 					break;
 				case 17:
+					return 'eventVikingParade';
 					break;
 				case 18:
+					return 'eventHailStorm';
 					break;
 				case 19:
+					return 'eventHiddenRoom';
 					break;
 				default:
 					'';
@@ -890,8 +922,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					break;
 			}
 		}
-		//updateLog(text);
-		
+
 	}
 
 
@@ -922,7 +953,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				}	
 			}
 
-			$scope.activeEvent = $scope.events[type].displayMode;
+			$scope.activeEvent = getEvent(type);
 		}
 
 
@@ -1360,8 +1391,15 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			}			
 
 			resetAllSelectedCards(player);
-
-			play("buyCart");
+			if(cartId===1) {
+				play("buyCart");
+			}
+			if(cartId===2) {
+				play("horseNeigh");
+			}
+			if(cartId===3) {
+				play("buyCart");
+			}
 		}
 		
 	$scope.playerBuyAction = function() {
@@ -1550,7 +1588,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		if(player===null) {
 			return;
 		}
-		if(questCardinplay.level==='4') {
+		if(questCardinplay.level===4) {
 			//questCardinplay.cardImage.height = "350";
 			questCardinplay.setCardSize("large");
 		}
@@ -2136,7 +2174,7 @@ function joinGame(playerId, playerName) {
 
 function completeEvent(eventId) {
 	$scope.loadingData=true;
-    gameFactory.joinGame(eventId, processGameStateCallback, processGameStateErrorCallback);
+    gameFactory.completeEvent(eventId, processGameStateCallback, processGameStateErrorCallback);
 }
 
 function pass(discard) {

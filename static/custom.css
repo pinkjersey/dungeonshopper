@@ -28,6 +28,12 @@
 .input[type=radio] {
     bottom: 2px;
 }
+
+[ng\:cloak], [ng-cloak], .ng-cloak {
+    display: none;
+}
+
+
 /*.img-with-text {
     text-align: center;
     width: [width of img];
@@ -47,9 +53,7 @@
 }  
 
 
-[ng\:cloak], [ng-cloak], .ng-cloak {
-    display: none;
-}
+
 
 
 .spin-add{

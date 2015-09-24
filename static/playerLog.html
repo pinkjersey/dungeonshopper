@@ -1,8 +1,8 @@
 <div>
-	<span class="panel-title pull-right"><button class="btn btn-primary" ng-show="true" ng-click="showLogResults()">{{showLogText}}</button></span>
+	<span class="float:left"><button class="btn btn-primary" ng-show="true" ng-click="showLogResults()">{{showLogText}}</button></span>
 </div>
 <br></br>
-<div ng-show="showLog" class="panel-title pull-right">
+<div ng-show="showLog" class="float:left">
 	 <table table-height="200px" class="table table-bordered" fixed-header>
 		<thead>
 			<tr>
@@ -11,7 +11,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="log in eventsLog track by $index">
+			<tr ng-repeat="log in playersLog track by $index">
 				<td width="50px">{{log.name}}</td>
 				<td width="500px">{{log.logItem}}</td>
 			</tr>
