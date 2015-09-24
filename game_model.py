@@ -21,8 +21,7 @@ class Cart(ndb.Model):
     cardCost = ndb.IntegerProperty(required=True)
     destroyed = ndb.BooleanProperty(required=True, default=False)
 
-class Player(ndb.Model):
-    isActive = ndb.BooleanProperty(required=True, default=False)
+class Player(ndb.Model):    
     playerId = ndb.IntegerProperty(required=True, default=0)
     name = ndb.StringProperty(required=True)
     hand = ndb.IntegerProperty(repeated=True)

@@ -3,19 +3,13 @@ import json
 import logging
 from game_model import *
 
-def createOtherPlayer(game, player, playerId):
+def createOtherPlayer(player):
     dict = player.to_dict()
     hand = dict["hand"]
     sz = len(hand)
     for i in range(sz):
         hand[i] = -1
     dict["hand"] = hand
-
-    if game.curPlayer == playerId:
-        dict["isActive"] = True
-    else:
-        dict["isActive"] = False
-    return dict
 
 def playerState(game, playerId):
     game.players[playerId].playerId = playerId
@@ -42,7 +36,7 @@ def playerState(game, playerId):
     otherPlayers = []
     for p in game.players:
         if (p != player):
-            otherPlayers.append(createOtherPlayer(game, p, playerId))
+            otherPlayers.append(createOtherPlayer(p))
     thedict["otherPlayers"] = otherPlayers
 
     thedict["actionsRemaining"] = game.actionsRemaining

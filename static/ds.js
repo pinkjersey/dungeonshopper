@@ -118,12 +118,11 @@ var Player = function (game, id, name) {
 	
 app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory) {
 
-	//$scope.knight = "../images/knight.gif";
 	$scope.hideImagesBool = false;
 	$scope.debug = false;
 	$scope.autoSelectHand = true;
 	$scope.autoSelectCart = true;
-	//$scope.events = [];
+
 	//plays audio files
 	play = function (soundId) {
 		var audio = document.getElementById(soundId);
@@ -167,7 +166,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			$scope.questImageBase = "../images/quest";
 			$scope.blankMarketImageBase = "../images/"
 			$scope.cartImageBase = "../images/cart";
-			$scope.splashImage = "../images/boxtopxxx.jpg";
+			$scope.splashImage = "../images/boxtop.jpg";
 			$scope.itemCardBack = "../images/shoppingCardBack.jpg";
 			$scope.vendorCardBack = "../images/vendorback.jpg";
 			$scope.knight = "../images/knight.gif";
@@ -182,9 +181,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	setupNoGame = function() {
 		$scope.displayMode = "nogame";
 		$scope.playerId = "";
-		//$scopeNextPlayerId = 0;
 		$scope.playerName="";
-//		$scopeNextPlayerId=0;		
 		$scope.numberOfPlayers =1;
 		$scope.playerId = 0;
 		$scope.game=null;
@@ -195,20 +192,11 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	
 	$scope.joinGame = function(numberOfPlayers, playerName, playerId) {
 		
-//		$scopeNextPlayerId++;		
 		$scope.numberOfPlayers = Number(numberOfPlayers);
-		//$scopeNextPlayerId++;
-		//$scope.playerName = "Player"+($scopeNextPlayerId+1);
-		//$scope.numberOfPlayersJoined = $scopeNextPlayerId;
-		//$scope.activePlayerId = $scopeNextPlayerId;
-		//$scope.activePlayer = $scope.game.players[$scope.activePlayerId];			
-//		$scope.myId=$scopeNextPlayerId;
 		hideImages($scope.hideImagesBool);
 		$scope.game = new Game(numberOfPlayers, $scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		joinGame(playerId, playerName);
-		//$scope.titleImg = "../images/title_small.jpg"
 		$scope.events = prepEvents();
-		//$scope.displayMode = "game";
 	}
 	
 	
@@ -219,13 +207,12 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.game = new Game(numberOfPlayers, $scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		loadData(numberOfPlayers, playerName);
 		play("cards");
-		//$scope.titleImg = "../images/title_small.jpg"
 		$scope.events = prepEvents();
 	}
 
 	//refresh data from backend if anything is stuck
 	$scope.playerRefresh = function() {
-		$scope.dots += "...";
+		//$scope.dots += "...";
 		playerRefresh($scope.activePlayerId);
 		$scope.loadingData=false;
 	}
@@ -244,7 +231,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
     //this is the initial load spectator refresh 
     $(document).ready(); {
-        startInterval(60000);
+        startInterval(2000);
     }
 
 	$scope.activeEvent = null;
@@ -275,7 +262,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.showLog = false;
 	$scope.showLogText = "Show Players Log";
 	$scope.blankText = "";
-	$scope.dots="...";
+	//$scope.dots="...";
 	//gui variable to control cart buttons
 	$scope.prevActiveCartId = -1;
 	$scope.activeCartId = -1;
@@ -1788,8 +1775,25 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				return "";
 		}
 	}
-
+	
+	//ex
 	//"playerLog": [{"event": "http://localhost:8080/game?action=discard&what=3&where=hand", "playerId": 0}]
+	/*
+	action=buyCart&withGold=0&items=0&cart=cart1
+	action=move&what=67&src=hand&dst=cart0
+	action=move&what=14&src=hand&dst=cart1
+	action=buyCart&withGold=0&items=288&cart=cart2
+	action=fish&what=6&where=cart0
+	action=move&what=37&src=hand&dst=cart0
+	action=completeQuest&what=377&where=cart0
+	action=buyCart&withGold=0&items=24456&cart=cart3
+	action=discard&what=14&where=cart1
+	action=discard&what=67&where=hand
+	action=fish&what=7&where=hand
+	action=move&what=23&src=hand&dst=cart1
+	action=move&what=45&src=hand&dst=cart2
+	*/
+
 	logPlayerAction = function(playersLog, playerName, logItem) {
 		if(logItem!="") {
 			var pattern = "/game?";
@@ -1892,22 +1896,6 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					}
 				}
 			
-			/*
-	action=buyCart&withGold=0&items=0&cart=cart1
-	action=move&what=67&src=hand&dst=cart0
-	action=move&what=14&src=hand&dst=cart1
-	action=buyCart&withGold=0&items=288&cart=cart2
-	action=fish&what=6&where=cart0
-	action=move&what=37&src=hand&dst=cart0
-	action=completeQuest&what=377&where=cart0
-	action=buyCart&withGold=0&items=24456&cart=cart3
-	action=discard&what=14&where=cart1
-	action=discard&what=67&where=hand
-	action=fish&what=7&where=hand
-	action=move&what=23&src=hand&dst=cart1
-	action=move&what=45&src=hand&dst=cart2
-	*/
-			//logItem.substring(index)
 			$scope.playersLog.push(new PlayersLog($scope.playersLog.length, playerName, logEntry + '.'));
 		}
 	}
@@ -1922,11 +1910,6 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		alert("Error Occurred: " + returnVal);
 	};
 
-	//updateLog = function(text) {
-	//	if(text!="") {
-	//		$scope.playerslog.push(new PlayersLog($scope.playerslog.length, text));
-	//	}
-	//}
 
 	var mode = function(isActive) {
 		if(isActive) {
@@ -2070,7 +2053,6 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 var getPlayerName = function(playerId) {
 	
 	for (var p = 0; p < $scope.game.players.length; ++p) {  
-//		var curPlayer = Number($scope.game.players[p].id)
 		if( $scope.game.players[p].id === playerId) {
 			return $scope.game.players[p].name;
 		}
@@ -2099,7 +2081,6 @@ function completeEvent(eventId) {
 
 function pass(discard) {
 	$scope.loadingData=true;
-	$scope.dots = "..";
     gameFactory.pass(discard, processGameStateCallback, processGameStateErrorCallback);
 }
 
