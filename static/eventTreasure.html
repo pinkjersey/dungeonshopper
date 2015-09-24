@@ -1,16 +1,16 @@
-﻿<div class="row" ng-show="player.active" ng-repeat="player in game.players" >
+﻿
 	<div class="panel panel-primary" >  
 		<div class="panel-heading">  
 			<div class="panel-body">
 
 					<table class="table table-condensed">
 							<tr>
-								<th><big>{{player.name}}</big></th>
-								<th><big>VP: {{player.vp}}</big></th>
-								<th><big>Bonus: {{player.bonus}}</big></th>
-								<th><big>Gold: {{player.gold}}</big></th>								
-								<th><big>Total: {{player.gold + player.vp + player.bonus}}</big></th>								
-								<th><big>Turns: {{player.turns}}</big></th>
+								<th><big>{{activePlayer.name}}</big></th>
+								<th><big>VP: {{activePlayer.vp}}</big></th>
+								<th><big>Bonus: {{activePlayer.bonus}}</big></th>
+								<th><big>Gold: {{activePlayer.gold}}</big></th>								
+								<th><big>Total: {{activePlayer.gold + activePlayer.vp + activePlayer.bonus}}</big></th>								
+								<th><big>Turns: {{activePlayer.turns}}</big></th>
 							</tr>
 					</table>
 
@@ -21,8 +21,8 @@
 						<div class="container-fluid">
 							<div class="row">
 								<span ng-repeat="questcard in game.questsInPlay.playingCards track by $index">
-									<questcard ng-show="questcard.level==='4'" info="questcard"></questcard>
-									<button ng-show="questcard.level==='4'" class="btn btn-warning" ng-click="playerCompleteEvent(0, $index)">Complete Event?</button>
+									<questcard ng-show="questcard.level===4" info="questcard"></questcard>
+									<button ng-show="questcard.level===4" class="btn btn-warning" ng-click="playerCompleteEvent(0, $index)">Complete Event?</button>
 								</span>	
 							</div>
 						</div>
@@ -31,6 +31,6 @@
 
 		</div>
 	</div>
-</div>	
+
 
 
