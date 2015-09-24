@@ -366,13 +366,15 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
+        self.appendToLog(game)
+
         try:
             priorPlayer = passPlayer(game, items)
         except ValueError as e:
             self.error(500)
             return
 
-        self.appendToLog(game)			
+
         retstr = playerState(game, priorPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"

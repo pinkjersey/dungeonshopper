@@ -118,7 +118,7 @@ var Player = function (game, id, name) {
 	
 app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory) {
 
-	$scope.knight = "../images/knight.gif";
+	//$scope.knight = "../images/knight.gif";
 	$scope.hideImagesBool = false;
 	$scope.debug = false;
 	$scope.autoSelectHand = true;
@@ -160,14 +160,18 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			$scope.splashImage = "../images/boxtopxxx.jpg";
 			$scope.itemCardBack = "../images/shoppingCardBack.jpgxxx";
 			$scope.vendorCardBack = "../images/vendorback.jpgxxx";
+			$scope.knight = "";
+			$scope.titleImg = "../images/title_smallxxx.jpg"
 		}
 		else {
 			$scope.questImageBase = "../images/quest";
 			$scope.blankMarketImageBase = "../images/"
 			$scope.cartImageBase = "../images/cart";
-			$scope.splashImage = "../images/boxtop.jpg";
+			$scope.splashImage = "../images/boxtopxxx.jpg";
 			$scope.itemCardBack = "../images/shoppingCardBack.jpg";
 			$scope.vendorCardBack = "../images/vendorback.jpg";
+			$scope.knight = "../images/knight.gif";
+			$scope.titleImg = "../images/title_small.jpg"
 		}
 	}
 
@@ -202,7 +206,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		hideImages($scope.hideImagesBool);
 		$scope.game = new Game(numberOfPlayers, $scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		joinGame(playerId, playerName);
-		$scope.titleImg = "../images/title_small.jpg"
+		//$scope.titleImg = "../images/title_small.jpg"
 		$scope.events = prepEvents();
 		//$scope.displayMode = "game";
 	}
@@ -215,7 +219,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.game = new Game(numberOfPlayers, $scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		loadData(numberOfPlayers, playerName);
 		play("cards");
-		$scope.titleImg = "../images/title_small.jpg"
+		//$scope.titleImg = "../images/title_small.jpg"
 		$scope.events = prepEvents();
 	}
 
@@ -240,7 +244,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
     //this is the initial load spectator refresh 
     $(document).ready(); {
-        startInterval(2000);
+        startInterval(60000);
     }
 
 	$scope.activeEvent = null;
@@ -1113,7 +1117,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			
 			var r =  confirm("Discard the " + card.name + "? Fish for a new card?");
 			if(r===true) {
-				fish(cardNumber, 'cart' + cart.id);
+				fish(card.number, 'cart' + cart.id);
 			}
 			else {
 				return;
@@ -1152,7 +1156,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 		var r =  confirm("Discard the " + card.name + "? Fish for a new card?");
 		if(r===true) {
-			fish(cardNumber, 'hand');
+			fish(card.number, 'hand');
 		}
 		else {
 			return;
@@ -1924,7 +1928,15 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	//	}
 	//}
 
-		
+	var mode = function(isActive) {
+		if(isActive) {
+			return 'game';
+		}
+		else {
+			//$scope.dots = "..";
+			return 'gameSpectator';
+		}
+	}		
 
 	function getObjectResults(data) {
 		var text = "";
@@ -1935,25 +1947,12 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.isActive = data.isActive;
 		$scope.numPlayers = data.numPlayers;
 
-		var mode = function(isActive) {
-			if(isActive) {
-				return 'game';
-			}
-			else {
-				//$scope.dots = "..";
-				return 'gameSpectator';
-			}
-		}
+
 
 		$scope.otherPlayers = [];		
 		$scope.game.players = [];
-		var o = 1;
-		//fill in other players data into game.scope.players
-		//for (var p = 0; p < data.numPlayers-1; ++p) {  
-
-//	this.bonus = 0;
 		
-			//current player
+		//current player
 		var p=0;
 		$scope.game.players.push(new Player(game, data.curPlayer, data.name));
 		$scope.game.players[p].active = data.isActive;
@@ -1983,29 +1982,45 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		for (var q = 0; q < data.questsCompleted.length; ++q) {   
 			dealQuestsCompleted(activePlayer.questsCompleted, data.questsCompleted[q].items);
 		}
-
+		var len=0;
+		var o=0;
 		for (var z = 0; z < data.otherPlayers.length; ++z) {
+			
+			if(data.curPlayer === z) {
+				o++;
+			}
+			else {
+				if(data.curPlayer===data.numPlayers-1) {
+					o=0;
+				}
+				else {
+					o++
+				}
+			}
 			$scope.game.players.push(new Player(game, o, data.otherPlayers[z].name));
-			$scope.game.players[o].cards = new cardSet();
-			$scope.game.players[o].questsCompleted =  new cardSet();
+
+			var len = $scope.game.players.length - 1;
+
+			$scope.game.players[len].cards = new cardSet();
+			$scope.game.players[len].questsCompleted =  new cardSet();
 	
 			for (var i = 0; i < data.otherPlayers[z].hand.length; ++i) {   
-				//dealNumberToPlayer($scope.game.players[o], data.otherPlayers[z].hand[i]);	
-				dealNumberToPlayer($scope.game.players[o], -1);	
+				dealNumberToPlayer($scope.game.players[len], data.otherPlayers[z].hand[i]);	
+				//dealNumberToPlayer($scope.game.players[z], -1);	
 			}
 
 			//populate carts
 			for (var c = 0; c < data.carts.length; ++c) {   
-				$scope.game.players[o].carts[c].cards =  new cardSet();
-				updatePlayerCarts($scope.game.players[o], $scope.game.players[o].carts[c], data.otherPlayers[z].carts[c]);	
+				$scope.game.players[len].carts[c].cards =  new cardSet();
+				updatePlayerCarts($scope.game.players[len], $scope.game.players[len].carts[c], data.otherPlayers[z].carts[c]);	
 			}
 			
 			for (var q = 0; q < data.otherPlayers[z].questsCompleted.length; ++q) {   
-				dealQuestsCompleted($scope.game.players[o].questsCompleted, data.otherPlayers[z].questsCompleted[q].items);
+				dealQuestsCompleted($scope.game.players[len].questsCompleted, data.otherPlayers[z].questsCompleted[q].items);
 			}
-			$scope.game.players[o].questsCompleted.setCardSize("small");
-			$scope.otherPlayers[z] = $scope.game.players[o];
-			o++;
+			$scope.game.players[len].questsCompleted.setCardSize("small");
+			$scope.otherPlayers[z] = $scope.game.players[len];
+
 		}
 	
 
