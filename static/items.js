@@ -187,7 +187,7 @@ function playingCard(oNumber,oName, oImage,oImageSmall,oImageLarge,oImageSmallCh
 
 	// Initialise settings
 	this.number = oNumber;
-	this.name = name;
+	this.name = oName;
 	this.imageOrig = oImage;
 	this.image = oImage;
 	this.imageSmall = oImageSmall;
@@ -233,3 +233,4 @@ switch (size)
 			this.image = this.imageOrig;
 	}
 };
+

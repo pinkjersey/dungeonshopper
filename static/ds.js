@@ -1,5 +1,14 @@
 
-//'ngAnimate'
+var Event = function (type, name ) {
+	var eventImageBase="../images/event";
+	this.id = type;
+	this.name = name;
+	this.displayMode = 'event' + name;
+	this.image = eventImageBase + name + '.jpg';
+}
+
+
+
 var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased, imageNotPurchased) {
     this.id = id;
 	this.size = size;
@@ -72,8 +81,6 @@ var Game = function(numPlayers, blankMarketImageBase, questImageBase, cartImageB
 	//event id, event type, event name
 	
 
-
-
 }
 
 var PlayersLog = function (id, name, logItem) {
@@ -82,15 +89,6 @@ var PlayersLog = function (id, name, logItem) {
 	this.logItem = logItem;
 }
 
-
-var Event = function (index, type, name ) {
-	var eventImageBase="../images/event";
-	index = index;
-	id = type;
-	name = name;
-	displayMode = 'event' + name;
-	image = eventImageBase + name + '.jpg';
-}
 
 
 
@@ -205,7 +203,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.game = new Game(numberOfPlayers, $scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		joinGame(playerId, playerName);
 		$scope.titleImg = "../images/title_small.jpg"
-		//$scope.events = prepEvents();
+		$scope.events = prepEvents();
 		//$scope.displayMode = "game";
 	}
 	
@@ -218,7 +216,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		loadData(numberOfPlayers, playerName);
 		play("cards");
 		$scope.titleImg = "../images/title_small.jpg"
-		//$scope.events = prepEvents();
+		$scope.events = prepEvents();
 	}
 
 	//refresh data from backend if anything is stuck
@@ -285,32 +283,34 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.showHideVar = "Show";
 	$scope.showHideQuestVar = "Show";
 	
-	/*
+
+	
 	function prepEvents() {
 	 	var events = [];
-		events.push(new Event(events.length,0,"unknown"));
-		events.push(new Event(events.length,0,"unknown"));
-		events.push(new Event(events.length,0,"unknown"));
-		events.push(new Event(events.length,0,"unknown"));
-		events.push(new Event(events.length,0,"unknown"));
-		events.push(new Event(events.length,0,"unknown"));
-		events.push(new Event(events.length,6,"BarbarianAttack"));
-		events.push(new Event(events.length,7,"BrokenItems"));
-		events.push(new Event(events.length,8,"CastleTaxation"));
-		events.push(new Event(events.length,9,"GolbinRaid"));
-		events.push(new Event(events.length,10,"KingsFeast"));
-		events.push(new Event(events.length,11,"MarketShortage"));
-		events.push(new Event(events.length,12,"MarketSurplus"));
-		events.push(new Event(events.length,13,"OrcsAttack"));
-		events.push(new Event(events.length,14,"SandStorm"));
-		events.push(new Event(events.length,15,"ThrownInTheDungeon"));
-		events.push(new Event(events.length,16,"Treasure"));
-		events.push(new Event(events.length,17,"VikingParade"));
-		events.push(new Event(events.length,18,"HailStorm"));
-		events.push(new Event(events.length,19,"HiddenRoom"));
+		events.push(new Event(0,"unknown"));
+		events.push(new Event(1,"Battle of Castillon"));
+		events.push(new Event(2,"Capture of Lusignan"));
+		events.push(new Event(3,"Combat of the Thirty"));
+		events.push(new Event(4,"Loire Campaign"));
+		events.push(new Event(5,"Siege of Harfleur"));
+		events.push(new Event(6,"BarbarianAttack"));
+		events.push(new Event(7,"BrokenItems"));
+		events.push(new Event(8,"CastleTaxation"));
+		events.push(new Event(9,"GolbinRaid"));
+		events.push(new Event(10,"KingsFeast"));
+		events.push(new Event(11,"MarketShortage"));
+		events.push(new Event(12,"MarketSurplus"));
+		events.push(new Event(13,"OrcsAttack"));
+		events.push(new Event(14,"SandStorm"));
+		events.push(new Event(15,"ThrownInTheDungeon"));
+		events.push(new Event(16,"Treasure"));
+		events.push(new Event(17,"VikingParade"));
+		events.push(new Event(18,"HailStorm"));
+		events.push(new Event(19,"HiddenRoom"));
 		return events;
 	}
-	*/
+
+	
 	$scope.showOtherPlayerDataClick = function () {
 		$scope.showOtherPlayerData = !$scope.showOtherPlayerData;
 		$scope.showHideVar = showHide();
@@ -839,72 +839,20 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		//updateLog(text);
 	}
 
-	//	'eventBarbarianAttack',6,image+"BarbarianAttack",this);
-	//	'eventBrokenItems',7,image+"BrokenItems",this);
-	//	'eventCastleTaxation',8,image+"CastleTaxation",this);
-	//	'eventGolbinRaid',9,image+"GolbinRaid",this);
-	//	'eventKingsFeast',10,image+"KingsFeast",this);	
-	//	'eventMarketShortage',11,image+"MarketShortage",this);	
-	//	'eventMarketSurplus',12,image+"MarketSurplus",this);	
-	//	'eventOrcsAttack',13,image+"OrcsAttack",this);	
-	//	'eventSandStorm',14,image+"SandStorm",this);	
-	//	'eventThrownInTheDungeon',15,image+"ThrownInTheDungeon",this);	
-	//	'eventTreasure',16,image+"Treasure",this);	
-	//	'eventVikingParade',17,image+"VikingParade",this);	
-
-	getEvent = function (type) {
-		switch (type)
-		{
-				case 6:
-					return 'eventBarbarianAttack';
-					break;
-				case 7:
-					return 'eventBrokenItems';
-					break;
-				case 8:
-					return 'eventCastleTaxation';
-					break;
-				case 9:
-					return 'eventGolbinRaid';
-					break;
-				case 10:
-					return 'eventKingsFeast';
-					break;
-				case 11:
-					return 'eventMarketShortage';
-					break;
-				case 12:
-					return 'eventMarketSurplus';
-					break;
-				case 13:
-					return 'eventOrcsAttack';
-					break;
-				case 14:
-					return 'eventSandStorm';
-					break;
-				case 15:
-					return 'eventThrownInTheDungeon';
-					break;
-				case 16:
-					return 'eventTreasure';
-					break;
-				case 17:
-					return 'eventVikingParade';
-					break;
-				case 18:
-					return 'eventHailStorm';
-					break;
-				case 19:
-					return 'eventHiddenRoom';
-					break;
-				default:
-					'';
-		}
-		return event;
-	}
-
-
-
+	//	'eventBarbarianAttack',6
+	//	'eventBrokenItems',7
+	//	'eventCastleTaxation',8
+	//	'eventGolbinRaid',9
+	//	'eventKingsFeast',10
+	//	'eventMarketShortage',11
+	//	'eventMarketSurplus',12
+	//	'eventOrcsAttack',13
+	//	'eventSandStorm',14
+	//	'eventThrownInTheDungeon',15
+	//	'eventTreasure',16
+	//	'eventVikingParade',17
+	//	'eventHailStorm', 18
+	//	'eventsHiddenRoom',19
 
 	dealQuestsCompleted = function(questsCompleted, items) {
 		var game = $scope.game;
@@ -953,55 +901,11 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				}	
 			}
 
-			$scope.activeEvent = getEvent(type);
+			$scope.activeEvent = events[type].displayMode;
+			if(level === 4) {
+				prepareEventForPlayer(card);
+			}
 		}
-
-
-		
-		if(level === 4) {
-			prepareEventForPlayer(card);
-		}
-
-	}
-
-	getSelectedCardName = function(cardNumber) {
-		var name = "";
-		switch (cardNumber) {
-				   case 1: 
-					   name = "Club";
-					   break;
-				   case 2:
-					   name = "Shield";
-					   break;
-				   case 3:
-					   name = "Mace";
-					   break;
-				   case 4:
-					   name = "Flail";
-					   break;
-				   case 5:
-					   name = "Sword";
-					   break;
-				   case 6:
-					   name = "Axe";
-					   break;
-				   case 7:
-					   name = "Crossbow";
-					   break;
-				   case 8:
-					   name = "Armor";
-					   break;
-				   case 9:
-					   name = "Trebuchet";
-					   break;
-				   case 10:
-					   name = "Ballista";
-					   break;
-				   default:
-					   name = "Unknown";
-					   break;
-			   }
-		return name;
 	}
 
 	//returns first selected card in deck
@@ -1013,7 +917,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			}
 			continue;
 		}
-		return card.number;
+		return card;
 	}
 
 	//returns card numbers appended to each other for deck.  ex. 1224
@@ -1204,10 +1108,10 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		if($scope.selectedCartItemsCount > 0) {
 			//var cart = player.carts[id];
 			
-			var cardNumber = getSelectedCard(cart.cards);
+			var card = getSelectedCard(cart.cards);
 			//text = "fished for a card.  Discarded a " + cardNumber + ".";
 			
-			var r =  confirm("Discard the " + getSelectedCardName(cardNumber) + "? Fish for a new card?");
+			var r =  confirm("Discard the " + card.name + "? Fish for a new card?");
 			if(r===true) {
 				fish(cardNumber, 'cart' + cart.id);
 			}
@@ -1241,12 +1145,12 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 
 		//returns card selected
-		var cardNumber = getSelectedCard(player.cards);
+		var card = getSelectedCard(player.cards);
 
 		//text = "fished for a card.  Discarded a " + cardNumber + ".";
 		//call backend fish
 
-		var r =  confirm("Discard the " + getSelectedCardName(cardNumber) + "? Fish for a new card?");
+		var r =  confirm("Discard the " + card.name + "? Fish for a new card?");
 		if(r===true) {
 			fish(cardNumber, 'hand');
 		}
@@ -1254,6 +1158,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			return;
 		}
 
+		//getSelectedCardName(card.number)
 
 		resetAllSelectedCards(player);
 		play("fish");
@@ -2554,4 +2459,46 @@ eventCycleToNextPlayer = function(game, questCardinplay) {
 	$scope.activePlayer.active = true;
 	prepareEventForPlayer(questCardinplay, $scope.activePlayer);	
 }
+*/
+
+/*
+	getSelectedCardName = function(cardNumber) {
+		var name = "";
+		switch (cardNumber) {
+				   case 1: 
+					   name = "Club";
+					   break;
+				   case 2:
+					   name = "Shield";
+					   break;
+				   case 3:
+					   name = "Mace";
+					   break;
+				   case 4:
+					   name = "Flail";
+					   break;
+				   case 5:
+					   name = "Sword";
+					   break;
+				   case 6:
+					   name = "Axe";
+					   break;
+				   case 7:
+					   name = "Crossbow";
+					   break;
+				   case 8:
+					   name = "Armor";
+					   break;
+				   case 9:
+					   name = "Trebuchet";
+					   break;
+				   case 10:
+					   name = "Ballista";
+					   break;
+				   default:
+					   name = "Unknown";
+					   break;
+			   }
+		return name;
+	}
 */
