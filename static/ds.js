@@ -76,10 +76,6 @@ var PlayersLog = function (id, name, logItem) {
 	this.logItem = logItem;
 }
 
-var PlayersLog = function (id, text) {
-	this.id = id;
-	this.text = text;
-}
 
 var Event = function (index, type, name, displayMode) {
 	var eventImageBase="../images/event";
@@ -118,7 +114,7 @@ var Player = function (game, id, name) {
 	
 app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory) {
 
-
+	$scope.knight = "../images/knight.gif";
 	$scope.hideImagesBool = false;
 	$scope.debug = false;
 	$scope.autoSelectHand = true;
@@ -164,7 +160,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			$scope.questImageBase = "../images/quest";
 			$scope.blankMarketImageBase = "../images/"
 			$scope.cartImageBase = "../images/cart";
-			//$scope.splashImage = "../images/boxtop.jpg";
+			$scope.splashImage = "../images/boxtop.jpg";
 			$scope.itemCardBack = "../images/shoppingCardBack.jpg";
 			$scope.vendorCardBack = "../images/vendorback.jpg";
 		}
@@ -199,6 +195,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		hideImages($scope.hideImagesBool);
 		$scope.game = new Game(numberOfPlayers, $scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		joinGame(playerId, playerName);
+		$scope.titleImg = "../images/title_small.jpg"
 		//$scope.displayMode = "game";
 	}
 	
@@ -210,6 +207,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.game = new Game(numberOfPlayers, $scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		loadData(numberOfPlayers, playerName);
 		play("cards");
+		$scope.titleImg = "../images/title_small.jpg"
 	}
 
 	//refresh data from backend if anything is stuck
@@ -272,24 +270,31 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.borderPXselected = "border:3px solid red";
 	$scope.borderPX = "border:1px solid black";
 	$scope.borderPXorig = "border:1px solid black";
-	$scope.showHideVar = "Show";
-	$scope.showPlayerData = false;
+	$scope.showOtherPlayerData = false;
 	$scope.showMyCompletedQuests = false;
+	$scope.showHideVar = "Show";
+	$scope.showHideQuestVar = "Show";
 	
 
 	
-	$scope.showPlayerDataClick = function () {
-		$scope.showPlayerData = !$scope.showPlayerData;
+	$scope.showOtherPlayerDataClick = function () {
+		$scope.showOtherPlayerData = !$scope.showOtherPlayerData;
 		$scope.showHideVar = $scope.showHide();
 	}
 
 	$scope.showMyCompletedQuestsClick = function () {
 		$scope.showMyCompletedQuests = !$scope.showMyCompletedQuests;
-		$scope.showHideVar = $scope.showHide();
+		$scope.showHideQuestVar = $scope.showHide();
 	}
 
 	$scope.showHide	= function() {
 		if($scope.showMyCompletedQuests) {
+				return "Hide";
+			}
+			else {
+				return "Show";
+			}
+		if($scope.showOtherPlayerData)	{
 				return "Hide";
 			}
 			else {
@@ -332,12 +337,10 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 	var cardColor = function(card) {
 		if(card.selected) {
-			return $scope.borderPXselected;
-		//return 'red';
+			return $scope.borderPXselected; //red
 		}
 		else {
-			return $scope.borderPXorig;
-		//return 'black';
+			return $scope.borderPXorig; //black
 		}
 	}
 

@@ -1,5 +1,6 @@
 ﻿<h4>
-Awaiting others to pass..{{dots}}
+Awaiting others to pass..
+<img ng-src="{{knight}}"></img>
 </h4>
 <br></br>
 
@@ -15,11 +16,9 @@ Awaiting others to pass..{{dots}}
 	</div>
 </div>
 
-
-
 	<div class="panel panel-primary">  
 		<div class="panel-heading">  
-			<div class="panel-body">
+			<!--<div class="panel-body">-->
 				<table class="table table-condensed">
 					<tr>
 						<th><big>{{activePlayer.name}}</big></th>
@@ -31,7 +30,7 @@ Awaiting others to pass..{{dots}}
 						<th><big>Turns: {{activePlayer.turns}}</big></th>
 					</tr>
 				</table>
-			</div>
+			<!--<div>-->
 		</div>
 
 		<br></br>
@@ -54,12 +53,12 @@ Awaiting others to pass..{{dots}}
 
 		</div>
 		<div>
-		<br></br>
+
 			<div ng-show="activePlayer.questsCompleted.playingCards.length > 0" >{{activePlayer.name}}'s Completed Quests:</div>
 			<span ng-repeat="questcard in activePlayer.questsCompleted.playingCards track by $index">
 				<img style="{{card.borderColor}}" ng-src="{{questcard.image}}"></img>
 			</span>
-			<br></br>
+
 		</div>
 		
 
@@ -67,8 +66,7 @@ Awaiting others to pass..{{dots}}
 
 
 
-<button class="btn btn-warning" ng-click="showPlayerDataClick()" >{{showHideVar}} Other Player Info?</button>
-<br></br>
+<button class="btn btn-warning" ng-click="showOtherPlayerDataClick()" >{{showHideVar}} Other Player Info?</button>
 <div><ng-include src="'otherPlayers.html'" ></ng-include></div>
 
 
