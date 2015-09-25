@@ -42,7 +42,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.showMyCompletedQuests = false;
 	$scope.showHideVar = "Show";
 	$scope.showHideQuestVar = "Show";
-	
+	$scope.playerFishButton=false;
+
 
 
 	$scope.noGame = function () {
@@ -265,8 +266,6 @@ var cardColor = function(card) {
 		var selectedCards = getSelectedCards(cart.cards, true);
 		var questCards = getSelectedCardArrayForQuest(cart.cards);
 		var items =  new Array(questClicked.item1, questClicked.item2, questClicked.item3, questClicked.item4, questClicked.item5);
-		//var itemsTrimmed = getSelectedCardsFoQuest(items);
-		//var items = questClicked.item1.toString() +questClicked.item2.toString()+questClicked.item3.toString()+questClicked.item4.toString()+questClicked.item5.toString();
 		
 		if (parseSelectedCardArrayFoQuest(questCards) === parseSelectedCardArrayFoQuest(items) ){
 			questCanBeCompleted = true;
@@ -330,7 +329,6 @@ var cardColor = function(card) {
 		player.cardSumSelected = getSelectedCardSum(player.cards, true);
 		$scope.selectedItemsCount = getSelectedCardcount(player.cards);
 		updatePurchaseText(player.cardSumSelected);
-		//updateLog($scope.blankText);
 		play("button");
 	}
 
