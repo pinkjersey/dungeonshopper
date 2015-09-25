@@ -330,7 +330,7 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        logging.error("Compelete eventId: running")
+        logging.error("EventId found:  {0}".format(eventId))
         result = completeEvent(game, eventId)
         if (result == False):
             self.error(500)

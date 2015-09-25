@@ -39,6 +39,7 @@ def playerState(game, playerId):
             otherPlayers.append(createOtherPlayer(p))
     thedict["otherPlayers"] = otherPlayers
 
+
     thedict["actionsRemaining"] = game.actionsRemaining
 
     discardLen = len(game.discardPile)
@@ -393,6 +394,34 @@ def getIntersection(list1, list2):
     ret.sort()
     return ret
 
+def completeEvent(game, eventId):
+    player = game.players[game.curPlayer]
+    logging.error("EventId:  {0}".format(eventId))
+    if eventId == 16:
+        player.gold += 1
+
+    game.eventCompletedCount += 1
+
+    game.curPlayer += 1
+    if game.curPlayer == game.numPlayers:
+        game.curPlayer = 0
+
+    #added by gary to try and simulate getting a new quest after an event
+    if(game.eventCompletedCount==game.numPlayers):
+        game.eventCompletedCount = 0	
+        decklen = len(game.questsInPlay)
+        if(decklen == 0):
+            return
+        else:
+            del game.questsInPlay[decklen-1]
+
+        dealQuest(game)
+
+    # save game to data store
+    game.put()
+    return True	
+
+	
 def completeQuest(game, what, where):
     # completing quests require no actions
     whats = whatToArray(what)
@@ -702,9 +731,7 @@ def dealQuest(game):
         quest = game.questDeck[0]
         del game.questDeck[0]
         game.questsInPlay.append(quest)
-        #added by gary to try and simulate getting a new quest after an event
-        if(quest.level==4 and game.eventCompletedCount==game.numPlayers):
-            dealQuest(game)
+
 	
 def newQuestDeck(numPlayers):
     level1Cards = []
@@ -824,8 +851,8 @@ def newQuestDeck(numPlayers):
     level4Cards = shuffle(level4Cards)
 
     if numPlayers == "1":
-        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
-		#createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,0,0,0,4,4)
+        #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
+		createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,0,0,0,4,4)
     elif numPlayers == "2":
         createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,7,1,4,1,2,4,2,2)
     elif numPlayers == "3":

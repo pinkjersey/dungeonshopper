@@ -31,7 +31,20 @@
 [ng\:cloak], [ng-cloak], .ng-cloak {
     display: none;
 }
-
+.imgPad{
+	padding: 10;
+}
+.right{
+ width:700px;
+ height:150px;
+ float:right;
+ background:white;
+}
+.left{
+ height:150px;
+ background:white;
+ overflow:hidden;
+}
 
 /*.img-with-text {
     text-align: center;
