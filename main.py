@@ -330,8 +330,13 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
+        handItems = self.request.get('handItems')
+
+        cartidstr = self.request.get('cart')        
+
         logging.error("EventId found:  {0}".format(eventId))
-        result = completeEvent(game, eventId)
+        logging.error("Hand Items Found:  {0}".format(handItems))
+        result = completeEvent(game, eventId, cartidstr, handItems)
         if (result == False):
             self.error(500)
             return
