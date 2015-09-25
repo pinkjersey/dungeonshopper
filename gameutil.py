@@ -3,21 +3,13 @@ import json
 import logging
 from game_model import *
 
-def createOtherPlayer(player, curPlayer, playerId):
+def createOtherPlayer(player):
     dict = player.to_dict()
-    #hand = dict["hand"]
-    #sz = len(hand)
-    #for i in range(sz):
-    #    hand[i] = -1
-    #dict["hand"] = hand
-    #dict["playerId"] = playerId
-
-    if curPlayer == playerId:
-        dict["isActive"] = True		
-    else:
-        dict["isActive"] = False	
-	
-    return dict
+    hand = dict["hand"]
+    sz = len(hand)
+    for i in range(sz):
+        hand[i] = -1
+    dict["hand"] = hand
 
 def playerState(game, playerId):
     game.players[playerId].playerId = playerId
@@ -30,7 +22,7 @@ def playerState(game, playerId):
     thedict["itemsCountRemaining"] = len(game.itemDeck)
     thedict["questsCountRemaining"] = len(game.questDeck)
     thedict["market"] = game.market
-
+    thedict["playerId"] = playerId
     if game.curPlayer == playerId:
         thedict["isActive"] = True
     else:
@@ -44,8 +36,9 @@ def playerState(game, playerId):
     otherPlayers = []
     for p in game.players:
         if (p != player):
-            otherPlayers.append(createOtherPlayer(p, game.curPlayer, playerId))
+            otherPlayers.append(createOtherPlayer(p))
     thedict["otherPlayers"] = otherPlayers
+
 
     thedict["actionsRemaining"] = game.actionsRemaining
 
@@ -401,6 +394,62 @@ def getIntersection(list1, list2):
     ret.sort()
     return ret
 
+def completeEvent(game, eventId, cartidstr, handItems):
+    player = game.players[game.curPlayer]
+    logging.error("EventId:  {0}".format(eventId))
+    if cartidstr != "":
+        cartid = getCartId(cartidstr)
+
+    try:
+    #orcs attack.  Wheelbarrow destroyed.  if handItems present don't destroy, but discard them
+        if eventId == 13:
+            if (cartid <0 or cartid > 3):
+                logging.error("Invalid cart id")
+                return False
+            else:    # find cart
+                cart = player.carts[cartid]
+                if (cart.purchased and handItems==null):
+                    # destroy it
+                    cart.destroyed == true
+
+            #dont destroy, just discard selected cards to pay for cart
+            if (cart.destroyed != True and handItems!=null):
+                for whati in handItems:        
+                    found = discardItem(game, whati, "hand")
+                    if (found == False):
+                        logging.error("Couldn't find all handItems {0}".format(whati))        
+                        return False
+
+        if eventId == 16:
+            player.gold += 1
+
+
+        #advance event to next player, deal new quest if done
+        game.eventCompletedCount += 1
+
+        game.curPlayer += 1
+        if game.curPlayer == game.numPlayers:
+            game.curPlayer = 0
+
+        if(game.eventCompletedCount==game.numPlayers):
+            game.eventCompletedCount = 0	
+            decklen = len(game.questsInPlay)
+            if(decklen == 0):
+                return
+            else:
+                del game.questsInPlay[decklen-1]
+
+            dealQuest(game)
+
+    except ValueError as e:
+        logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
+        return False  
+
+    # save game to data store
+    game.put()
+    return True	
+
+	
 def completeQuest(game, what, where):
     # completing quests require no actions
     whats = whatToArray(what)
@@ -710,9 +759,7 @@ def dealQuest(game):
         quest = game.questDeck[0]
         del game.questDeck[0]
         game.questsInPlay.append(quest)
-        #added by gary to try and simulate getting a new quest after an event
-        if(quest.level==4 and game.eventCompletedCount==game.numPlayers):
-            dealQuest(game)
+
 	
 def newQuestDeck(numPlayers):
     level1Cards = []
@@ -799,18 +846,18 @@ def newQuestDeck(numPlayers):
     level3Cards.append(createQuestCard(3,True,[1,3,5,6,9],5,5))
     level3Cards.append(createQuestCard(3,False,[3,4,7,8,9],6,5))
     #simulate treasure event only for now
-    level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,16))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
     
     #level4Cards.append(createQuestCard(4,False,[],0,6))
     #level4Cards.append(createQuestCard(4,False,[],0,7))
@@ -832,8 +879,8 @@ def newQuestDeck(numPlayers):
     level4Cards = shuffle(level4Cards)
 
     if numPlayers == "1":
-        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
-		#createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,0,0,0,4,4)
+        #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
+		createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,0,0,0,4,4)
     elif numPlayers == "2":
         createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,7,1,4,1,2,4,2,2)
     elif numPlayers == "3":

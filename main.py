@@ -330,8 +330,13 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        logging.error("Compelete eventId: running")
-        result = completeEvent(game, eventId)
+        handItems = self.request.get('handItems')
+
+        cartidstr = self.request.get('cart')        
+
+        logging.error("EventId found:  {0}".format(eventId))
+        logging.error("Hand Items Found:  {0}".format(handItems))
+        result = completeEvent(game, eventId, cartidstr, handItems)
         if (result == False):
             self.error(500)
             return
@@ -366,13 +371,15 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
+        self.appendToLog(game)
+
         try:
             priorPlayer = passPlayer(game, items)
         except ValueError as e:
             self.error(500)
             return
 
-        self.appendToLog(game)			
+
         retstr = playerState(game, priorPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"

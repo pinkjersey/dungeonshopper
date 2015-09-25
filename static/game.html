@@ -60,16 +60,19 @@
 				</div>
 			</div>
 			<p></p>
-			<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in activePlayer.cards.playingCards track by $index + card.positionOnStack" >
-				<img ng-click="userClickedItemImage($index)" style="{{card.borderColor}}"  ng-src="{{card.image}}"/>
-			</span>
-	
-			<span ng-disabled="!loadingData">
-				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerFish($index)" ng-if="activePlayer.actionsRemaining > 0 && selectedItemsCount === 1"> Fish</button>    
-				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerDiscard()" ng-if="activePlayer.actionsRemaining > 0 && selectedItemsCount > 0" >Discard</button>    
-				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-if="activePlayer.actionsRemaining > 0 && activePlayer.cardSumSelected === sumMarketValueSelected && activePlayer.cardSumSelected < 11 && activePlayer.cardSumSelected > 0" ng-click="playerMarketTrade()" >Trade {{activePlayer.cardSumSelected}} item points?</button>    														
-			</span>
-			
+				<table class="table table-condensed">
+					<thead>
+						<tr>
+							<td>
+								<div class="left"><ng-include src="'cardsPlayer.html'"></ng-include></div>
+							</td>
+							<td>
+								<div class="right"><ng-include src="'marketPlayer.html'"></ng-include></div>
+							</td>
+						</tr>
+					</thead>
+				</table>
+
 
 				<div>
 					<button ng-show="activePlayer.questsCompleted.playingCards.length > 0" ng-disabled="loadingData===true" class="btn btn-warning" ng-click="showMyCompletedQuestsClick()" >{{showHideQuestVar}} my completed quests?</button>

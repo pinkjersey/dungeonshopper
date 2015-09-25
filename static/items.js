@@ -52,7 +52,7 @@ cardSet.prototype.addCard = function (oNumber,oName, oImage,oImageSmall,oImageLa
 
 cardSet.prototype.addCardc = function (oCard) {
 	// Add a card to the deck
-	this.playingCards[this.playingCards.length] = new playingCard(oCard.number,oCard.oName, oCard.image,oCard.imageSmall,oCard.imageLarge,oCard.imageSmallChecked, oCard.imageChecked, oCard.count);
+	this.playingCards[this.playingCards.length] = new playingCard(oCard.number,oCard.name, oCard.image,oCard.imageSmall,oCard.imageLarge,oCard.imageSmallChecked, oCard.imageChecked, oCard.count);
 
 };
 

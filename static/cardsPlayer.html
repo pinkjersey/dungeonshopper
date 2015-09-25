@@ -1,0 +1,27 @@
+<table>
+	<thead>
+	<tr><big><b><u>My Cards:</u></b></big>
+		<td>
+			<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in activePlayer.cards.playingCards track by $index + card.positionOnStack" >
+				<img ng-click="userClickedItemImage($index)" style="{{card.borderColor}}"  ng-src="{{card.image}}"/>
+			</span>
+		<td>
+	</tr>
+	<tr>
+<td>
+</td>
+	</tr>
+	<tr>
+		<td>
+			<span ng-disabled="!loadingData">
+				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerFish($index)" ng-if="activePlayer.actionsRemaining > 0 && selectedItemsCount === 1">Fish</button>    
+				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerDiscard()" ng-if="activePlayer.actionsRemaining > 0 && selectedItemsCount > 0" >Discard</button>    
+				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-if="activePlayer.actionsRemaining > 0 && activePlayer.cardSumSelected === sumMarketValueSelected && activePlayer.cardSumSelected < 11 && activePlayer.cardSumSelected > 0" ng-click="playerMarketTrade()" >Trade {{activePlayer.cardSumSelected}} item points?</button>    														
+			</span>		
+		</td>
+	</tr>
+	</thead>
+</table>
+
+
+	
