@@ -167,7 +167,7 @@ var cardColor = function(card) {
 	$scope.endGame = function() {
 		var r =  confirm("Are you sure you want to quit?");
 			if(r===true) {
-				gameEnd($scope);
+				gameEnd();
 			}
 			else {
 				return;
@@ -235,11 +235,11 @@ var cardColor = function(card) {
 		play("button");
 	}
 
-	gameEnd = function(scope) {
-		scope.displayMode = "gameover";
-		scope.displayModeName = "Game Over";
-		clearInterval(scope.timerId);
-		scope.loadingData=false;
+	gameEnd = function() {
+		$scope.displayMode = "gameover";
+		$scope.displayModeName = "Game Over";
+		clearInterval($scope.timerId);
+		$scope.loadingData=false;
 	}
 	
 	selectHandCards = function(cardArray) {
@@ -900,6 +900,7 @@ var cardColor = function(card) {
 					
 					break;
 				case 'eventBarbarianAttack':
+				//market has been destroyed
 					break;
 				case 'eventBrokenItems':
 					break;
@@ -936,6 +937,11 @@ var cardColor = function(card) {
 		
 	}
 
+	$scope.checkIfPlayerHas123InHand = function(playerItemCards) {
+		return false;
+	}
+
+	
 	resetDisplayMode = function(mode) {
 		$scope.displayMode = mode;
 		switch(mode) {
@@ -965,10 +971,40 @@ var cardColor = function(card) {
 		var questCardinplay = game.questsInPlay.playingCards[id];
 		var event = $scope.game.activeEvent;
 		var selectedItemCards = getSelectedCards(player.cards, true);
+		var playerItemCards = getSelectedCards(player.cards, false);
 		var destroyCart = 'cart0';
-
-
+		var playerHas123InHand = checkIfPlayerHas123InHand(playerItemCards);
+	/*events.push(new Event(6,"BarbarianAttack"));
+	events.push(new Event(7,"BrokenItems"));
+	events.push(new Event(8,"CastleTaxation"));
+	events.push(new Event(9,"GolbinRaid"));
+	events.push(new Event(10,"KingsFeast"));
+	events.push(new Event(11,"MarketShortage"));
+	events.push(new Event(12,"MarketSurplus"));
+	events.push(new Event(13,"OrcsAttack"));
+	events.push(new Event(14,"SandStorm"));
+	events.push(new Event(15,"ThrownInTheDungeon"));
+	events.push(new Event(16,"Treasure"));
+	events.push(new Event(17,"VikingParade"));
+	events.push(new Event(18,"HailStorm"));
+	events.push(new Event(19,"HiddenRoom"));
+*/
 			switch (event) {
+				case 'eventBarbarianAttack':
+					var eventId = 6;
+					completeEvent(eventId, "", "");
+					//market has been destroyed
+					break;
+				case 'eventBrokenItems':
+					var eventId = 7;
+					//discard with no actions from hand or cart
+					
+					if(cardSelectedCount > 1) {
+						alert("You may only select one item at a time to replace.");
+						return;
+					}
+			
+					break;
 				case 'eventOrcsAttack':
 					var eventId = 13;
 					if(id==='Y') {
@@ -979,8 +1015,6 @@ var cardColor = function(card) {
 						if($scope.selectedItemsCount > 0 && playerCardsSumSelected >= 5) {			
 							//selectedItemCards - these will be removed in back end and reloaded
 						}					
-						//player.carts[0].active=true;
-						//player.carts[0].image = player.carts[0].imagePurchased;
 					}
 					else if(id==='N') {
 						//do nothing, nothing was destroyed
@@ -993,29 +1027,7 @@ var cardColor = function(card) {
 					//the prepevents already moved the cards back to hand first
 					completeEvent(eventId, destroyCart, selectedItemCards);
 					break;
-				case 'eventBarbarianAttack':
-					break;
-				case 'eventBrokenItems':
-					//discard with no actions from hand or cart
-					
-					if(cardSelectedCount > 1) {
-						alert("You may only select one item at a time to replace.");
-						return;
-					}
 
-					if(cardSelectedCount > 0 && $scope.selectedItemsCount > 0) {			
-						$scope.playerDiscard();
-					}
-					else if(cardSelectedCount > 0 && $scope.selectedCartItemsCount > 0) {			
-						$scope.playerDiscardFromCart(id);
-					}
-					
-					for (var j = 0; j < cardSelectedCount; ++j)  {
-						//dealCardToPlayer(player, game.itemDeck);
-						$scope.eventActionsRemaining--;					
-					}
-
-					break;
 
 				case 'eventCastleTaxation':
 					//discard with no actions from hand only
@@ -1075,16 +1087,7 @@ var cardColor = function(card) {
 					resetDisplayMode('game');
 			}
 			
-
-			$scope.playersCompletedEventCount++;
-			
-			if($scope.numberOfPlayers === $scope.playersCompletedEventCount) {
-				$scope.game.questsInPlay
-				resetDisplayMode('game');
-				$scope.playersCompletedEventCount=0;
-			}
-			
-
+			resetDisplayMode('game');
 		}
 
 

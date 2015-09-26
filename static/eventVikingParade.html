@@ -10,9 +10,11 @@
 				<img  style="{{card.borderColor}}" ng-click="userClickedCartItem(cart.id, $index)" ng-src="{{card.image}}"/>
 			</span>
 			<span ng-if="cart.active">
-				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerCartFish($index)" ng-if="cart.cardSumSelected > 0 && selectedCartItemsCount===1" >Replace Broken Item? </button>    
+				<button ng-disabled="loadingData===true" ng-if="cart.size - cart.cards.playingCards.length >= selectedItemsCount && cart.cardSumSelected === 0 && (selectedItemsCount+selectedCartItemsCount) > 0" class="btn btn-info" ng-click="moveItemsToCart(cart.id)" > Move to {{cart.name}}? </button>   
 			</span>	
-			
+
+			<span ng-show="!cart.active"><p>Cart size: {{cart.size}}</p></span>
+			<span ng-show="cart.active"><p>Cart can hold: {{cart.size -  cart.cards.playingCards.length}} more items(s)</p></span>
 		</div>
 	</div>
 	<p></p>
@@ -29,10 +31,6 @@
 		</thead>
 	</table>
 </div>
-
-
-<h4 class="tab40">Event! Broken Items - Select up to two items to replace  (Click zero, one or two items)</h4>
-<ng-include src="'eventTemplate.html'"></ng-include>
-
+<ng-include src="'eventTemplate.html'"></ng-include>	
 
 		

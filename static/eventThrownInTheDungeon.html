@@ -5,13 +5,10 @@
 
 	<div class="row" ng-disabled="loadingData">
 		<div class="col-sm-3" ng-repeat="cart in activePlayer.carts track by $index" >
-			<img ng-if="cart.active" style="{{cart.borderColor}}" width={{cart.width}} height={{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImage(cart.id)"></img>
+			<img ng-if="cart.active" style="{{cart.borderColor}}" width={{cart.width}} height={{cart.height}}" ng-src="{{cart.image}}" ></img>
 			<span class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
-				<img  style="{{card.borderColor}}" ng-click="userClickedCartItem(cart.id, $index)" ng-src="{{card.image}}"/>
+				<img  style="{{card.borderColor}}" ng-src="{{card.image}}"/>
 			</span>
-			<span ng-if="cart.active">
-				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerCartFish($index)" ng-if="cart.cardSumSelected > 0 && selectedCartItemsCount===1" >Replace Broken Item? </button>    
-			</span>	
 			
 		</div>
 	</div>
@@ -31,7 +28,7 @@
 </div>
 
 
-<h4 class="tab40">Event! Broken Items - Select up to two items to replace  (Click zero, one or two items)</h4>
+<h4 class="tab40" ng-if="playerHas123InHand">Event! Thrown In The Dungeon - Discard either a Club, Shield or Hammer (1, 2, or 3)</h4>
 <ng-include src="'eventTemplate.html'"></ng-include>
 
 

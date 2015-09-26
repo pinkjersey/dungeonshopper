@@ -16,7 +16,7 @@
 			<span ng-disabled="!loadingData">
 				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerFish($index)" ng-if="activePlayer.actionsRemaining > 0 && selectedItemsCount === 1">Fish</button>    
 				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerDiscard()" ng-if="activePlayer.actionsRemaining > 0 && selectedItemsCount > 0" >Discard</button>    
-				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-if="activePlayer.actionsRemaining > 0 && activePlayer.cardSumSelected === sumMarketValueSelected && activePlayer.cardSumSelected < 11 && activePlayer.cardSumSelected > 0" ng-click="playerMarketTrade()" >Trade {{activePlayer.cardSumSelected}} item points?</button>    														
+				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-if="activePlayer.actionsRemaining > 0 && activePlayer.cardSumSelected === sumMarketValueSelected && activePlayer.cardSumSelected < 11 && activePlayer.cardSumSelected > 0" ng-click="playerMarketTrade()" >Trade {{activePlayer.cardSumSelected}} item points?</button>
 			</span>		
 		</td>
 	</tr>
