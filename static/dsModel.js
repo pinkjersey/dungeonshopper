@@ -7,6 +7,12 @@ var Event = function (type, name ) {
 	this.image = eventImageBase + name + '.jpg';
 }
 
+var QuestReady = function (items, questCard, cartId, questIndex) {
+	this.items = items;
+	this.questCard = questCard;
+	this.cartId = cartId;
+	this.questIndex = questIndex;
+}
 
 
 var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased, imageNotPurchased) {

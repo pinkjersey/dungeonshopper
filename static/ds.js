@@ -4,6 +4,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.debug = false;
 	$scope.autoSelectHand = true;
 	$scope.autoSelectCart = true;
+	$scope.autoSelectQuest = true;
+	$scope.autoPass = true;
 	$scope.playersCompletedEventCount = 0;
 	//$scope.eventActionsRemaining=0;;
 	//gui variable to control item buttons
@@ -61,6 +63,15 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.autoSelectHandCheck = function () {
 		$scope.autoSelectHand = !$scope.autoSelectHand;
 	}	
+	
+	$scope.autoSelectQuestCheck = function () {
+		$scope.autoSelectQuest = !$scope.autoSelectQuest;
+	}	
+
+	$scope.autoPassCheck = function () {
+		$scope.autoPass = !$scope.autoPass;
+	}	
+
 
 	$scope.hideImagesCheck = function () {
 		$scope.hideImagesBool = !$scope.hideImagesBool;
@@ -142,6 +153,8 @@ var cardColor = function(card) {
 		$scope.showHideQuestVar = showHideQuests($scope.showMyCompletedQuests);
 	}
 
+
+	
 	$scope.showLogResults = function() {
 		if(!$scope.showLog) {
 			$scope.showLogText = "Hide Players Log";
@@ -455,7 +468,6 @@ var cardColor = function(card) {
 		resetAllSelectedCards(player);
 		//updateLog(text);
 		play("swords");
-		//checkIfQuestIsReady();
 	}
 
 	moveItemsBetweenCarts = function(prevId, id, selectedCartItems ) {
@@ -484,7 +496,6 @@ var cardColor = function(card) {
 		
 		cart.cards.setCardSize("small");
 		resetAllSelectedCards(player);
-		//checkIfQuestIsReady();
 		
 
 	}  
@@ -958,6 +969,7 @@ var cardColor = function(card) {
 		var questCardinplay = game.questsInPlay.playingCards[id];
 		var event = $scope.game.activeEvent;
 		var selectedItemCards = getSelectedCards(player.cards, true);
+		var destroyCart = 'cart0';
 
 
 			switch (event) {
@@ -978,7 +990,6 @@ var cardColor = function(card) {
 						//do nothing, nothing was destroyed
 					}
 					else if(id==='X') {
-						var destroyCart = 'cart0';
 						var selectedItemCards = "";
 					}					
 					
@@ -1286,12 +1297,38 @@ var cardColor = function(card) {
 			gameEnd();
 			return;
 		}
+
+	
+		$scope.loadingData=false;
+		var questReady = checkIfQuestIsReadyFromCart(game, $scope.activePlayer);
+		if(questReady.index != undefined) {
+			if(questReady.cartId >= 0 && $scope.autoSelectCart) {
+				$scope.userClickedCartImage(questReady.cartId);
+				if($scope.autoSelectQuest) {
+					$scope.userClickedQuestImage(questReady.index);
+					return;
+				}
+			}
+		}
+ 
+		 
+		var questReady = checkIfQuestISReadyFromHand(game, $scope.activePlayer, $scope.autoSelectHand);
+		if(questReady.items != undefined) {
+			if(questReady.items.length >=3 && $scope.autoSelectHand) {
+				selectHandCards(questReady.items);
+			}
+		}
 		
-		 $scope.loadingData=false;
-		 checkIfQuestIsReady($scope);
-		 checkIfHaveCardsForQuest(game, $scope.activePlayer, $scope.autoSelectHand);
+		checkAutoPass(data.actionsRemaining);
+	
 	}
-		
+
+	function checkAutoPass(actionsRemaining) {
+		if(actionsRemaining === 0 && $scope.activePlayer.gold < 2 && $scope.autoPass) {
+			$scope.playerPass();
+		}
+	}
+	
 	function loadData(numPlayers, playerName) {
 		$scope.loadingData=true;
 		gameFactory.newGame(numPlayers, playerName,  processGameStateCallback, processGameStateErrorCallback);
@@ -1359,6 +1396,14 @@ var cardColor = function(card) {
             card: '=info'
         },
         templateUrl: 'questcard.html?2'
+    };
+}).directive('eventcard', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            card: '=info'
+        },
+        templateUrl: 'eventcard.html?2'
     };
 }).directive('marketcard', function () {
     return {

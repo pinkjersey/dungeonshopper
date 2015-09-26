@@ -1,13 +1,13 @@
-﻿<div class="panel panel-primary" >  
+﻿<div class="panel panel-primary">
 	<ng-include src="'playerHeader.html'"></ng-include>
-	<br></br>
-	<h4>Event! - Treasure!</h4>
-	<div class="container-fluid">
-		<div class="row">
-			<span ng-repeat="questcard in game.questsInPlay.playingCards track by $index">
-				<questcard ng-show="questcard.level===4" info="questcard"></questcard>
-				<button ng-show="questcard.level===4" class="btn btn-warning" ng-click="playerCompleteEvent(0, $index)">Complete Event?</button>
-			</span>	
+		<br></br>
+		<div class="container-fluid">
+			<div class="row">
+				<span ng-repeat="eventcard in game.questsInPlay.playingCards track by $index">
+					<eventcard ng-show="eventcard.level===4" info="eventcard"></eventcard>
+					<button ng-show="eventcard.level===4" class="btn btn-warning" ng-click="playerCompleteEvent(0, $index)">Complete Event?</button>
+				</span>	
+			</div>
 		</div>
 	</div>
 </div>

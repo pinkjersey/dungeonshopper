@@ -110,7 +110,6 @@ mode = function(isActive) {
 		return 'game';
 	}
 	else {
-		//$scope.dots = "..";
 		return 'gameSpectator';
 	}
 }	
@@ -125,12 +124,12 @@ var getPlayerName = function(game, playerId) {
 }
 
 
-checkIfQuestIsReady = function (scope) {
-	var game = scope.game;
-	var player = scope.activePlayer;
+checkIfQuestIsReadyFromCart = function (game, player) {
 	var questCanBeCompleted = false;
-
-
+	var cartId = -1;
+	var questIndex = -1;
+	var questReady = {};
+	
 	for (var i = 0; i < player.carts.length; ++i) {
 		if(questCanBeCompleted === true){
 				break;
@@ -146,7 +145,8 @@ checkIfQuestIsReady = function (scope) {
 			if (parseSelectedCardArrayFoQuest(selectedCards) === parseSelectedCardArrayFoQuest(items) ){
 				questCanBeCompleted = true;
 				var cartWithItems = player.carts[i].cards;
-				var cartId = i;
+				cartId = i;
+				questIndex = j;
 				break;
 			}
 
@@ -155,11 +155,14 @@ checkIfQuestIsReady = function (scope) {
 	
 	if (questCanBeCompleted === true) {
 		questFound.borderColor = 'border:10px solid green';
-		if(scope.autoSelectCart) {
-			scope.userClickedCartImage(cartId);
-		}
-	
+		questReady.cartId = cartId;
+		questReady.questCard = questFound;
+		questReady.items = cartWithItems.playingCards;
+		questReady.index = questIndex;
 	}
+
+	
+	return questReady;
 }
 
 function getIntersect(hand, quest) {
@@ -179,10 +182,11 @@ function getIntersect(hand, quest) {
 			return r;
 		}
 
-var checkIfHaveCardsForQuest = function (game, player, autoSelectHand) {
+var checkIfQuestISReadyFromHand = function (game, player, autoSelectHand) {
 	var questCanBeCompleted = false;
-
+	var r = [];
 	var hand = [];
+	var questReady = {};
 	for (var j = 0; j < player.cards.playingCards.length; ++j) {
 		card = player.cards.playingCards[j];
 		hand[j]= card.number;
@@ -219,18 +223,15 @@ var checkIfHaveCardsForQuest = function (game, player, autoSelectHand) {
 
 		if (parseSelectedCardArrayFoQuest(quest) === parseSelectedCardArrayFoQuest(r) ){
 			questCanBeCompleted = true;
+			questFound.borderColor = 'border:10px solid green';
+			questReady.items = r;
+			questReady.questCard = questFound;
+
+			return questReady;
 		}
 	}
 		
-	if (questCanBeCompleted === true) {	
-		questFound.borderColor = 'border:10px solid green';
-		if(autoSelectHand) {
-			selectHandCards(r);
-			foundHandSetMatch = true;
-		}
-		//reset hand to original cards to see if you can complete more than one
-	}
-
+	return questReady;
 }
 
 
