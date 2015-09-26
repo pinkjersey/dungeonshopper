@@ -875,34 +875,28 @@ var cardColor = function(card) {
 	
 	prepareEventForPlayer = function(game, questCardinplay) {	
 
+
 		var player = $scope.activePlayer;
+		var cart = player.carts[0];
+		$scope.wheelbarrowCardSum = getSelectedCardSum(cart.cards, false);
 		
 		if(player===null) {
 			return;
 		}
+		
 		if(questCardinplay.level===4) {
-			//questCardinplay.cardImage.height = "350";
 			questCardinplay.setCardSize("large");
 		}
-		var cart = player.carts[0];
+
 		
 		switch (questCardinplay.name)
 		{
 				case 'eventOrcsAttack':
-					//set variable for items in cart[0]
-					$scope.wheelbarrowCardSum = getSelectedCardSum(cart.cards, false);
-					if ($scope.wheelbarrowCardSum < 5) {
-						//cart destoyed on back end
-					}
-					else {
+					if ($scope.wheelbarrowCardSum > 0  && $scope.wheelbarrowCardSum < 5) {
 						//discard all items from cart to hand
 						var cardsToMoveBackToHand = getSelectedCards(cart.cards,false);
 						move(cardsToMoveBackToHand, 'cart0', 'hand');
-						}
-		
-					
-						
-						
+						}					
 					
 					break;
 				case 'eventBarbarianAttack':
@@ -937,7 +931,9 @@ var cardColor = function(card) {
 		
 		$scope.displayMode = game.activeEvent;
 		$scope.displayModeName = " - Event! - Your Turn"
-
+		//deselect all cards
+		resetAllSelectedCards($scope.activePlayer);
+		
 	}
 
 	resetDisplayMode = function(mode) {
@@ -1315,11 +1311,16 @@ var cardColor = function(card) {
 		var questReady = checkIfQuestISReadyFromHand(game, $scope.activePlayer, $scope.autoSelectHand);
 		if(questReady.items != undefined) {
 			if(questReady.items.length >=3 && $scope.autoSelectHand) {
-				selectHandCards(questReady.items);
+				if($scope.displayMode === 'game') {	
+					selectHandCards(questReady.items);
+				}
 			}
 		}
 		
-		checkAutoPass(data.actionsRemaining);
+		//dont autopass in the middle of an event
+		if($scope.displayMode === 'game') {
+			checkAutoPass(data.actionsRemaining);
+		}
 	
 	}
 

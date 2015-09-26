@@ -156,7 +156,7 @@ def removeItems(game, what, where):
 
 def move(game, what, src, dst):
     """Moves cards from src to dst"""
-    if game.actionsRemaining == 0:
+    if (game.actionsRemaining == 0 and game.gameMode == "game"):
         # no actions remaining
         logging.error("No actions remaining")        
         return False
@@ -204,7 +204,9 @@ def move(game, what, src, dst):
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror))        
         return False
 
-    game.actionsRemaining = game.actionsRemaining -1
+    if game.gameMode == "game":
+        game.actionsRemaining = game.actionsRemaining -1
+
     game.put()
 
     return True
@@ -330,7 +332,7 @@ def marketTrade(game, handItems, marketItems):
     return True                
 
 def discard(game, what, where):
-    if game.actionsRemaining == 0:
+    if (game.actionsRemaining == 0 and game.gameMode == "game"):
         # no actions remaining
         logging.error("No actions remaining")  
         return False
@@ -356,8 +358,10 @@ def discard(game, what, where):
         logging.error("Couldn't discard one or more cards")  
         # couldn't find 'what'
         return False
-    
-    game.actionsRemaining = game.actionsRemaining -1
+
+    if game.gameMode == "game":
+        game.actionsRemaining = game.actionsRemaining -1
+
     game.put()
 
     return True
@@ -396,6 +400,7 @@ def getIntersection(list1, list2):
 def completeEvent(game, eventId, cartidstr, handItems):
     player = game.players[game.curPlayer]
     logging.error("EventId:  {0}".format(eventId))
+    game.gameMode = "event"
     if cartidstr != "":
         cartid = getCartId(cartidstr)
 
@@ -434,6 +439,7 @@ def completeEvent(game, eventId, cartidstr, handItems):
             game.curPlayer = 0
 
         if(game.eventCompletedCount==game.numPlayers):
+            game.gameMode = "game"		
             game.eventCompletedCount = 0	
             decklen = len(game.questsInPlay)
             if(decklen == 0):
@@ -451,7 +457,7 @@ def completeEvent(game, eventId, cartidstr, handItems):
     game.put()
     return True	
 
-	
+
 def completeQuest(game, what, where):
     # completing quests require no actions
     whats = whatToArray(what)
@@ -492,8 +498,9 @@ def completeQuest(game, what, where):
 
     except ValueError as e:
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
-        return False    
-    
+        return False
+
+    game.gameMode = "game"    
     game.put()
 
     return True
@@ -535,15 +542,16 @@ def passPlayer(game, items):
     if game.curPlayer == game.numPlayers:
         game.curPlayer = 0
 
-	player.turns += 1	
-		
+    player.turns += 1	
+
     # save game to data store
+    game.gameMode = "game"
     game.put()
 
     return priorPlayer
 
 def fish(game, what, where):
-    if game.actionsRemaining == 0:
+    if (game.actionsRemaining == 0 and game.gameMode == "game"):
         # no actions remaining
         return False
 
@@ -564,7 +572,10 @@ def fish(game, what, where):
         return False
 
     dealItemCard(game.curPlayer, game)
-    game.actionsRemaining = game.actionsRemaining -1
+
+    if game.gameMode == "game":
+        game.actionsRemaining = game.actionsRemaining -1
+
     game.put()
 
     return True
@@ -653,6 +664,7 @@ def createNewGame(numPlayers, name):
         dealQuest(game)
 
     # save game to data store
+    game.gameMode = "game"
     game.put()
     return game
 
@@ -761,6 +773,9 @@ def dealQuest(game):
         quest = game.questDeck[0]
         del game.questDeck[0]
         game.questsInPlay.append(quest)
+        if quest.level == 4:
+            game.gameMode = "event"
+            logging.error("GameMode: {0}".format(game.gameMode)) 
 
 	
 def newQuestDeck(numPlayers):
@@ -881,8 +896,8 @@ def newQuestDeck(numPlayers):
     level4Cards = shuffle(level4Cards)
 
     if numPlayers == "1":
-        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
-		#createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,0,0,0,4,4)
+        #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
+        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,0,0,0,4,4)
     elif numPlayers == "2":
         createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,7,1,4,1,2,4,2,2)
     elif numPlayers == "3":

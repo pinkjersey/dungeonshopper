@@ -378,12 +378,12 @@ getSelectedCards = function(deck, selectedCardsOnly){
 	var cardNumber = "";
 	for (var i = 0; i < deck.playingCards.length; ++i)  {
 		var card = deck.playingCards[i];
+		cardNumber = card.number;
+		if(card.number===10) {
+			cardNumber = 0;
+		}
 		if(selectedCardsOnly){
 			if(card.selected) {
-				cardNumber = card.number;
-				if(card.number===10) {
-					cardNumber = 0;
-				}
 				selectedCards+=cardNumber;
 			}
 		}

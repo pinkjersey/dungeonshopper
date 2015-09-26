@@ -15,7 +15,8 @@
 		<tr>
 	<td>
 	<br></br>
-	<h4 class = "tab30">Your wheelbarrow has been D-E-S-T-R-O-Y-E-D!</h4>
+	<h4 class = "tab30" ng-if="wheelbarrowCardSum < 5">Your wheelbarrow has been D-E-S-T-R-O-Y-E-D!</h4>
+	<h4 class = "tab30" ng-if="wheelbarrowCardSum >= 5">Your had defeated the Orcs!</h4>
 	<div>
 		<div class="row">
 			<span ng-repeat="eventcard in game.questsInPlay.playingCards track by $index">

@@ -23,13 +23,13 @@
 				</span>
 			<td>
 		</tr>
-<tr>
+		<tr>
 		<td>
 			<span ng-repeat="marketcard in game.itemMarketHolders.playingCards track by $index">
 				<img ng-show = "marketcard.count > 0" ng-src="{{marketcard.image}}" ng-click="userClickedMarketImage($index)"></img>
 			</span>
 		</td>
-</tr>
+		</tr>
 
 
 		<tr ng-show="isActive===true">
