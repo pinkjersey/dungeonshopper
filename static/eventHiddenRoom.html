@@ -1,11 +1,12 @@
-﻿<div class="panel panel-primary">
+﻿<ng-include src="'gameEventHeader.html'"></ng-include>
+<div class="panel panel-primary">
 	<ng-include src="'playerHeader.html'"></ng-include>		
 
 	<br></br>
 
 	<div class="row" ng-disabled="loadingData">
 		<div class="col-sm-3" ng-repeat="cart in activePlayer.carts track by $index" >
-			<img ng-if="cart.active" style="{{cart.borderColor}} width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}"></img>
+			<img ng-if="cart.active" style="{{cart.borderColor}}" width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}"></img>
 			<span class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
 				<img  style="{{card.borderColor}}" ng-src="{{card.image}}"/>
 			</span>

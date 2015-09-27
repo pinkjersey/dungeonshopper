@@ -768,6 +768,7 @@ var cardColor = function(card) {
 			if(player.actionsRemaining === 0 && (player.cards.playingCards.length > player.maxHand))	{
 				if(player.cards.playingCards.length - selectedCardCount < player.maxHand) {	
 					alert("You have no actions remaining.  Only select card(s) to discard to get back to max hand size of " + player.maxHand + ".");
+					resetAllSelectedCards(player);
 					return;
 				}
 			}
@@ -927,13 +928,37 @@ var cardColor = function(card) {
 					resetDisplayMode('game');
 		}
 		
-		$scope.displayMode = game.activeEvent;
-		$scope.displayModeName = " - Event! - Your Turn";
+		resetDisplayMode(game.activeEvent);
 		//deselect all cards
 		resetAllSelectedCards($scope.activePlayer);
 		
 	}
 
+	resetDisplayMode = function(mode) {
+		$scope.displayMode = mode;
+		switch(mode) {
+			case "game":
+				$scope.displayModeName = " - Your Turn";
+				break;
+			case "gameSpectator":
+				$scope.displayModeName = " - Game Spectating";
+				break;
+			case "gameover":
+				$scope.displayModeName = "Game Over";
+				break;
+			default:
+				$scope.displayModeName = mode;
+				if($scope.isActive) {
+					$scope.displayModeName = " - Your Turn";
+				}
+				else {
+					$scope.displayModeName = " - Game Spectating";
+				}
+				
+		}
+	}
+	
+	
 	checkIfPlayerHas123InHand = function(playerItemCards) {
 		for (var i = 0; i < playerItemCards.length; ++i)  {
 			var card = playerItemCards.playingCards[i];
@@ -1200,14 +1225,17 @@ var cardColor = function(card) {
 				case 'eventThrownInTheDungeon':
 				
 					eventId = 15;
-					if(selectedItemsCount === 0 && checkIfPlayerHas123InHand){
+					if($scope.selectedItemsCount === 0 && checkIfPlayerHas123InHand){
 						alert("Select one item - Club, Shield or Hammer to lose.");
 						return;
 					}
 					else {
 						break;
 					}
-					
+					if($scope.selectedItemsCount > 0 && checkIfPlayerHas123InHand && playerCardsSumSelected > 3) {
+						alert("Select one item - Club, Shield or Hammer to lose.");
+						return;
+					}
 					if($scope.selectedItemsCount > 0 && checkIfPlayerHas123InHand) {			
 						if(playerCardCountSel===1) {
 							what1 = selectedItemCards;
@@ -1252,8 +1280,8 @@ var cardColor = function(card) {
 			if(what2===undefined) {what2=""}
 			if(where2===undefined) {where2=""}
 			if(dest1===undefined) {dest1=""}
-			completeEvent(eventId, destroyCart, selectedItemCards, gold, what1, where1, what2, where2, dest1);
-			
+			completeEvent(eventId, destroyCart, gold, what1, where1, what2, where2, dest1);
+			resetPlayerCardsSelected(player);
 			resetDisplayMode('game');
 		}
 
@@ -1322,24 +1350,7 @@ var cardColor = function(card) {
 		$scope.activePlayer.cards.playingCards.sort(function (a,b) {return a.number-b.number});
 	}
 	
-	resetDisplayMode = function(mode) {
-		$scope.displayMode = mode;
-		switch(mode) {
-			case "game":
-				$scope.displayModeName = " - Your Turn";
-				break;
-			case "gameSpectator":
-				$scope.displayModeName = " - Game Spectating";
-				break;
-			case "gameover":
-				$scope.displayModeName = "Game Over";
-				break;
-			default:
-				$scope.displayModeName = "";		
-				
-		}
-	}
-	
+
 	var processGameStateCallback = function (data) {
 		getObjectResults(data);
 	};
@@ -1359,7 +1370,7 @@ var cardColor = function(card) {
 		$scope.numPlayers = data.numPlayers;
 
 
-
+		
 		$scope.otherPlayers = [];		
 		$scope.game.players = [];
 		
@@ -1416,8 +1427,8 @@ var cardColor = function(card) {
 			game.players[len].questsCompleted =  new cardSet();
 	
 			for (var i = 0; i < data.otherPlayers[z].hand.length; ++i) {   
-				dealNumberToPlayer(game, game.players[len], data.otherPlayers[z].hand[i]);	
-				//dealNumberToPlayer($scope.game.players[z], -1);	
+				//dealNumberToPlayer(game, game.players[len], data.otherPlayers[z].hand[i]);	
+				dealNumberToPlayer(game, $scope.game.players[len], -1);	
 			}
 
 			//populate carts

@@ -46,10 +46,18 @@ Awaiting others to pass..
 				</div>	
 			</div>
 			<p></p>		
-			<!--added card.positionOnStack variable to the index to make it unique or cards would not render as they are dupes-->
-			<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in activePlayer.cards.playingCards track by $index + card.positionOnStack" >
-				<img style="{{card.borderColor}}"  ng-src="{{card.image}}" />
-			</span>
+	<table class="table table-condensed">
+		<thead>
+			<tr>
+				<td>
+					<div class="left"><ng-include src="'cardsPlayer.html'"></ng-include></div>
+				</td>
+				<td>
+					<div class="right"><ng-include src="'marketPlayer.html'"></ng-include></div>
+				</td>
+			</tr>
+		</thead>
+	</table>
 
 		</div>
 		<div>

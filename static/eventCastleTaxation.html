@@ -1,11 +1,12 @@
-﻿<div class="panel panel-primary">
+﻿<ng-include src="'gameEventHeader.html'"></ng-include>
+<div class="panel panel-primary">
 	<ng-include src="'playerHeader.html'"></ng-include>		
 
 	<br></br>
 
 	<div class="row" ng-disabled="loadingData">
 	<div class="col-sm-3" ng-repeat="cart in activePlayer.carts track by $index" >
-			<img ng-if="cart.active" style="{{cart.borderColor}} width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImage(cart.id)"></img>
+			<img ng-if="cart.active" style="{{cart.borderColor}}" width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImage(cart.id)"></img>
 			<span class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
 				<img  style="{{card.borderColor}}" ng-click="userClickedCartItemEvent(cart.id, $index)" ng-src="{{card.image}}"/>
 			</span>
@@ -31,14 +32,14 @@
 </div>
 
 
-<h4 class="tab40">Event! Castle Taxation - Select either two items for Castle Tax or pay one gold?</h4>
+<h4 class="tab40">Event! Castle Taxation - Select either two items for Castle Tax or pay one gold.</h4>
 	<div>
 		<div class="row">
 			<span ng-repeat="eventcard in game.questsInPlay.playingCards track by $index">
 				<eventcard ng-show="eventcard.level===4" info="eventcard"></eventcard>
-				<span class = "tab40" ng-show="eventcard.level===4" ng-if="activePlayer.gold > 0"><big>Pay with gold?</big></span>
-				<button ng-show="eventcard.level===4" ng-if="activePlayer.gold > 0" class="btn btn-warning" ng-click="playerCompleteEvent($index, 'gold')">Pay with gold & Complete Event></button>
-				<button ng-show="eventcard.level===4" ng-if="activePlayer.gold === 0 || playerPaidWithItems === 2" class="btn btn-warning" ng-click="playerCompleteEvent($index,'items')">Complete Event</button>   
+				<span class = "tab40" ng-show="eventcard.level===4" ng-if="activePlayer.gold > 0"></span>
+				<button ng-show="eventcard.level===4" ng-if="activePlayer.gold > 0" class="btn btn-warning" ng-click="playerCompleteEvent($index, 'gold')">Pay with gold & Complete Event</button>
+				<button ng-show="eventcard.level===4" ng-if="playerPaidWithItems === 2" class="btn btn-warning" ng-click="playerCompleteEvent($index,'items')">Pay with items & Complete Event</button>   
 			</span>	
 		</div>
 	</div>

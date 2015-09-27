@@ -81,11 +81,11 @@
 			<ng-include src="'eventGoblinRaid.html'" ng-show="displayMode === 'eventGolbinRaid'"></ng-include>
 			<ng-include src="'eventHiddenRoom.html'" ng-show="displayMode === 'eventHiddenRoom'"></ng-include>
 			<ng-include src="'eventThrownInTheDungeon.html'" ng-show="displayMode === 'eventThrownInTheDungeon'"></ng-include>
-			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventVikingParade'"></ng-include>
 		</div>
 	</div>
-	<div ng-show="displayMode === 'game' || displayMode === 'gameSpectator'">
-		<div><ng-include src="'quests.html'"></ng-include>  </div>
+	<div ng-show="displayMode != 'nogame' && displayMode != 'gameover'">
+		<div><ng-include ng-show="displayMode === 'game' || displayMode === 'gameSpectator'" src="'quests.html'"></ng-include>  </div>
+		<div><ng-include ng-show="displayMode != 'game' && displayMode != 'gameSpectator'" src="'gameEventQuests.html'"></ng-include>  </div>
 		<div ng-show="displayMode === 'gameSpectator'"><ng-include src="'market.html'"></ng-include>  </div>
 		<div><ng-include src="'gameFooter.html'" ></ng-include></div>
 		<div><ng-include src="'playerLog.html'"></ng-include></div>
