@@ -1,0 +1,48 @@
+﻿<div class="panel panel-primary">
+	<ng-include src="'playerHeader.html'"></ng-include>		
+
+	<br></br>
+
+	<div class="row" ng-disabled="loadingData">
+	<div class="col-sm-3" ng-repeat="cart in activePlayer.carts track by $index" >
+			<img ng-if="cart.active" style="{{cart.borderColor}} width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImage(cart.id)"></img>
+			<span class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
+				<img  style="{{card.borderColor}}" ng-click="userClickedCartItemEvent(cart.id, $index)" ng-src="{{card.image}}"/>
+			</span>
+			<span ng-if="cart.active">
+				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerDiscardFromCart($index)" ng-if="cart.cardSumSelected > 0 && selectedCartItemsCount===1" >Pay taxes with item(s)? </button>
+			</span>	
+			
+		</div>
+	</div>
+	<p></p>
+	<table class="table table-condensed">
+		<thead>
+			<tr>
+				<td>
+					<div class="left"><ng-include src="'cardsEvent.html'"></ng-include></div>
+				</td>
+				<td>
+					<div class="right"><ng-include src="'marketEvent.html'"></ng-include></div>
+				</td>
+			</tr>
+		</thead>
+	</table>
+</div>
+
+
+<h4 class="tab40">Event! Castle Taxation - Select either two items for Castle Tax or pay one gold?</h4>
+	<div>
+		<div class="row">
+			<span ng-repeat="eventcard in game.questsInPlay.playingCards track by $index">
+				<eventcard ng-show="eventcard.level===4" info="eventcard"></eventcard>
+				<span class = "tab40" ng-show="eventcard.level===4" ng-if="activePlayer.gold > 0"><big>Pay with gold?</big></span>
+				<button ng-show="eventcard.level===4" ng-if="activePlayer.gold > 0" class="btn btn-warning" ng-click="playerCompleteEvent($index, 'gold')">Pay with gold & Complete Event></button>
+				<button ng-show="eventcard.level===4" ng-if="activePlayer.gold === 0 || playerPaidWithItems === 2" class="btn btn-warning" ng-click="playerCompleteEvent($index,'items')">Complete Event</button>   
+			</span>	
+		</div>
+	</div>
+
+
+
+		

@@ -142,7 +142,7 @@ checkIfQuestIsReadyFromCart = function (game, player) {
 			}
 			var items =  new Array(questFound.item1, questFound.item2, questFound.item3, questFound.item4, questFound.item5);
 			
-			if (parseSelectedCardArrayFoQuest(selectedCards) === parseSelectedCardArrayFoQuest(items) ){
+			if (parseSelectedCardArrayForQuest(selectedCards) === parseSelectedCardArrayForQuest(items) ){
 				questCanBeCompleted = true;
 				var cartWithItems = player.carts[i].cards;
 				cartId = i;
@@ -221,7 +221,7 @@ var checkIfQuestISReadyFromHand = function (game, player, autoSelectHand) {
 		var r = getIntersect(hand, quest);
 
 
-		if (parseSelectedCardArrayFoQuest(quest) === parseSelectedCardArrayFoQuest(r) ){
+		if (parseSelectedCardArrayForQuest(quest) === parseSelectedCardArrayForQuest(r) ){
 			questCanBeCompleted = true;
 			questFound.borderColor = 'border:10px solid green';
 			questReady.items = r;
@@ -236,7 +236,7 @@ var checkIfQuestISReadyFromHand = function (game, player, autoSelectHand) {
 
 
 
-//returns card numbers appended to each other for deck.  ex. 1224
+//returns card in an array
 getSelectedCardArrayForQuest = function(deck){
 	var arr = [];
 	for (var i = 0; i < 5; ++i)  {
@@ -252,7 +252,7 @@ getSelectedCardArrayForQuest = function(deck){
 }
 
 
-parseSelectedCardArrayFoQuest = function(items) {
+parseSelectedCardArrayForQuest = function(items) {
 	var s = "";
 	var num = "";
 	for (var i = 0; i < items.length; i++) {
@@ -358,7 +358,24 @@ dealQuestCard = function(game, items, level, type) {
 	}
 }
 		
-		
+		//sort player cart cards
+sortPlayerCartCards = function(cart) {
+	cart.cards.playingCards.sort(function (a,b) {return a.number-b.number});
+}
+
+//sort player quests
+sortPlayerQuests = function(activePlayer) {
+	activePlayer.questsCompleted.playingCards.sort(function (a,b) {return a.nameId-b.nameId});
+}
+
+cardPurchaseWithText = function(cardSumSelected, itemCost) {
+	if (cardSumSelected >= itemCost) {
+		return 'items';	
+		}
+	else	{
+		return 'gold';
+	}
+}	
 	
 //returns first selected card in deck
 getSelectedCard = function(deck){

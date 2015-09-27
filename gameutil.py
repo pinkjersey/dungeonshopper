@@ -397,7 +397,11 @@ def getIntersection(list1, list2):
     ret.sort()
     return ret
 
-def completeEvent(game, eventId, cartidstr, handItems):
+def completeEvent(game, eventId, cartidstr, handItems, gold, what1, where1, what2, where2):
+#note that the gameMode has been added to the game object
+#this controls if the game is in game or event mode
+#game.gameMode = "game"	
+#game.gameMode = "event"	
     player = game.players[game.curPlayer]
     logging.error("EventId:  {0}".format(eventId))
     game.gameMode = "event"
@@ -405,7 +409,48 @@ def completeEvent(game, eventId, cartidstr, handItems):
         cartid = getCartId(cartidstr)
 
     try:
-    #orcs attack.  Wheelbarrow destroyed.  if handItems present don't destroy, but discard them
+        #destroy market and re-seed if you are the first to get here        
+        if eventId == 6:
+            if (game.eventCompletedCount == 0):
+                resetMarket()
+        #BrokenItems
+        #if eventId == 7:
+            #fish(game, what1, where1):
+            #fish(game, what2, where2):
+        #CastleTaxation
+        if eventId == 8:
+            #discard items first
+            if handItems > 0:
+                for whati in handItems:        
+                    found = discardItem(game, whati, "hand")
+                    if (found == False):
+                        logging.error("Couldn't find all handItems {0}".format(whati))        
+                        return False
+            player.gold -= gold
+        #GolbinRaid
+        if eventId == 9:
+            #discard items first
+            if handItems > 0:
+                for whati in handItems:        
+                    found = discardItem(game, whati, "hand")
+                    if (found == False):
+                        logging.error("Couldn't find all handItems {0}".format(whati))        
+                        return False
+        #KingsFeast
+        if eventId == 10:
+            player.gold += 0
+        #MarketShortage		
+        if eventId == 11:
+            player.gold += 0
+        #MarketSurplus
+        if eventId == 12:
+            # deal card to market
+            if (game.eventCompletedCount == 0):
+                for i in range(5):
+                    dealItemCardToMarket(game)
+			
+
+        #orcs attack.  Wheelbarrow destroyed.  if handItems present don't destroy, but discard them
         if eventId == 13:
             #discard items first
             if handItems > 0:
@@ -427,8 +472,19 @@ def completeEvent(game, eventId, cartidstr, handItems):
                     cart.destroyed == true
                     cart.purchased == false
 
+        #players pass hand to the right
+        if eventId == 14:
+            player.gold += 0
+        if eventId == 15:
+            player.gold += 0
         if eventId == 16:
-            player.gold += 1
+            player.gold += gold
+        if eventId == 17:
+            player.gold += 0
+        if eventId == 18:
+            player.gold += 0
+        if eventId == 19:
+            player.gold += 0
 
 
         #advance event to next player, deal new quest if done
@@ -727,27 +783,32 @@ def newItemDeck():
     shuffled = shuffle(cards)                
     return shuffled
 
+	
+def resetMarket():
+    # move market to discard
+    game.discardPile.extend(game.market)
+
+    # clear the market
+    game.market = []
+
+    # shuffle discard and set it to item deck
+    game.itemDeck = shuffle(game.discardPile)
+
+    if (len(game.itemDeck) > 4):
+        raise ValueError("Newly created itemdeck has a size less than 5")
+
+    # clear discard
+    game.discardPile = []
+
+    # deal to market
+    for i in range(4):
+        dealItemCardToMarket(game)
+	
+	
 def getFirstItemCard(game):
     decklen = len(game.itemDeck)
     if (decklen == 0):
-        # move market to discard
-        game.discardPile.extend(game.market)
-
-        # clear the market
-        game.market = []
-
-        # shuffle discard and set it to item deck
-        game.itemDeck = shuffle(game.discardPile)
-
-        if (len(game.itemDeck) > 4):
-            raise ValueError("Newly created itemdeck has a size less than 5")
-
-        # clear discard
-        game.discardPile = []
-
-        # deal to market
-        for i in range(4):
-            dealItemCardToMarket(game)
+        resetMarket()
 
         # deal like usual
         return getFirstItemCard(game)
@@ -863,31 +924,20 @@ def newQuestDeck(numPlayers):
     level3Cards.append(createQuestCard(3,True,[1,3,5,6,9],5,5))
     level3Cards.append(createQuestCard(3,False,[3,4,7,8,9],6,5))
     #simulate treasure event only for now
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
+
     
-    #level4Cards.append(createQuestCard(4,False,[],0,6))
-    #level4Cards.append(createQuestCard(4,False,[],0,7))
-    #level4Cards.append(createQuestCard(4,False,[],0,8))
-    #level4Cards.append(createQuestCard(4,False,[],0,9))
-    #level4Cards.append(createQuestCard(4,False,[],0,10))
-    #level4Cards.append(createQuestCard(4,False,[],0,11))
-    #level4Cards.append(createQuestCard(4,False,[],0,12))
-    #level4Cards.append(createQuestCard(4,False,[],0,13))
-    #level4Cards.append(createQuestCard(4,False,[],0,14))
-    #level4Cards.append(createQuestCard(4,False,[],0,15))
-    #level4Cards.append(createQuestCard(4,False,[],0,16))
-    #level4Cards.append(createQuestCard(4,False,[],0,17))
+    level4Cards.append(createQuestCard(4,False,[],0,6))
+    level4Cards.append(createQuestCard(4,False,[],0,7))
+    level4Cards.append(createQuestCard(4,False,[],0,8))
+    level4Cards.append(createQuestCard(4,False,[],0,9))
+    level4Cards.append(createQuestCard(4,False,[],0,10))
+    level4Cards.append(createQuestCard(4,False,[],0,11))
+    level4Cards.append(createQuestCard(4,False,[],0,12))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,14))
+    level4Cards.append(createQuestCard(4,False,[],0,15))
+    level4Cards.append(createQuestCard(4,False,[],0,16))
+    level4Cards.append(createQuestCard(4,False,[],0,17))
 
 
     level1Cards = shuffle(level1Cards)
