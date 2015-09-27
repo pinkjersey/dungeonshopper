@@ -397,14 +397,17 @@ def getIntersection(list1, list2):
     ret.sort()
     return ret
 
-def completeEvent(game, eventId, cartidstr, handItems, gold, what1, where1, what2, where2):
+def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, dest1):
 #note that the gameMode has been added to the game object
 #this controls if the game is in game or event mode
 #game.gameMode = "game"	
 #game.gameMode = "event"	
     player = game.players[game.curPlayer]
     logging.error("EventId:  {0}".format(eventId))
+    what1arr = whatToArray(what1)
+    what2arr = whatToArray(what2)
     game.gameMode = "event"
+
     if cartidstr != "":
         cartid = getCartId(cartidstr)
 
@@ -414,32 +417,38 @@ def completeEvent(game, eventId, cartidstr, handItems, gold, what1, where1, what
             if (game.eventCompletedCount == 0):
                 resetMarket()
         #BrokenItems
-        #if eventId == 7:
-            #fish(game, what1, where1):
-            #fish(game, what2, where2):
+        if eventId == 7:
+            if len(what1arr) > 0:
+                logging.error("what1 {0}".format(what1)) 
+                logging.error("where1 {0}".format(where1)) 
+                fish(game, what1, where1)
+            if len(what2arr) > 0:
+                logging.error("what2 {0}".format(what2)) 
+                logging.error("where2 {0}".format(where2)) 
+                fish(game, what2, where2)
         #CastleTaxation
         if eventId == 8:
             #discard items first
-            if handItems > 0:
-                for whati in handItems:        
+            if len(what1arr) > 0:
+                for whati in what1arr:        
                     found = discardItem(game, whati, "hand")
                     if (found == False):
-                        logging.error("Couldn't find all handItems {0}".format(whati))        
+                        logging.error("Couldn't find all what1 {0}".format(whati))        
                         return False
             player.gold -= gold
         #GolbinRaid
         if eventId == 9:
             #discard items first
-            if handItems > 0:
-                for whati in handItems:        
-                    found = discardItem(game, whati, "hand")
+            if len(what1arr):
+                for whati in what1arr:        
+                    found = discardItem(game, whati, where1)
                     if (found == False):
-                        logging.error("Couldn't find all handItems {0}".format(whati))        
+                        logging.error("Couldn't find all what1arr {0}".format(whati))        
                         return False
         #KingsFeast
         if eventId == 10:
-            player.gold += 0
-        #MarketShortage		
+            dealItemCard(game.curPlayer, game)
+        #MarketShortage	- not done
         if eventId == 11:
             player.gold += 0
         #MarketSurplus
@@ -453,11 +462,11 @@ def completeEvent(game, eventId, cartidstr, handItems, gold, what1, where1, what
         #orcs attack.  Wheelbarrow destroyed.  if handItems present don't destroy, but discard them
         if eventId == 13:
             #discard items first
-            if handItems > 0:
-                for whati in handItems:        
+            if len(what1arr) > 0:
+                for whati in what1arr:        
                     found = discardItem(game, whati, "hand")
                     if (found == False):
-                        logging.error("Couldn't find all handItems {0}".format(whati))        
+                        logging.error("Couldn't find all what1arr {0}".format(whati))        
                         return False
             #validate cart passed in
             if (cartid <0 or cartid > 3):
@@ -467,22 +476,33 @@ def completeEvent(game, eventId, cartidstr, handItems, gold, what1, where1, what
                 # find cart
                 cart = player.carts[cartid]
                 #destroy it	if no cards passed in
-                if (cart.purchased and handItems==null):
+                if (cart.purchased and what1==""):
                     # destroy it
                     cart.destroyed == true
                     cart.purchased == false
 
-        #players pass hand to the right
+        #SandStorm players pass hand to the right - not done
         if eventId == 14:
             player.gold += 0
+        #ThrownInTheDungeon
         if eventId == 15:
-            player.gold += 0
+            #discard item
+            if len(what1arr) > 0:
+                for whati in what1arr:        
+                    found = discardItem(game, whati, "hand")
+                    if (found == False):
+                        logging.error("Couldn't find all what1arr {0}".format(whati))        
+                        return False
+        #Treasure
         if eventId == 16:
             player.gold += gold
+        #VikingParade
         if eventId == 17:
-            player.gold += 0
+            move(game, what1, where1, dest1)
+        #HailStorm not done
         if eventId == 18:
             player.gold += 0
+        #HiddenRoom not done
         if eventId == 19:
             player.gold += 0
 
@@ -925,19 +945,30 @@ def newQuestDeck(numPlayers):
     level3Cards.append(createQuestCard(3,False,[3,4,7,8,9],6,5))
     #simulate treasure event only for now
 
-    
-    level4Cards.append(createQuestCard(4,False,[],0,6))
     level4Cards.append(createQuestCard(4,False,[],0,7))
-    level4Cards.append(createQuestCard(4,False,[],0,8))
-    level4Cards.append(createQuestCard(4,False,[],0,9))
-    level4Cards.append(createQuestCard(4,False,[],0,10))
-    level4Cards.append(createQuestCard(4,False,[],0,11))
-    level4Cards.append(createQuestCard(4,False,[],0,12))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,14))
-    level4Cards.append(createQuestCard(4,False,[],0,15))
-    level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,17))
+    level4Cards.append(createQuestCard(4,False,[],0,7))
+    level4Cards.append(createQuestCard(4,False,[],0,7))
+    level4Cards.append(createQuestCard(4,False,[],0,7))
+    level4Cards.append(createQuestCard(4,False,[],0,7))
+    level4Cards.append(createQuestCard(4,False,[],0,7))
+    level4Cards.append(createQuestCard(4,False,[],0,7))
+    level4Cards.append(createQuestCard(4,False,[],0,7))
+    level4Cards.append(createQuestCard(4,False,[],0,7))
+    level4Cards.append(createQuestCard(4,False,[],0,7))
+    level4Cards.append(createQuestCard(4,False,[],0,7))
+    level4Cards.append(createQuestCard(4,False,[],0,7))	
+    #level4Cards.append(createQuestCard(4,False,[],0,6))
+    #level4Cards.append(createQuestCard(4,False,[],0,7))
+    #level4Cards.append(createQuestCard(4,False,[],0,8))
+    #level4Cards.append(createQuestCard(4,False,[],0,9))
+    #level4Cards.append(createQuestCard(4,False,[],0,10))
+    #level4Cards.append(createQuestCard(4,False,[],0,11))
+    #level4Cards.append(createQuestCard(4,False,[],0,12))
+    #level4Cards.append(createQuestCard(4,False,[],0,13))
+    #level4Cards.append(createQuestCard(4,False,[],0,14))
+    #level4Cards.append(createQuestCard(4,False,[],0,15))
+    #level4Cards.append(createQuestCard(4,False,[],0,16))
+    #level4Cards.append(createQuestCard(4,False,[],0,17))
 
 
     level1Cards = shuffle(level1Cards)

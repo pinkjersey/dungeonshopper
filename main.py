@@ -330,13 +330,20 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        handItems = self.request.get('handItems')
-
         cartidstr = self.request.get('cart')        
-
+        gold = self.request.get('gold')
+        what1 = self.request.get('what1')
+        where1 = self.request.get('where1')
+        what2 = self.request.get('what2')
+        where2 = self.request.get('where2')
+        dest1 = self.request.get('dest1')
         logging.error("EventId found:  {0}".format(eventId))
-        logging.error("Hand Items Found:  {0}".format(handItems))
-        result = completeEvent(game, eventId, cartidstr, handItems)
+        logging.error("what1 Items Found:  {0}".format(what1))
+        logging.error("where1 Items Found:  {0}".format(where1))
+        logging.error("what2 Items Found:  {0}".format(what2))
+        logging.error("where2 Items Found:  {0}".format(where2))
+        logging.error("dest1 Items Found:  {0}".format(dest1))
+        result = completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, dest1)
         if (result == False):
             self.error(500)
             return
