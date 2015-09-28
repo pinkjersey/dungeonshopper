@@ -1,0 +1,61 @@
+	//	'eventBarbarianAttack',6
+	destroy market
+	rebuild
+	
+	//	'eventBrokenItems',7
+	players may discard 2 items from cart or hand
+	player will need to highlight one at a time and click button
+	button will send fish event to server for each
+	
+	
+	//	'eventCastleTaxation',8
+	discard two items from any cart/hand or pay one gold
+	
+	//	'eventGolbinRaid',9
+	lose one item from any wagon if possible
+	
+	//	'eventKingsFeast',10
+	all players get one item card as they accept the event
+	
+	//	'eventMarketShortage',11
+	discard next item
+	what ever the number is, remove all from market
+	only do this once, not per player
+	
+	//	'eventMarketSurplus',12
+	flip over the next 5 items into the market
+	only do this once, not per player
+	
+	//	'eventOrcsAttack',13
+	check wheelbarrow.  if > 5 item points nothing happens.
+	if < than 5 item points, all go back to player hand
+	wheelbarrow is destroyed
+	player may repurchase for item points >= 5
+	
+	//	'eventSandStorm',14
+	all players pass items cards to the left 
+	they will see their new hand on screen
+	they should be auto dealt any missing cards to max hand
+	they must discard down to max hand size before accepting event button if needed
+	
+	//	'eventThrownInTheDungeon',15
+	players check items for 1,2 or 3
+	if they have any of these, they must discard only one, their choice
+	if all items > 3, nothing happens
+
+	
+	//	'eventTreasure',16
+	All players get one gold as they accept the event
+	
+	//	'eventVikingParade',17
+	players may move one group of items between wagons only.  wagon limits apply.  not from hand.
+	
+	//	'eventHailStorm', 18
+	all players pass items cards to the right 
+	they will see their new hand on screen
+	they should be auto dealt any missing cards to max hand
+	they must discard down to max hand size before accepting event button if needed
+	
+	//	'eventsHiddenRoom',19
+	players either take one gold or two itemss
+	hand size applies before accepting event

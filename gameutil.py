@@ -10,9 +10,10 @@ def createOtherPlayer(player):
     for i in range(sz):
         hand[i] = -1
     dict["hand"] = hand
+    return player
 
 def playerState(game, playerId):
-    game.players[playerId].playerId = playerId
+    #game.players[playerId].playerId = playerId
     player = game.players[playerId]
     player.playerId = playerId
     thedict = player.to_dict()
@@ -36,9 +37,14 @@ def playerState(game, playerId):
     otherPlayers = []
     for p in game.players:
         if (p != player):
-            otherPlayers.append(createOtherPlayer(p))
+            #dict = p.to_dict()
+            #hand = dict["hand"]
+            #sz = len(hand)
+            #for i in range(sz):
+                #hand[i] = -1
+                #dict["hand"] = hand
+            otherPlayers.append(p.to_dict())
     thedict["otherPlayers"] = otherPlayers
-
 
     thedict["actionsRemaining"] = game.actionsRemaining
 
@@ -157,7 +163,7 @@ def removeItems(game, what, where):
 
 def move(game, what, src, dst):
     """Moves cards from src to dst"""
-    if game.actionsRemaining == 0:
+    if (game.actionsRemaining == 0 and game.gameMode == "game"):
         # no actions remaining
         logging.error("No actions remaining")        
         return False
@@ -205,7 +211,9 @@ def move(game, what, src, dst):
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror))        
         return False
 
-    game.actionsRemaining = game.actionsRemaining -1
+    if game.gameMode == "game":
+        game.actionsRemaining = game.actionsRemaining -1
+
     game.put()
 
     return True
@@ -331,7 +339,7 @@ def marketTrade(game, handItems, marketItems):
     return True                
 
 def discard(game, what, where):
-    if game.actionsRemaining == 0:
+    if (game.actionsRemaining == 0 and game.gameMode == "game"):
         # no actions remaining
         logging.error("No actions remaining")  
         return False
@@ -357,8 +365,10 @@ def discard(game, what, where):
         logging.error("Couldn't discard one or more cards")  
         # couldn't find 'what'
         return False
-    
-    game.actionsRemaining = game.actionsRemaining -1
+
+    if game.gameMode == "game":
+        game.actionsRemaining = game.actionsRemaining -1
+
     game.put()
 
     return True
@@ -394,62 +404,154 @@ def getIntersection(list1, list2):
     ret.sort()
     return ret
 
-def completeEvent(game, eventId, cartidstr, handItems):
+def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, dest1):
+#note that the gameMode has been added to the game object
+#this controls if the game is in game or event mode
+#game.gameMode = "game"	
+#game.gameMode = "event"	
+    eventId=int(eventId)
+    gold=int(gold)
     player = game.players[game.curPlayer]
-    logging.error("EventId:  {0}".format(eventId))
+    logging.info("Entered Logic for Events")
+    what1arr = whatToArray(what1)
+    what2arr = whatToArray(what2)
+    game.gameMode = "event"
     if cartidstr != "":
         cartid = getCartId(cartidstr)
+        #validate cart passed in
+        if (cartid <0 or cartid > 3):
+            logging.error("Invalid cart id")
+            return False
+        cart = game.players[game.curPlayer].carts[cartid]
 
     try:
-    #orcs attack.  Wheelbarrow destroyed.  if handItems present don't destroy, but discard them
-        if eventId == 13:
-            if (cartid <0 or cartid > 3):
-                logging.error("Invalid cart id")
-                return False
-            else:    # find cart
-                cart = player.carts[cartid]
-                if (cart.purchased and handItems==null):
-                    # destroy it
-                    cart.destroyed == true
-
-            #dont destroy, just discard selected cards to pay for cart
-            if (cart.destroyed != True and handItems!=null):
-                for whati in handItems:        
-                    found = discardItem(game, whati, "hand")
+        #destroy market and re-seed if you are the first to get here        
+        if eventId == 6:
+            logging.info("Entered Logic for event barb attack")
+            if game.eventCompletedCount == 0:
+                resetMarket(game)
+        #BrokenItems
+        if eventId == 7:
+            logging.info("Entered Logic for event BrokenItems")
+            if len(what1arr) > 0:
+                logging.info("what1 {0}".format(what1)) 
+                logging.info("where1 {0}".format(where1)) 
+                fish(game, what1, where1)
+            if len(what2arr) > 0:
+                logging.info("what2 {0}".format(what2)) 
+                logging.info("where2 {0}".format(where2)) 
+                fish(game, what2, where2)
+        #CastleTaxation
+        if eventId == 8:
+            #discard items first
+            if len(what1arr) > 0:
+                for whati in what1arr:        
+                    found = discardItem(game, whati, where1)
                     if (found == False):
-                        logging.error("Couldn't find all handItems {0}".format(whati))        
+                        logging.error("Couldn't find all what1 {0}".format(whati))        
                         return False
-
+            player.gold -= gold
+        #GolbinRaid
+        if eventId == 9:
+            #discard items first
+            if len(what1arr):
+                for whati in what1arr:        
+                    found = discardItem(game, whati, where1)
+                    if (found == False):
+                        logging.error("Couldn't find all what1arr {0}".format(whati))        
+                        return False
+        #KingsFeast
+        if eventId == 10:
+            dealItemCard(game.curPlayer, game)
+        #MarketShortage	- not done
+        if eventId == 11:
+            player.gold += 0
+        #MarketSurplus
+        if eventId == 12:
+            # deal card to market
+            if (game.eventCompletedCount == 0):
+                for i in range(5):
+                    dealItemCardToMarket(game)
+    
+        #orcs attack.  Wheelbarrow destroyed.  if handItems present don't destroy, but discard them
+        if eventId == 13:
+            if what1==None:
+                logging.info("Destroying Cart")
+            #destroy it	if no cards passed in
+            if (cart.purchased and what1==None):
+                # destroy it
+                cart.destroyed = True
+                cart.purchased = False
+            #discard items if buying it back
+            if len(what1arr) > 0:
+                for whati in what1arr:
+                    logging.info("Discarding {0} from {1}".format(whati, where1))
+                    found = discardItem(game, whati, where1)
+                    if (found == False):
+                        logging.error("Couldn't find all what1arr {0}".format(whati))        
+                        return False
+                    else:
+                        cart.destroyed = False
+                        cart.purchased = True
+        #SandStorm players pass hand to the right - not done
+        if eventId == 14:
+            logging.info("Sandstorm start Event Id:  {0}".format(eventId))
+            player.gold += 0
+        #ThrownInTheDungeon
+        if eventId == 15:
+            logging.info("Thrown in the dungeon start Event Id:  {0}".format(eventId))
+            #discard item
+            if len(what1arr) > 0:
+                for whati in what1arr:
+                    logging.info("Discarding {0} from {1}".format(whati, where1))
+                    found = discardItem(game, whati, where1)
+                    if (found == False):
+                        logging.error("Couldn't find all what1arr {0}".format(whati))        
+                        return False
+        #Treasure
         if eventId == 16:
-            player.gold += 1
-
-
-        #advance event to next player, deal new quest if done
-        game.eventCompletedCount += 1
-
-        game.curPlayer += 1
-        if game.curPlayer == game.numPlayers:
-            game.curPlayer = 0
-
-        if(game.eventCompletedCount==game.numPlayers):
-            game.eventCompletedCount = 0	
-            decklen = len(game.questsInPlay)
-            if(decklen == 0):
-                return
-            else:
-                del game.questsInPlay[decklen-1]
-
-            dealQuest(game)
+            logging.info("Starting Event Id:  {0}".format(eventId))
+            logging.info("Gold Found! {0}".format(gold))    
+            player.gold += gold
+        #VikingParade
+        if eventId == 17:
+            logging.info("Viking Parade start Event Id:  {0}".format(eventId))
+            move(game, what1, where1, dest1)
+        #HailStorm not done
+        if eventId == 18:
+            logging.info("Sandstorm start Event Id:  {0}".format(eventId))
+            player.gold += 0
+        #HiddenRoom not done
+        if eventId == 19:
+            player.gold += 0
 
     except ValueError as e:
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
         return False  
 
+    #advance event to next player, deal new quest if done
+    game.eventCompletedCount += 1
+    game.curPlayer += 1
+    if game.curPlayer == game.numPlayers:
+        game.curPlayer = 0
+    if(game.eventCompletedCount==game.numPlayers):
+        game.gameMode = "game"		
+        game.eventCompletedCount = 0	
+        decklen = len(game.questsInPlay)
+        if(decklen == 0):
+            return
+        else:
+            del game.questsInPlay[decklen-1]
+
+        dealQuest(game)
+
+
+
     # save game to data store
     game.put()
     return True	
 
-	
+
 def completeQuest(game, what, where):
     # completing quests require no actions
     whats = whatToArray(what)
@@ -490,8 +592,9 @@ def completeQuest(game, what, where):
 
     except ValueError as e:
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
-        return False    
-    
+        return False
+
+    game.gameMode = "game"    
     game.put()
 
     return True
@@ -533,15 +636,16 @@ def passPlayer(game, items):
     if game.curPlayer == game.numPlayers:
         game.curPlayer = 0
 
-	player.turns += 1	
-		
+    player.turns += 1	
+
     # save game to data store
+    game.gameMode = "game"
     game.put()
 
     return priorPlayer
 
 def fish(game, what, where):
-    if game.actionsRemaining == 0:
+    if (game.actionsRemaining == 0 and game.gameMode == "game"):
         # no actions remaining
         return False
 
@@ -562,7 +666,10 @@ def fish(game, what, where):
         return False
 
     dealItemCard(game.curPlayer, game)
-    game.actionsRemaining = game.actionsRemaining -1
+
+    if game.gameMode == "game":
+        game.actionsRemaining = game.actionsRemaining -1
+
     game.put()
 
     return True
@@ -595,10 +702,9 @@ def createNewGame(numPlayers, name):
 
     game.itemDeck = newItemDeck()
     for i in range (0, game.numPlayers):
-        p=Player(name="defaultPlayer{0}".format(i))
+        p=Player(name="defaultPlayer{0}".format(i), playerId=i)
         if (i == 0):
             p.name = name
-            p.playerId = 0
         game.players.append(p)
 
     # deal five cards
@@ -651,6 +757,7 @@ def createNewGame(numPlayers, name):
         dealQuest(game)
 
     # save game to data store
+    game.gameMode = "game"
     game.put()
     return game
 
@@ -713,27 +820,36 @@ def newItemDeck():
     shuffled = shuffle(cards)                
     return shuffled
 
+
+def resetMarket(game):
+    logging.info("Reseting Market")
+    # move market to discard
+    game.discardPile.extend(game.market)
+    # clear the market
+    game.market = []
+
+    game.itemDeck.extend(game.discardPile)
+    # clear discard
+    game.discardPile = []
+
+    # shuffle discard and set it to item deck
+    shuffled = shuffle(game.itemDeck)
+    game.itemDeck = shuffled
+
+    if (len(game.itemDeck) < 5):
+        raise ValueError("Newly created itemdeck has a size less than 5")
+
+
+
+    # deal to market
+    for i in range(4):
+        dealItemCardToMarket(game)
+
+
 def getFirstItemCard(game):
     decklen = len(game.itemDeck)
     if (decklen == 0):
-        # move market to discard
-        game.discardPile.extend(game.market)
-
-        # clear the market
-        game.market = []
-
-        # shuffle discard and set it to item deck
-        game.itemDeck = shuffle(game.discardPile)
-
-        if (len(game.itemDeck) > 4):
-            raise ValueError("Newly created itemdeck has a size less than 5")
-
-        # clear discard
-        game.discardPile = []
-
-        # deal to market
-        for i in range(4):
-            dealItemCardToMarket(game)
+        resetMarket()
 
         # deal like usual
         return getFirstItemCard(game)
@@ -759,6 +875,9 @@ def dealQuest(game):
         quest = game.questDeck[0]
         del game.questDeck[0]
         game.questsInPlay.append(quest)
+        if quest.level == 4:
+            game.gameMode = "event"
+            logging.info("GameMode: {0}".format(game.gameMode)) 
 
 	
 def newQuestDeck(numPlayers):
@@ -846,31 +965,19 @@ def newQuestDeck(numPlayers):
     level3Cards.append(createQuestCard(3,True,[1,3,5,6,9],5,5))
     level3Cards.append(createQuestCard(3,False,[3,4,7,8,9],6,5))
     #simulate treasure event only for now
+
+    level4Cards.append(createQuestCard(4,False,[],0,6))
+    level4Cards.append(createQuestCard(4,False,[],0,7))
+    level4Cards.append(createQuestCard(4,False,[],0,8))
+    level4Cards.append(createQuestCard(4,False,[],0,9))
+    level4Cards.append(createQuestCard(4,False,[],0,10))
+    level4Cards.append(createQuestCard(4,False,[],0,11))
+    level4Cards.append(createQuestCard(4,False,[],0,12))
     level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    
-    #level4Cards.append(createQuestCard(4,False,[],0,6))
-    #level4Cards.append(createQuestCard(4,False,[],0,7))
-    #level4Cards.append(createQuestCard(4,False,[],0,8))
-    #level4Cards.append(createQuestCard(4,False,[],0,9))
-    #level4Cards.append(createQuestCard(4,False,[],0,10))
-    #level4Cards.append(createQuestCard(4,False,[],0,11))
-    #level4Cards.append(createQuestCard(4,False,[],0,12))
-    #level4Cards.append(createQuestCard(4,False,[],0,13))
-    #level4Cards.append(createQuestCard(4,False,[],0,14))
-    #level4Cards.append(createQuestCard(4,False,[],0,15))
-    #level4Cards.append(createQuestCard(4,False,[],0,16))
-    #level4Cards.append(createQuestCard(4,False,[],0,17))
+    level4Cards.append(createQuestCard(4,False,[],0,14))
+    level4Cards.append(createQuestCard(4,False,[],0,15))
+    level4Cards.append(createQuestCard(4,False,[],0,16))
+    level4Cards.append(createQuestCard(4,False,[],0,17))
 
 
     level1Cards = shuffle(level1Cards)
@@ -879,8 +986,8 @@ def newQuestDeck(numPlayers):
     level4Cards = shuffle(level4Cards)
 
     if numPlayers == "1":
-        #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
-		createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,0,0,0,4,4)
+        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
+        #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,1,1,1,4,4)
     elif numPlayers == "2":
         createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,7,1,4,1,2,4,2,2)
     elif numPlayers == "3":

@@ -2,6 +2,7 @@
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" ng-app="dsApp">
 <head>
+<meta name="viewport" content="width=480">
     <meta charset="utf-8" />
 
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
@@ -59,33 +60,31 @@
 
     <div class="panel panel-info">
 		<div class="panel-heading">
-			<img ng-show="displayMode != 'nogame'" ng-src="{{titleImg}}" </img><big>{{displayModeName}}</big>
+			<img ng-show="displayMode != 'nogame'" ng-src="{{titleImg}}" </img><big>{{displayMode}} {{displayModeName}}</big>
 			<span class="panel-title pull-right"><button class="btn btn-primary" ng-show="displayMode === 'game'" ng-click="noGame()">Reset</button></span>
 			<ng-include src="'nogame.html'" ng-show="displayMode === 'nogame'"></ng-include>
 			<ng-include src="'game.html'" ng-show="displayMode === 'game'"></ng-include>
 			<ng-include src="'gameSpectator.html'" ng-show="displayMode === 'gameSpectator'"></ng-include>
 			<ng-include src="'gameover.html'" ng-show="displayMode === 'gameover'"></ng-include>
 			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventTemplate'"></ng-include>
+			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventKingsFeast'"></ng-include>
+			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventMarketShortage'"></ng-include>
+			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventMarketSurplus'"></ng-include>
+			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventVikingParade'"></ng-include>
+			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventTreasure'"></ng-include>
+			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventBarbarianAttack'"></ng-include>
+			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventSandStorm'"></ng-include>
+			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventHailStorm'"></ng-include>
 			<ng-include src="'eventOrcsAttack.html'" ng-show="displayMode === 'eventOrcsAttack'"></ng-include>
-			<ng-include src="'eventTreasure.html'" ng-show="displayMode === 'eventTreasure'"></ng-include>
 			<ng-include src="'eventBrokenItems.html'" ng-show="displayMode === 'eventBrokenItems'"></ng-include>
-	<!--    <ng-include src="'eventBarbarianAttack.html'" ng-show="displayMode === 'eventBarbarianAttack'"></ng-include>
 			<ng-include src="'eventCastleTaxation.html'" ng-show="displayMode === 'eventCastleTaxation'"></ng-include>
-			<ng-include src="'eventGolbinRaid.html'" ng-show="displayMode === 'eventGolbinRaid'"></ng-include>
-			<ng-include src="'eventKingsFeast.html'" ng-show="displayMode === 'eventKingsFeast'"></ng-include>
-			<ng-include src="'eventMarketShortage.html'" ng-show="displayMode === 'eventMarketShortage'"></ng-include>
-			<ng-include src="'eventMarketSurplus.html'" ng-show="displayMode === 'eventMarketSurplus'"></ng-include>
-
-			<ng-include src="'eventSandStorm.html'" ng-show="displayMode === 'eventSandStorm'"></ng-include>
-			<ng-include src="'eventHailStorm.html'" ng-show="displayMode === 'eventHailStorm'"></ng-include>
+			<ng-include src="'eventGoblinRaid.html'" ng-show="displayMode === 'eventGolbinRaid'"></ng-include>
 			<ng-include src="'eventHiddenRoom.html'" ng-show="displayMode === 'eventHiddenRoom'"></ng-include>
 			<ng-include src="'eventThrownInTheDungeon.html'" ng-show="displayMode === 'eventThrownInTheDungeon'"></ng-include>
-			<ng-include src="'eventVikingParade.html'" ng-show="displayMode === 'eventVikingParade'"></ng-include>-->
 		</div>
 	</div>
-	<div ng-show="displayMode === 'game' || displayMode === 'gameSpectator'">
-		<div><ng-include src="'quests.html'"></ng-include>  </div>
-		<div ng-show="displayMode === 'gameSpectator'"><ng-include src="'market.html'"></ng-include>  </div>
+	<div ng-show="displayMode != 'nogame' && displayMode != 'gameover'">
+		<div><ng-show="displayMode === 'game'" ng-include src="'quests.html'"></ng-include>  </div>
 		<div><ng-include src="'gameFooter.html'" ></ng-include></div>
 		<div><ng-include src="'playerLog.html'"></ng-include></div>
 	</div>

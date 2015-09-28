@@ -1,96 +1,71 @@
-﻿<div class="container" ng-show="isActive===true">
-	<div class="row" >
-			<div  style="float:right; padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 5px;" ng-show="isActive===true">
-				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerBuyAction()" >Buy Action</button>    
-				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerPass()" >Pass</button>
-				<button class="btn btn-warning" ng-click="playerRefresh()" >Refresh</button>    
-				<button ng-disabled="loadingData===true" class="btn btn-danger" ng-click="endGame()">Quit</button>
+﻿<ng-include src="'gameHeader.html'"></ng-include>
+
+<div class="panel panel-primary">
+	<ng-include src="'playerHeader.html'"></ng-include>		
+
+	<br></br>
+
+	<div class="row" ng-disabled="loadingData">
+		<div class="col-sm-3" ng-repeat="cart in activePlayer.carts track by $index" >
+			<div ng-disabled="activePlayer.nextCartId < cart.id" ng-if="!cart.active"><b>Gold Cost:</b> {{cart.goldCost}}<span style="color:red;"> / </span><b>Item Cost:</b> {{cart.itemCost}}</div>
+			<button ng-disabled="activePlayer.nextCartId < cart.id" ng-if="!cart.active" class="btn btn-warning" ng-click="playerBuyCart(cart.id)" >Buy {{cart.name}} with {{cart.purchaseWith}}</button>   
+			<img ng-if="cart.active" style="{{cart.borderColor}}" width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImage(cart.id)"></img>
+			<span class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
+				<img  style="{{card.borderColor}}" ng-click="userClickedCartItem(cart.id, $index)" ng-src="{{card.image}}"/>
+			</span>
+			<span ng-if="activePlayer.actionsRemaining > 0 && cart.active">
+				<button ng-disabled="loadingData===true" ng-if="cart.size - cart.cards.playingCards.length >= selectedItemsCount && cart.cardSumSelected === 0 && (selectedItemsCount+selectedCartItemsCount) > 0" class="btn btn-info" ng-click="moveItemsToCart(cart.id)" > Move to {{cart.name}}? </button>   
+				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerDiscardFromCart($index)" ng-if="cart.cards.playingCards.length > 0 && cart.cardSumSelected > 0" >Discard </button>    
+				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerCartFish($index)" ng-if="cart.cardSumSelected > 0 && selectedCartItemsCount===1" >Fish </button>    
+			</span>	
+
+			<div ng-show="debug==true">	
+			<p>Selected ItemCount: {{selectedItemsCount}}</p>
+			<p>Cart active? {{cart.active}}</p>
+			<p>Cart Sum Selected: {{cart.cardSumSelected}}</p>
+			<p>Card Sum Selected: {{activePlayer.cardSumSelected}}</p>
+			<p>Sum Market Value Selected: {{sumMarketValueSelected}}</p>
+			<p>Active Cart: {{activeCartId}}</p>
+			<p>Previous Active Cart: {{prevActiveCartId}}</p>
 			</div>
+			
+			<span ng-show="!cart.active"><p>Cart size: {{cart.size}}</p></span>
+			<span ng-show="cart.active"><p>Cart can hold: {{cart.size -  cart.cards.playingCards.length}} more items(s)</p></span>
+		</div>
 	</div>
+	<p></p>
+	<table class="table table-condensed">
+		<thead>
+			<tr>
+				<td>
+					<div class="left"><ng-include src="'cardsPlayer.html'"></ng-include></div>
+				</td>
+				<td>
+					<div class="right"><ng-include src="'marketPlayer.html'"></ng-include></div>
+				</td>
+			</tr>
+		</thead>
+	</table>
+
+
+	<div>
+		<button ng-show="activePlayer.questsCompleted.playingCards.length > 0" ng-disabled="loadingData===true" class="btn btn-warning" ng-click="showMyCompletedQuestsClick()" >{{showHideQuestVar}} my completed quests?</button>
+	</div>
+
+	<span ng-show="showMyCompletedQuests">
+		<span ng-repeat="questcard in activePlayer.questsCompleted.playingCards track by $index">
+			<img style="{{card.borderColor}}" ng-src="{{questcard.image}}"></img>
+		</span>
+	</span>
+
+
 </div>
- 
-
-<!--<div class="row" ng-repeat="activePlayer in game.players">-->
-	<div class="panel panel-primary">  
-		<div class="panel-heading">  
-			<!--<div class="panel-body">-->
-				<table class="table table-condensed">
-					<tr>
-						<th><big>{{activePlayer.name}}</big></th>
-						<th><big>Actions Remaining {{activePlayer.actionsRemaining}}</big></th>
-						<th><big>VP: {{activePlayer.vp}}</big></th>
-						<th><big>Bonus: {{activePlayer.bonus}}</big></th>
-						<th><big>Gold: {{activePlayer.gold}}</big></th>								
-						<th><big>Total: {{activePlayer.gold + activePlayer.vp + activePlayer.bonus}}</big></th>								
-						<th><big>Turns: {{activePlayer.turns}}</big></th>
-					</tr>
-				</table>
-			<!--</div>-->
-		</div>
-
-		<br></br>
-
-		<!--<div class="container-fluid">-->
-			<div class="row" ng-disabled="loadingData">
-				<div class="col-sm-3" ng-repeat="cart in activePlayer.carts track by $index" >
-					<div ng-disabled="activePlayer.nextCartId < cart.id" ng-if="!cart.active"><b>Gold Cost:</b> {{cart.goldCost}}<span style="color:red;"> / </span><b>Item Cost:</b> {{cart.itemCost}}</div>
-					<button ng-disabled="activePlayer.nextCartId < cart.id" ng-if="!cart.active" class="btn btn-warning" ng-click="playerBuyCart(cart.id)" >Buy {{cart.name}} with {{cart.purchaseWith}}</button>   
-					<img ng-if="cart.active" style="{{cart.borderColor}}" width={{cart.width}} height={{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImage(cart.id)"></img>
-					<span class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
-						<img  style="{{card.borderColor}}" ng-click="userClickedCartItem(cart.id, $index)" ng-src="{{card.image}}"/>
-					</span>
-					<span ng-if="activePlayer.actionsRemaining > 0 && cart.active">
-						<button ng-disabled="loadingData===true" ng-if="cart.size - cart.cards.playingCards.length >= selectedItemsCount && cart.cardSumSelected === 0 && (selectedItemsCount+selectedCartItemsCount) > 0" class="btn btn-info" ng-click="moveItemsToCart(cart.id)" > Move to {{cart.name}}? </button>   
-						<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerDiscardFromCart($index)" ng-if="cart.cards.playingCards.length > 0 && cart.cardSumSelected > 0" >Discard </button>    
-						<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerCartFish($index)" ng-if="cart.cardSumSelected > 0 && selectedCartItemsCount===1" >Fish </button>    
-					</span>	
-
-					<div ng-show="debug==true">	
-					<p>Selected ItemCount: {{selectedItemsCount}}</p>
-					<p>Cart active? {{cart.active}}</p>
-					<p>Cart Sum Selected: {{cart.cardSumSelected}}</p>
-					<p>Card Sum Selected: {{activePlayer.cardSumSelected}}</p>
-					<p>Sum Market Value Selected: {{sumMarketValueSelected}}</p>
-					<p>Active Cart: {{activeCartId}}</p>
-					<p>Previous Active Cart: {{prevActiveCartId}}</p>
-					</div>
-					
-					<span ng-show="!cart.active"><p>Cart size: {{cart.size}}</p></span>
-					<span ng-show="cart.active"><p>Cart can hold: {{cart.size -  cart.cards.playingCards.length}} more items(s)</p></span>
-				</div>
-			</div>
-			<p></p>
-				<table class="table table-condensed">
-					<thead>
-						<tr>
-							<td>
-								<div class="left"><ng-include src="'cardsPlayer.html'"></ng-include></div>
-							</td>
-							<td>
-								<div class="right"><ng-include src="'marketPlayer.html'"></ng-include></div>
-							</td>
-						</tr>
-					</thead>
-				</table>
 
 
-				<div>
-					<button ng-show="activePlayer.questsCompleted.playingCards.length > 0" ng-disabled="loadingData===true" class="btn btn-warning" ng-click="showMyCompletedQuestsClick()" >{{showHideQuestVar}} my completed quests?</button>
-				</div>
-				<span ng-show="showMyCompletedQuests">
-					<span ng-repeat="questcard in activePlayer.questsCompleted.playingCards track by $index">
-						<img style="{{card.borderColor}}" ng-src="{{questcard.image}}"></img>
-					</span>
-				</span>
+<button ng-show="numberOfPlayers>1"class="btn btn-warning" ng-click="showOtherPlayerDataClick()" >{{showHideVar}} Other Player Info?</button>
+<span><ng-include src="'otherPlayers.html'" ></ng-include></span>
 
-
-		</div>
-	</div>
-
-	<button ng-show="numberOfPlayers>1"class="btn btn-warning" ng-click="showOtherPlayerDataClick()" >{{showHideVar}} Other Player Info?</button>
-	<span><ng-include src="'otherPlayers.html'" ></ng-include></span>
-
-				
+			
 
 		
 			

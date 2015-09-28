@@ -110,7 +110,6 @@ mode = function(isActive) {
 		return 'game';
 	}
 	else {
-		//$scope.dots = "..";
 		return 'gameSpectator';
 	}
 }	
@@ -125,12 +124,12 @@ var getPlayerName = function(game, playerId) {
 }
 
 
-checkIfQuestIsReady = function (scope) {
-	var game = scope.game;
-	var player = scope.activePlayer;
+checkIfQuestIsReadyFromCart = function (game, player) {
 	var questCanBeCompleted = false;
-
-
+	var cartId = -1;
+	var questIndex = -1;
+	var questReady = {};
+	
 	for (var i = 0; i < player.carts.length; ++i) {
 		if(questCanBeCompleted === true){
 				break;
@@ -143,10 +142,11 @@ checkIfQuestIsReady = function (scope) {
 			}
 			var items =  new Array(questFound.item1, questFound.item2, questFound.item3, questFound.item4, questFound.item5);
 			
-			if (parseSelectedCardArrayFoQuest(selectedCards) === parseSelectedCardArrayFoQuest(items) ){
+			if (parseSelectedCardArrayForQuest(selectedCards) === parseSelectedCardArrayForQuest(items) ){
 				questCanBeCompleted = true;
 				var cartWithItems = player.carts[i].cards;
-				var cartId = i;
+				cartId = i;
+				questIndex = j;
 				break;
 			}
 
@@ -155,11 +155,14 @@ checkIfQuestIsReady = function (scope) {
 	
 	if (questCanBeCompleted === true) {
 		questFound.borderColor = 'border:10px solid green';
-		if(scope.autoSelectCart) {
-			scope.userClickedCartImage(cartId);
-		}
-	
+		questReady.cartId = cartId;
+		questReady.questCard = questFound;
+		questReady.items = cartWithItems.playingCards;
+		questReady.index = questIndex;
 	}
+
+	
+	return questReady;
 }
 
 function getIntersect(hand, quest) {
@@ -179,10 +182,11 @@ function getIntersect(hand, quest) {
 			return r;
 		}
 
-var checkIfHaveCardsForQuest = function (game, player, autoSelectHand) {
+var checkIfQuestISReadyFromHand = function (game, player, autoSelectHand) {
 	var questCanBeCompleted = false;
-
+	var r = [];
 	var hand = [];
+	var questReady = {};
 	for (var j = 0; j < player.cards.playingCards.length; ++j) {
 		card = player.cards.playingCards[j];
 		hand[j]= card.number;
@@ -217,25 +221,22 @@ var checkIfHaveCardsForQuest = function (game, player, autoSelectHand) {
 		var r = getIntersect(hand, quest);
 
 
-		if (parseSelectedCardArrayFoQuest(quest) === parseSelectedCardArrayFoQuest(r) ){
+		if (parseSelectedCardArrayForQuest(quest) === parseSelectedCardArrayForQuest(r) ){
 			questCanBeCompleted = true;
+			questFound.borderColor = 'border:10px solid green';
+			questReady.items = r;
+			questReady.questCard = questFound;
+
+			return questReady;
 		}
 	}
 		
-	if (questCanBeCompleted === true) {	
-		questFound.borderColor = 'border:10px solid green';
-		if(autoSelectHand) {
-			selectHandCards(r);
-			foundHandSetMatch = true;
-		}
-		//reset hand to original cards to see if you can complete more than one
-	}
-
+	return questReady;
 }
 
 
 
-//returns card numbers appended to each other for deck.  ex. 1224
+//returns card in an array
 getSelectedCardArrayForQuest = function(deck){
 	var arr = [];
 	for (var i = 0; i < 5; ++i)  {
@@ -251,7 +252,7 @@ getSelectedCardArrayForQuest = function(deck){
 }
 
 
-parseSelectedCardArrayFoQuest = function(items) {
+parseSelectedCardArrayForQuest = function(items) {
 	var s = "";
 	var num = "";
 	for (var i = 0; i < items.length; i++) {
@@ -357,7 +358,24 @@ dealQuestCard = function(game, items, level, type) {
 	}
 }
 		
-		
+		//sort player cart cards
+sortPlayerCartCards = function(cart) {
+	cart.cards.playingCards.sort(function (a,b) {return a.number-b.number});
+}
+
+//sort player quests
+sortPlayerQuests = function(activePlayer) {
+	activePlayer.questsCompleted.playingCards.sort(function (a,b) {return a.nameId-b.nameId});
+}
+
+cardPurchaseWithText = function(cardSumSelected, itemCost) {
+	if (cardSumSelected >= itemCost) {
+		return 'items';	
+		}
+	else	{
+		return 'gold';
+	}
+}	
 	
 //returns first selected card in deck
 getSelectedCard = function(deck){
@@ -377,12 +395,12 @@ getSelectedCards = function(deck, selectedCardsOnly){
 	var cardNumber = "";
 	for (var i = 0; i < deck.playingCards.length; ++i)  {
 		var card = deck.playingCards[i];
+		cardNumber = card.number;
+		if(card.number===10) {
+			cardNumber = 0;
+		}
 		if(selectedCardsOnly){
 			if(card.selected) {
-				cardNumber = card.number;
-				if(card.number===10) {
-					cardNumber = 0;
-				}
 				selectedCards+=cardNumber;
 			}
 		}

@@ -9,10 +9,10 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               completeEvent: function (eventId, cart, handItems, callback, errorcallback) {
+               completeEvent: function (eventId, cartToDestroy, gold, what1, where1, what2, where2, dest1, callback, errorcallback) {
                    $http({
                        method: 'GET',
-					   url: '/game?action=completeEvent&eventId=' + eventId + '&cart=' + cart + '&handItems=' + handItems,
+					   url: '/game?action=completeEvent&eventId=' + eventId + '&cart=' + cartToDestroy + '&gold=' + gold + '&what1=' + what1 + '&where1=' + where1 + '&what2=' + what2 + '&where2=' + where2 + '&dest1=' + dest1,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);

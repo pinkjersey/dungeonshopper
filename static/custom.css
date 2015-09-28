@@ -18,6 +18,9 @@
     top: -1px;
 }
 
+.tab40 { margin-left: 40px; }
+
+.tab30 { margin-left: 30px; }
 
 .input[type=checkbox], .input[type=radio] {
     vertical-align: middle;

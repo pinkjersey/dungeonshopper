@@ -1,39 +1,35 @@
-﻿<div class="panel panel-primary" >
+﻿<ng-include src="'gameEventHeader.html'"></ng-include>
+<div class="panel panel-info" >
 	<ng-include src="'playerHeader.html'"></ng-include>
 	<br></br>
-
-	<div class="container-fluid">
-		<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in player.cards.playingCards track by $index" >
-			<img ng-click="userClickedItemImage($index)" style="border:2px solid {{card.borderColor}}"  ng-src="{{card.image}}"	width = "{{card.cardImage.width}}" 	height = "{{card.cardImage.height}}" />
-		</span>
-	</div>	
-</div>
 	<br></br>
 
-<div class="panel panel-primary" >
-<table>
-	<thead>
-	<tr><big><b><u>My Cards:</u></b></big>
-		<td>
-			<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in activePlayer.cards.playingCards track by $index + card.positionOnStack" >
-				<img ng-click="userClickedItemImage($index)" style="{{card.borderColor}}"  ng-src="{{card.image}}"/>
-			</span>
-		<td>
-	</tr>
-	<tr>
-<td>
-	<h4>Event! - Orcs Attack!  Here's the total whats in your wheelbarrow: {{wheelbarrowCardSum}}</h4>
-	<div class="container-fluid">
+	<table>
+		<thead>
+		<tr><big><b><u>My Cards:</u></b></big>
+			<td>
+				<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in activePlayer.cards.playingCards track by $index + card.positionOnStack" >
+					<img ng-click="userClickedItemImageEvent($index)" style="{{card.borderColor}}"  ng-src="{{card.image}}"/>
+				</span>
+			<td>
+		</tr>
+		<tr>
+	<td>
+	<br></br>
+	<h4 class = "tab30" ng-if="wheelbarrowCardSum < 5">Your wheelbarrow has been D-E-S-T-R-O-Y-E-D!</h4>
+	<h4 class = "tab30" ng-if="wheelbarrowCardSum >= 5">Your had defeated the Orcs!</h4>
+	<div>
 		<div class="row">
-			<span ng-if="wheelbarrowCardSum < 5">Buy back wheelbarrow for 5+ item points?</span>
-
-			<span ng-repeat="questcard in game.questsInPlay.playingCards track by $index">
-				<questcard ng-show="questcard.level===4" info="questcard"></questcard>
-				<button ng-show="questcard.level===4" ng-if="wheelbarrowCardSum >= 5" class="btn btn-warning" ng-click="playerCompleteEvent(0, 'N')">Complete Event</button>   
-				<button ng-show="questcard.level===4" ng-if="wheelbarrowCardSum < 5" class="btn btn-warning" ng-click="playerCompleteEvent(0, 'Y')">Yes</button>   
-				<button ng-show="questcard.level===4" ng-if="wheelbarrowCardSum < 5" class="btn btn-warning" ng-click="playerCompleteEvent(0, 'X')">No</button>   
+			<span ng-repeat="eventcard in game.questsInPlay.playingCards track by $index">
+				<eventcard ng-show="eventcard.level===4" info="eventcard"></eventcard>
+				<span class = "tab40" ng-show="eventcard.level===4" ng-if="wheelbarrowCardSum < 5"><big>Buy back wheelbarrow for 5+ item points?</big></span>
+				<button ng-show="eventcard.level===4" ng-if="wheelbarrowCardSum >= 5" class="btn btn-warning" ng-click="playerCompleteEvent($index,'N')">Complete Event</button>   
+				<button ng-show="eventcard.level===4" ng-if="wheelbarrowCardSum < 5" class="btn btn-warning" ng-click="playerCompleteEvent($index,'Y')">Yes</button>   
+				<button ng-show="eventcard.level===4" ng-if="wheelbarrowCardSum < 5" class="btn btn-warning" ng-click="playerCompleteEvent($index,'X')">No</button>   
 			</span>	
 		</div>
 	</div>
 </div>
+
+
 

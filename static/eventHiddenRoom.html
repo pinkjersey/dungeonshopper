@@ -3,17 +3,14 @@
 	<ng-include src="'playerHeader.html'"></ng-include>		
 
 	<br></br>
-			<div ng-show="debug==true">	
-			<p>DisplayMode: 	{{displayMode}}</p>
-			</div>
-
 
 	<div class="row" ng-disabled="loadingData">
 		<div class="col-sm-3" ng-repeat="cart in activePlayer.carts track by $index" >
 			<img ng-if="cart.active" style="{{cart.borderColor}}" width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}"></img>
 			<span class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
-				<img  style="{{card.borderColor}}" ng-click="userClickedCartItemEvent(cart.id, $index)" ng-src="{{card.image}}"/>
+				<img  style="{{card.borderColor}}" ng-src="{{card.image}}"/>
 			</span>
+			
 		</div>
 	</div>
 	<p></p>
@@ -32,8 +29,23 @@
 </div>
 
 
-<h4 class="tab40">Event! Broken Items - Select up to two items to replace  (Click zero, one or two items)</h4>
-<ng-include src="'eventTemplateNoHeader.html'"></ng-include>
+<h4 class="tab40">Event! Hidden Room - Find 2 items or one gold</h4>
+<div class="panel panel-primary">
+		<br></br>
+		<div class="container-fluid">
+			<div class="row">
+				<span ng-repeat="eventcard in game.questsInPlay.playingCards track by $index">
+					<eventcard ng-show="eventcard.level===4" info="eventcard"></eventcard>
+					<button ng-show="eventcard.level===4" class="btn btn-warning" ng-click="playerCompleteEvent($index, 'gold')">Find Gold?</button>
+					<button ng-show="eventcard.level===4" class="btn btn-warning" ng-click="playerCompleteEvent($index, 'items')">Find Items?</button>
+				</span>	
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
 
 
 		

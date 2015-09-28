@@ -71,6 +71,7 @@ class GameHandler(webapp2.RequestHandler):
             return
 
         game.players[iPlayerId].name = name
+        #game.players[iPlayerId].playerId = playerId
         
         game.put()
         retstr = playerState(game, iPlayerId)        
@@ -283,7 +284,7 @@ class GameHandler(webapp2.RequestHandler):
         USAGE: /game?action=completeQuest&what=<itemList>where=<cartID>
         Uses the items in the cart to complete a quest. If a quest with the cards in the cart doesn't exist, it returns an error
         """
-        logging.error("Compelete quest: begin")
+        logging.info("Compelete quest: begin")
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
@@ -305,50 +306,56 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        logging.error("Compelete quest: done")
+        logging.info("Compelete quest: done")
 
         self.appendToLog(game)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
-        self.appendToLog(game) 
 
     def completeEvent(self):
         """
         USAGE: /game?action=completeEvent&eventId=<eventId>
         Complete an event. 
         """
-        logging.error("Compelete Event: begin")
+        logging.info("Compelete Event: begin")
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
-        logging.error("Compelete event: loaded event")
+        logging.info("Compelete event: loaded event")
 
         eventId = self.request.get('eventId')
         if (eventId == None or eventId == ""):
             self.error(500)
             return
 
-        handItems = self.request.get('handItems')
-
         cartidstr = self.request.get('cart')        
-
-        logging.error("EventId found:  {0}".format(eventId))
-        logging.error("Hand Items Found:  {0}".format(handItems))
-        result = completeEvent(game, eventId, cartidstr, handItems)
+        gold = self.request.get('gold')
+        what1 = self.request.get('what1')
+        where1 = self.request.get('where1')
+        what2 = self.request.get('what2')
+        where2 = self.request.get('where2')
+        dest1 = self.request.get('dest1')
+        logging.info("EventId found:  {0}".format(eventId))
+        logging.info("gold found:  {0}".format(gold))
+        logging.info("what1 Items Found:  {0}".format(what1))
+        logging.info("where1 Items Found:  {0}".format(where1))
+        logging.info("what2 Items Found:  {0}".format(what2))
+        logging.info("where2 Items Found:  {0}".format(where2))
+        logging.info("dest1 Items Found:  {0}".format(dest1))
+        result = completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, dest1)
         if (result == False):
             self.error(500)
             return
 
-        logging.error("Compelete event: done")
+        logging.info("Compelete event: done")
 
         self.appendToLog(game)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
-        self.appendToLog(game)
 		
     def passPlayer(self):
         """

@@ -25,9 +25,14 @@
 							<input type="checkbox" ng-click="autoSelectCartCheck()" ng-model="autoSelectCart"> Auto-select cart items when quest(s) can be completed?
 						</li>
 						<li class="checkbox">
-							<input type="checkbox" ng-click="autoSelectHandCheck()" ng-model="autoSelectHand"> Auto-select hand items when quest(s) can be completed?
+							<input type="checkbox" ng-click="autoSelectHandCheck()" ng-model="autoSelectHand"> Auto-select hand items for first quest match?
 						</li>
-						</ul>
+						<li class="checkbox">
+							<input type="checkbox" ng-click="autoSelectQuestCheck()" ng-model="autoSelectQuest"> Auto-select first quest match when quest(s) can be completed?
+						</li>
+						<li class="checkbox">
+							<input type="checkbox" ng-click="autoPassCheck()" ng-model="autoPass"> Auto-pass when out of gold?
+						</li>						</ul>
 					</div>
 					
 					<!-- =============================================== -->
