@@ -1596,6 +1596,14 @@ var cardColor = function(card) {
         },
         templateUrl: 'eventcard.html?2'
     };
+}).directive('eventquests', function () {
+    return {
+        restrict: 'E',
+        scope: {
+            card: '=info'
+        },
+        templateUrl: 'eventquests.html?2'
+    };
 }).directive('marketcard', function () {
     return {
         restrict: 'E',

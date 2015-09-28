@@ -7,14 +7,14 @@
 				<thead>
 				<tr>
 					<td>
-						<h4>Quests to complete:</h4> 
+						<h4>Quests to Complete:</h4> 
 					</td>
 				</tr>		
 
 				<tr>
 					<td>
-						<span ng-repeat="questcard in game.questsInPlay.playingCards track by $index">
-							<questcard info="questcard"></questcard>
+						<span ng-repeat="card in game.questsInPlay.playingCards track by $index">
+							<eventquests ng-show="card.level != 4" info="eventquests"></eventquests>
 						</span>	
 					</td>
 				</tr>

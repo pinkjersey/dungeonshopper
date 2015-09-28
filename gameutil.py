@@ -475,8 +475,10 @@ def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, 
     
         #orcs attack.  Wheelbarrow destroyed.  if handItems present don't destroy, but discard them
         if eventId == 13:
+            if what1==None:
+                logging.info("Destroying Cart")
             #destroy it	if no cards passed in
-            if (cart.purchased and what1==""):
+            if (cart.purchased and what1==None):
                 # destroy it
                 cart.destroyed = True
                 cart.purchased = False
@@ -488,15 +490,21 @@ def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, 
                     if (found == False):
                         logging.error("Couldn't find all what1arr {0}".format(whati))        
                         return False
+                    else:
+                        cart.destroyed = False
+                        cart.purchased = True
         #SandStorm players pass hand to the right - not done
         if eventId == 14:
+            logging.info("Sandstorm start Event Id:  {0}".format(eventId))
             player.gold += 0
         #ThrownInTheDungeon
         if eventId == 15:
+            logging.info("Thrown in the dungeon start Event Id:  {0}".format(eventId))
             #discard item
             if len(what1arr) > 0:
-                for whati in what1arr:        
-                    found = discardItem(game, whati, "hand")
+                for whati in what1arr:
+                    logging.info("Discarding {0} from {1}".format(whati, where1))
+                    found = discardItem(game, whati, where1)
                     if (found == False):
                         logging.error("Couldn't find all what1arr {0}".format(whati))        
                         return False
@@ -507,9 +515,11 @@ def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, 
             player.gold += gold
         #VikingParade
         if eventId == 17:
+            logging.info("Viking Parade start Event Id:  {0}".format(eventId))
             move(game, what1, where1, dest1)
         #HailStorm not done
         if eventId == 18:
+            logging.info("Sandstorm start Event Id:  {0}".format(eventId))
             player.gold += 0
         #HiddenRoom not done
         if eventId == 19:
@@ -976,8 +986,8 @@ def newQuestDeck(numPlayers):
     level4Cards = shuffle(level4Cards)
 
     if numPlayers == "1":
-        #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
-        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,1,1,1,4,4)
+        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
+        #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,1,1,1,4,4)
     elif numPlayers == "2":
         createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,7,1,4,1,2,4,2,2)
     elif numPlayers == "3":
