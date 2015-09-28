@@ -57,7 +57,7 @@ var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased,
 }
  
 
-var Game = function(numPlayers, blankMarketImageBase, questImageBase, cartImageBase) {
+var Game = function(blankMarketImageBase, questImageBase, cartImageBase) {
 
 	//all the starter empty playingCards holders	
 	this.quests = new questSet();

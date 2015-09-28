@@ -19,7 +19,7 @@
 	
 	//	'eventMarketShortage',11
 	discard next item
-	what ever the number is, remove all from market
+	what ever the number is, remove all from market 
 	only do this once, not per player
 	
 	//	'eventMarketSurplus',12

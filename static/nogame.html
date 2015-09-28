@@ -3,9 +3,9 @@
 			<img  ng-src="{{splashImage}}" width = "auto" height = "500" ></img>
 			<br></br>
 			<br></br>
+			<p>Player ID: <input type="text" ng-model="playerId" ng-Init="0"></input></p>
 			<p>Enter your name: <input type="text" ng-model="playerName"></input></p>
 			<p>Number of players: <input type="text" ng-model="numberOfPlayers"></input></p>
-			<p>Player ID: <input type="text" ng-model="playerId" ng-Init="0"></input></p>
 			<br></br>
 			<br></br>
 			<div class="col-xs-12 col-sm-10 col-sm-offset-1">
@@ -41,7 +41,7 @@
 					
 					<!-- SUBMIT BUTTON (DOESNT DO ANYTHING) -->
 					<button ng-show="numberOfPlayers > 0" class="btn btn-danger btn-lg" ng-click="newGame(numberOfPlayers, playerName)" ng-cloak>Start Game</button>            
-					<button class="btn btn-primary" ng-click="joinGame(numberOfPlayers,playerName, playerId)" ng-cloak>Join Game</button>
+					<button class="btn btn-primary" ng-click="joinGame(playerName, playerId)" ng-cloak>Join Game</button>
 						
 				</form>
 			</div>
