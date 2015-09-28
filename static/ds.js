@@ -45,6 +45,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.showHideVar = "Show";
 	$scope.showHideQuestVar = "Show";
 	$scope.playerFishButton=false;
+	$scope.refresh=false;
 
 
 
@@ -126,7 +127,7 @@ var cardColor = function(card) {
    	function startInterval(params) {
         $scope.timerId = setInterval(function () { 
 			if($scope.isActive===false) {
-				if($scope.myId != undefined) {
+				if($scope.refresh != false) {
 					$scope.playerRefresh();
 				}
 			}
@@ -1289,7 +1290,7 @@ var cardColor = function(card) {
 		activePlayer.turns = data.turns;
 		activePlayer.vp = data.points;
 		activePlayer.maxHand = data.maxHand;
-		activePlayer.active = data.isActive;
+		//activePlayer.active = data.isActive;
 		//$scope.activePlayerId = $scope.myId;
 		
 		for (var i = 0; i < data.hand.length; ++i) {   
@@ -1347,7 +1348,6 @@ var cardColor = function(card) {
 			}
 			game.players[len].questsCompleted.setCardSize("small");
 			$scope.otherPlayers[z] = game.players[len];
-
 		}
 	
 
@@ -1416,7 +1416,9 @@ var cardColor = function(card) {
 		if($scope.displayMode === 'game') {
 			checkAutoPass(data.actionsRemaining);
 		}
-	
+
+		$scope.refresh = true;
+		
 	}
 
 	function checkAutoPass(actionsRemaining) {
