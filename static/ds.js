@@ -641,7 +641,7 @@ var cardColor = function(card) {
 				play("horseNeigh");
 			}
 			if(cartId===3) {
-				play("buyCart");
+				play("anvil");
 			}
 		}
 		

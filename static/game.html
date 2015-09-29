@@ -9,7 +9,7 @@
 		<div class="col-sm-3" ng-repeat="cart in activePlayer.carts track by $index" >
 			<div ng-disabled="activePlayer.nextCartId < cart.id" ng-if="!cart.active"><b>Gold Cost:</b> {{cart.goldCost}}<span style="color:red;"> / </span><b>Item Cost:</b> {{cart.itemCost}}</div>
 			<button ng-disabled="activePlayer.nextCartId < cart.id" ng-if="!cart.active" class="btn btn-warning" ng-click="playerBuyCart(cart.id)" >Buy {{cart.name}} with {{cart.purchaseWith}}</button>   
-			<img class="tab40" ng-if="cart.active" style="{{cart.borderColor}}" width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImage(cart.id)"></img>
+			<img class="tab10" ng-if="cart.active" style="{{cart.borderColor}}" width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImage(cart.id)"></img>
 			<span class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
 				<img  style="{{card.borderColor}}" ng-click="userClickedCartItem(cart.id, $index)" ng-src="{{card.image}}"/>
 			</span>

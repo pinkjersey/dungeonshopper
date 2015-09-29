@@ -618,6 +618,7 @@ logPlayerAction = function(isActive, playersLog, playerName, logItem) {
 							break;
 						case "cart2":
 							logEntry+=convertToName("cart2");
+							sound="horseNeigh";
 							break;
 						case "cart3":
 							logEntry+=convertToName("cart3");
