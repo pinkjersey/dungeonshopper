@@ -533,13 +533,26 @@ action=move&what=23&src=hand&dst=cart1
 action=move&what=45&src=hand&dst=cart2
 */
 
-logPlayerAction = function(playersLog, playerName, logItem) {
+/*
+<audio id="trash">
+<audio id="swords">
+<audio id="horseNeigh">
+<audio id="questComplete">
+<audio id="fish">
+<audio id="button">
+<audio id="cards">
+<audio id="pass">
+<audio id="market">
+<audio id="buyCart">
+*/
+logPlayerAction = function(isActive, playersLog, playerName, logItem) {
 	if(logItem!="") {
 		var pattern = "/game?";
 		var index = logItem.indexOf(pattern) + pattern.length;
 				
 		var array = logItem.substring(index).split("&");
 		var logEntry = "";
+		var sound = "";
 		
 		for (var i = 0; i < array.length; ++i) {   
 			var logActions = array[i].split("=");
@@ -550,9 +563,31 @@ logPlayerAction = function(playersLog, playerName, logItem) {
 							break;
 						case "discard":
 							logEntry+=" discarded";
+							sound = "trash";
 							break;
 						case "fish":
 							logEntry+=" fished " ;
+							sound = "fish";
+							break;
+						case "completeQuest":
+							logEntry+= " completed a quest ";
+							sound = "questComplete";
+							break;
+						case "move":
+							logEntry+=" moved " ;
+							sound = "swords";
+							break;
+						case "marketTrade":
+							logEntry+= " did a market trade from ";
+							sound = "market";
+							break;
+						case "buyCart":
+							logEntry+= "bought ";
+							sound = "buyCart";
+							break;
+						case "pass":
+							logEntry+=" passed ";
+							sound = "swords";
 							break;
 						case "what":
 							logEntry+=" item(s) " ;
@@ -563,9 +598,6 @@ logPlayerAction = function(playersLog, playerName, logItem) {
 						case "dst":
 							logEntry+=" to the ";
 							break;
-						case "move":
-							logEntry+=" moved " ;
-							break;
 						case "src":
 							logEntry+=" from the " ;
 							break;
@@ -574,9 +606,6 @@ logPlayerAction = function(playersLog, playerName, logItem) {
 							break;
 						case "hand":
 							logEntry+=convertToName("hand");
-							break;
-						case "pass":
-							logEntry+=" passed ";
 							break;
 						case "cart":
 							logEntry+=" the ";
@@ -589,12 +618,10 @@ logPlayerAction = function(playersLog, playerName, logItem) {
 							break;
 						case "cart2":
 							logEntry+=convertToName("cart2");
+							sound="horseNeigh";
 							break;
 						case "cart3":
 							logEntry+=convertToName("cart3");
-							break;
-						case "buyCart":
-							logEntry+= "bought ";
 							break;
 						case "items":
 							if(logActions[j+1]!="") {
@@ -614,14 +641,8 @@ logPlayerAction = function(playersLog, playerName, logItem) {
 							}
 
 							break;
-						case "marketTrade":
-							logEntry+= " did a market trade from ";
-							break;
 						case "marketItems":
 							logEntry+= " for market item(s) ";
-							break;
-						case "completeQuest":
-							logEntry+= " completed a quest ";
 							break;
 						case "withGold":
 							logEntry+= " with gold the ";
@@ -636,5 +657,8 @@ logPlayerAction = function(playersLog, playerName, logItem) {
 			}
 		
 		playersLog.push(new PlayersLog(playersLog.length, playerName, logEntry + '.'));
+		if(!isActive && sound != "") {
+			play(sound);
+		}
 	}
 }
