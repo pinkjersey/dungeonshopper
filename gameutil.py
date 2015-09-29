@@ -268,7 +268,9 @@ def buyCart(game, cartidstr, withGold, items):
     elif cartid == 3:
         player.maxHand += 1
 
-    game.actionsRemaining = game.actionsRemaining -1
+    if game.gameMode == "game":
+        game.actionsRemaining = game.actionsRemaining -1
+
     game.put()    
 
     return True
@@ -333,7 +335,9 @@ def marketTrade(game, handItems, marketItems):
     player.hand.extend(addToHand)
     player.hand.sort()
     
-    game.actionsRemaining = game.actionsRemaining -1
+    if game.gameMode == "game":
+        game.actionsRemaining = game.actionsRemaining -1
+
     game.put()
 
     return True                
@@ -412,7 +416,9 @@ def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, 
     eventId=int(eventId)
     gold=int(gold)
     player = game.players[game.curPlayer]
+    playerId = game.players[game.curPlayer].playerId
     logging.info("Entered Logic for Events")
+    logging.info("playerid is: {0}".format(playerId)) 
     what1arr = whatToArray(what1)
     what2arr = whatToArray(what2)
     game.gameMode = "event"
@@ -531,9 +537,15 @@ def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, 
 
     #advance event to next player, deal new quest if done
     game.eventCompletedCount += 1
+
+    logging.info("Event count increased to:  {0}".format(game.eventCompletedCount))
     game.curPlayer += 1
     if game.curPlayer == game.numPlayers:
         game.curPlayer = 0
+    logging.info("CurPlayer changed to:  {0}".format(game.curPlayer))		
+    
+
+
     if(game.eventCompletedCount==game.numPlayers):
         game.gameMode = "game"		
         game.eventCompletedCount = 0	
@@ -544,8 +556,6 @@ def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, 
             del game.questsInPlay[decklen-1]
 
         dealQuest(game)
-
-
 
     # save game to data store
     game.put()
@@ -593,8 +603,7 @@ def completeQuest(game, what, where):
     except ValueError as e:
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
         return False
-
-    game.gameMode = "game"    
+    
     game.put()
 
     return True
@@ -639,7 +648,6 @@ def passPlayer(game, items):
     player.turns += 1	
 
     # save game to data store
-    game.gameMode = "game"
     game.put()
 
     return priorPlayer
@@ -681,8 +689,10 @@ def buyAction(game):
     if (player.gold < buyCost):
         return False
 
-    player.gold = player.gold - buyCost    
-    game.actionsRemaining = game.actionsRemaining + 1
+    player.gold = player.gold - buyCost
+    if game.gameMode == "game":
+        game.actionsRemaining = game.actionsRemaining + 1
+
     game.put()
 
     return True
@@ -877,9 +887,11 @@ def dealQuest(game):
         game.questsInPlay.append(quest)
         if quest.level == 4:
             game.gameMode = "event"
-            logging.info("GameMode: {0}".format(game.gameMode)) 
+            logging.info("GameMode: {0}".format(game.gameMode))
+        else:
+            game.gameMode = "game"
 
-	
+
 def newQuestDeck(numPlayers):
     level1Cards = []
     level2Cards = []
@@ -989,7 +1001,8 @@ def newQuestDeck(numPlayers):
         createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
         #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,1,1,1,4,4)
     elif numPlayers == "2":
-        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,7,1,4,1,2,4,2,2)
+        #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,7,1,4,1,2,4,2,2)
+		createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,1,1,1,4,4)
     elif numPlayers == "3":
         createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,10,3,7,2,3,5,2,2)
     elif numPlayers == "4":
