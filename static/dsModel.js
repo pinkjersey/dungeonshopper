@@ -71,7 +71,7 @@ var Game = function(blankMarketImageBase, questImageBase, cartImageBase) {
 	this.itemHolders.createBlankMarket(blankMarketImageBase);
 	this.itemMarketHolders.createBlankMarket(blankMarketImageBase);
 	this.quests.createQuestDeck(questImageBase);
-
+	this.playersLog = [];
 	this.players = [];
 	//set initial size of the cards for the gui
 	//their are times in the code that these are changed and reset

@@ -29,7 +29,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	//$scope.questSelected=false;
 	$scope.isActive = false;
 	$scope.selectedCartItems = "";
-	$scope.playerslog = [];
+	
 	$scope.showLog = false;
 	$scope.showLogText = "Show Players Log";
 	$scope.blankText = "";
@@ -46,6 +46,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.showHideQuestVar = "Show";
 	$scope.playerFishButton=false;
 	$scope.refresh=false;
+	$scope.logItemCount = 0;
 
 
 
@@ -720,8 +721,8 @@ var cardColor = function(card) {
 	$scope.playerMarketTrade = function() {
 		if(!$scope.isActive){return;}
 		//check if one to one or many to many
-		var text = "";
 		var game = $scope.game;
+		var text = "";
 		var player = $scope.activePlayer;
 		var selectedItemCards = getSelectedCards(player.cards, true);
 		var selectedMarketCards = getSelectedCards(game.marketDeckInTrade, true);
@@ -757,9 +758,9 @@ var cardColor = function(card) {
 			return;
 		}
 		
-		text = "Market trade with " + logSelectedCards(selectedItemCards) + ' for ' + logSelectedCards(selectedMarketCards);
-		
+
 		//move player items to market
+			text = "Market trade with " + logSelectedCards(selectedItemCards) + ' for ' + logSelectedCards(selectedMarketCards);
 		
 			var r =  confirm(text + "?");
 			if(r===true) {
@@ -779,7 +780,6 @@ var cardColor = function(card) {
 
 		resetPlayerCardsSelected(player);
 		setMarketCounts(game);
-		//updateLog(text);
 		play("market");
 	}
 	
@@ -1356,7 +1356,7 @@ var cardColor = function(card) {
 		$scope.itemsCountRemaining = data.itemsCountRemaining;
 		$scope.questsCountRemaining = data.questsCountRemaining;
 		$scope.discardsCount = data.discardsCount;
-		$scope.playersLog = [];
+		
 		game.questsInPlay = new cardSet();
 		game.marketDeck = new cardSet();
 		
@@ -1378,11 +1378,15 @@ var cardColor = function(card) {
 			updateDiscardPile(game, data.lastDiscarded);	
 		}
 		
-
-		for (var i = 0; i < data.playerLog.length; ++i) {   
+		var log = [];
+		log = data.playerLog;
+		log.reverse();
+		for (var i = 0; i < log.length - $scope.logItemCount; ++i) {   
 		//0 is always the active player
-			logPlayerAction($scope.playersLog, getPlayerName(game, data.playerLog[i].playerId), data.playerLog[i].event);
+			logPlayerAction($scope.isActive, game.playersLog, getPlayerName(game, data.playerLog[i].playerId), data.playerLog[i].event);
 		}
+
+		$scope.logItemCount = data.playerLog.length;
 		
 		if(data.gameOver===true)	{
 			gameEnd();
