@@ -316,7 +316,7 @@ class GameHandler(webapp2.RequestHandler):
 
     def completeEvent(self):
         """
-        USAGE: /game?action=completeEvent&eventId=<eventId>
+        USAGE: /game?action=completeEvent&eventId=<eventId>&cart=<cart0>&gold=<0>&what1=<>&where1=<>&what2=<>&where2=<>&dest1=<>
         Complete an event. 
         """
         logging.info("Compelete Event: begin")

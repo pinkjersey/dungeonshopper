@@ -432,16 +432,20 @@ logSelectedCards = function(items) {
 }
 
 //returns number of cards selected for deck
-getSelectedCardcount = function(deck){
-	var selectedCardCount = 0;
+getSelectedCardcount = function(deck, selectedCardsOnly){
+	var total = 0;
 	for (var i = 0; i < deck.playingCards.length; ++i)  {
 		var card = deck.playingCards[i];
-		if(card.selected) {
-			selectedCardCount++;
+		if(selectedCardsOnly){
+			if(card.selected) {
+				total++;
+			}
+		else {
+			total += deck.playingCards[i].number;
 		}
 		continue;
 	}
-	return selectedCardCount;
+	return total;
 
 }
 
