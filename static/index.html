@@ -69,7 +69,7 @@
 
     <div class="panel panel-info">
 		<div class="panel-heading">
-			<img ng-show="displayMode != 'nogame'" ng-src="{{titleImg}}" </img><big> {{displayModeName}}</big>
+			<img ng-show="displayMode != 'nogame'" ng-src="{{titleImg}}" </img><big> {{displayMode}} : {{displayModeName}}</big>
 			<span class="panel-title pull-right"><button class="btn btn-primary" ng-show="displayMode === 'game'" ng-click="noGame()">Reset</button></span>
 			<ng-include src="'nogame.html'" ng-show="displayMode === 'nogame'"></ng-include>
 			<ng-include src="'game.html'" ng-show="displayMode === 'game'"></ng-include>
@@ -79,7 +79,7 @@
 			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventKingsFeast'"></ng-include>
 			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventMarketShortage'"></ng-include>
 			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventMarketSurplus'"></ng-include>
-			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventVikingParade'"></ng-include>
+			<ng-include src="'eventVikingParade.html'" ng-show="displayMode === 'eventVikingParade'"></ng-include>
 			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventTreasure'"></ng-include>
 			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventBarbarianAttack'"></ng-include>
 			<ng-include src="'eventTemplate.html'" ng-show="displayMode === 'eventSandStorm'"></ng-include>

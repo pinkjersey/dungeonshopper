@@ -78,6 +78,7 @@ showHide = function(showOtherPlayerData) {
 			return "Show";
 		}
 }
+
 showHideQuests = function(showMyCompletedQuests) {
 	if(showMyCompletedQuests) {
 			return "Hide";
@@ -86,7 +87,6 @@ showHideQuests = function(showMyCompletedQuests) {
 			return "Show";
 		}
 }
-
 
 nextCartName = function(cartId) {
 if(cartId === 1)
@@ -122,7 +122,6 @@ var getPlayerName = function(game, playerId) {
 		}
 	}
 }
-
 
 checkIfQuestIsReadyFromCart = function (game, player) {
 	var questCanBeCompleted = false;
@@ -234,8 +233,6 @@ var checkIfQuestISReadyFromHand = function (game, player, autoSelectHand) {
 	return questReady;
 }
 
-
-
 //returns card in an array
 getSelectedCardArrayForQuest = function(deck){
 	var arr = [];
@@ -250,7 +247,6 @@ getSelectedCardArrayForQuest = function(deck){
 	}
 	return arr;
 }
-
 
 parseSelectedCardArrayForQuest = function(items) {
 	var s = "";
@@ -299,6 +295,7 @@ dealNumberToPlayer = function(game, player, number) {
 		}
 	}
 }
+
 dealNumberToMarket = function(game, number) {
 	for (var i = 0; i < game.itemMarketHolders.playingCards.length; ++i)  {
 		var card = game.itemMarketHolders.playingCards[i];
@@ -432,17 +429,22 @@ logSelectedCards = function(items) {
 }
 
 //returns number of cards selected for deck
-getSelectedCardcount = function(deck){
-	var selectedCardCount = 0;
+getSelectedCardcount = function(deck, selectedCardsOnly){
+	var total = 0;
 	for (var i = 0; i < deck.playingCards.length; ++i)  {
 		var card = deck.playingCards[i];
-		if(card.selected) {
-			selectedCardCount++;
+		if(selectedCardsOnly){
+			if(card.selected) {
+				total++;
+			}
 		}
-		continue;
+		else {
+			total += deck.playingCards[i].number;
+		}
+		
+		
 	}
-	return selectedCardCount;
-
+	return total;
 }
 
 //returns total number sum of selected cards in deck
@@ -545,6 +547,9 @@ action=move&what=45&src=hand&dst=cart2
 <audio id="market">
 <audio id="buyCart">
 */
+
+//completeEventeventId16 the wheelbarrowgold1what1where1what2where2dest1.
+
 logPlayerAction = function(isActive, playersLog, playerName, logItem) {
 	if(logItem!="") {
 		var pattern = "/game?";
@@ -565,6 +570,17 @@ logPlayerAction = function(isActive, playersLog, playerName, logItem) {
 							logEntry+=" discarded";
 							sound = "trash";
 							break;
+						case "completeEventeventId":
+							logEntry+=" completed event "
+							logActions.splice(i,1);
+							logActions.splice(i,1);
+							logActions.splice(i,1);
+							logActions.splice(i,1);
+							logActions.splice(i,1);
+							logActions.splice(i,1);							
+							logActions.splice(i,1);							
+							logActions.splice(i,1);							
+							break
 						case "fish":
 							logEntry+=" fished " ;
 							sound = "fish";

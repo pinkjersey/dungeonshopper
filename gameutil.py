@@ -268,7 +268,13 @@ def buyCart(game, cartidstr, withGold, items):
     elif cartid == 3:
         player.maxHand += 1
 
-    game.actionsRemaining = game.actionsRemaining -1
+    if game.gameMode == "game":
+        game.actionsRemaining = game.actionsRemaining -1
+
+    if game.pendingMode == "event":
+        game.gameMode == "event"
+        game.pendingMode == "game"
+		
     game.put()    
 
     return True
@@ -333,7 +339,9 @@ def marketTrade(game, handItems, marketItems):
     player.hand.extend(addToHand)
     player.hand.sort()
     
-    game.actionsRemaining = game.actionsRemaining -1
+    if game.gameMode == "game":
+        game.actionsRemaining = game.actionsRemaining -1
+
     game.put()
 
     return True                
@@ -412,7 +420,9 @@ def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, 
     eventId=int(eventId)
     gold=int(gold)
     player = game.players[game.curPlayer]
+    playerId = game.players[game.curPlayer].playerId
     logging.info("Entered Logic for Events")
+    logging.info("playerid is: {0}".format(playerId)) 
     what1arr = whatToArray(what1)
     what2arr = whatToArray(what2)
     game.gameMode = "event"
@@ -434,13 +444,15 @@ def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, 
         if eventId == 7:
             logging.info("Entered Logic for event BrokenItems")
             if len(what1arr) > 0:
-                logging.info("what1 {0}".format(what1)) 
-                logging.info("where1 {0}".format(where1)) 
-                fish(game, what1, where1)
+                for whati in what1arr:
+                    logging.info("whati {0}".format(whati)) 
+                    logging.info("where1 {0}".format(where1)) 
+                    fish(game, whati, where1)
             if len(what2arr) > 0:
-                logging.info("what2 {0}".format(what2)) 
-                logging.info("where2 {0}".format(where2)) 
-                fish(game, what2, where2)
+                for whati2 in what2arr:
+                    logging.info("whati2 {0}".format(whati2)) 
+                    logging.info("where2 {0}".format(where2)) 
+                    fish(game, whati2, where2)
         #CastleTaxation
         if eventId == 8:
             #discard items first
@@ -475,24 +487,24 @@ def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, 
     
         #orcs attack.  Wheelbarrow destroyed.  if handItems present don't destroy, but discard them
         if eventId == 13:
-            if what1==None:
-                logging.info("Destroying Cart")
-            #destroy it	if no cards passed in
-            if (cart.purchased and what1==None):
-                # destroy it
-                cart.destroyed = True
-                cart.purchased = False
-            #discard items if buying it back
-            if len(what1arr) > 0:
-                for whati in what1arr:
-                    logging.info("Discarding {0} from {1}".format(whati, where1))
-                    found = discardItem(game, whati, where1)
-                    if (found == False):
-                        logging.error("Couldn't find all what1arr {0}".format(whati))        
-                        return False
-                    else:
-                        cart.destroyed = False
-                        cart.purchased = True
+            if cartidstr == None:
+                pass
+            else:
+                #destroy it	if no cards passed in
+                if (cart.purchased and what1==None):
+                    # destroy it
+                    cart.destroyed = True
+                    cart.purchased = False
+                #discard items if buying it back
+                if len(what1arr) > 0:
+                    for whati in what1arr:
+                        logging.info("Discarding {0} from {1}".format(whati, where1))
+                        found = discardItem(game, whati, where1)
+                        if (found == False):
+                            logging.error("Couldn't find all what1arr {0}".format(whati))        
+                            return False
+                    cart.destroyed = False
+                    cart.purchased = True
         #SandStorm players pass hand to the right - not done
         if eventId == 14:
             logging.info("Sandstorm start Event Id:  {0}".format(eventId))
@@ -531,9 +543,15 @@ def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, 
 
     #advance event to next player, deal new quest if done
     game.eventCompletedCount += 1
+
+    logging.info("Event count increased to:  {0}".format(game.eventCompletedCount))
     game.curPlayer += 1
     if game.curPlayer == game.numPlayers:
         game.curPlayer = 0
+    logging.info("CurPlayer changed to:  {0}".format(game.curPlayer))		
+    
+
+
     if(game.eventCompletedCount==game.numPlayers):
         game.gameMode = "game"		
         game.eventCompletedCount = 0	
@@ -544,8 +562,10 @@ def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, 
             del game.questsInPlay[decklen-1]
 
         dealQuest(game)
-
-
+		
+    if game.pendingMode == "event":
+        game.gameMode == "event"
+        game.pendingMode == "game"
 
     # save game to data store
     game.put()
@@ -594,7 +614,10 @@ def completeQuest(game, what, where):
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
         return False
 
-    game.gameMode = "game"    
+    if game.pendingMode == "event":
+        game.gameMode == "event"
+        game.pendingMode == "game"
+		
     game.put()
 
     return True
@@ -639,7 +662,6 @@ def passPlayer(game, items):
     player.turns += 1	
 
     # save game to data store
-    game.gameMode = "game"
     game.put()
 
     return priorPlayer
@@ -681,8 +703,10 @@ def buyAction(game):
     if (player.gold < buyCost):
         return False
 
-    player.gold = player.gold - buyCost    
-    game.actionsRemaining = game.actionsRemaining + 1
+    player.gold = player.gold - buyCost
+    if game.gameMode == "game":
+        game.actionsRemaining = game.actionsRemaining + 1
+
     game.put()
 
     return True
@@ -876,10 +900,12 @@ def dealQuest(game):
         del game.questDeck[0]
         game.questsInPlay.append(quest)
         if quest.level == 4:
-            game.gameMode = "event"
-            logging.info("GameMode: {0}".format(game.gameMode)) 
+            game.pendingMode = "event"
+            logging.info("GameMode pending: {0}".format(game.gameMode))
+        else:
+            game.gameMode = "game"
 
-	
+
 def newQuestDeck(numPlayers):
     level1Cards = []
     level2Cards = []
@@ -990,6 +1016,7 @@ def newQuestDeck(numPlayers):
         #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,1,1,1,4,4)
     elif numPlayers == "2":
         createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,7,1,4,1,2,4,2,2)
+		#createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,0,1,0,1,0,2,2)
     elif numPlayers == "3":
         createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,10,3,7,2,3,5,2,2)
     elif numPlayers == "4":
