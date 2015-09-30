@@ -3,10 +3,6 @@
 	<ng-include src="'playerHeader.html'"></ng-include>		
 
 	<br></br>
-			<div ng-show="debug==true">	
-			<p>DisplayMode: 	{{displayMode}}</p>
-			</div>
-
 
 	<div class="row" ng-disabled="loadingData">
 		<div class="col-sm-3" ng-repeat="cart in activePlayer.carts track by $index" >

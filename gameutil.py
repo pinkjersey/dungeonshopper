@@ -415,15 +415,16 @@ def getIntersection(list1, list2):
     ret.sort()
     return ret
 
-def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, dest1):
+def completeEvent(game, eventId, playerId, cartidstr, gold, what1, where1, what2, where2, dest1):
 #note that the gameMode has been added to the game object
 #this controls if the game is in game or event mode
 #game.gameMode = "game"	
 #game.gameMode = "event"	
     eventId=int(eventId)
     gold=int(gold)
-    player = game.players[game.curPlayer]
-    playerId = game.players[game.curPlayer].playerId
+    #player = game.players[game.curPlayer]
+    player = game.players[playerId]
+    #playerId = game.players[game.curPlayer].playerId
     logging.info("Entered Logic for Events")
     logging.info("playerid is: {0}".format(playerId)) 
     what1arr = whatToArray(what1)
@@ -435,7 +436,7 @@ def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, 
         if (cartid <0 or cartid > 3):
             logging.error("Invalid cart id")
             return False
-        cart = game.players[game.curPlayer].carts[cartid]
+        cart = game.players[playerId].carts[cartid]
 
     try:
         #destroy market and re-seed if you are the first to get here        
@@ -477,7 +478,7 @@ def completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, 
                         return False
         #KingsFeast
         if eventId == 10:
-            dealItemCard(game.curPlayer, game)
+            dealItemCard(playerId, game)
         #MarketShortage	- not done
         if eventId == 11:
             player.gold += 0

@@ -33,7 +33,8 @@
 	</table>
 </div>
 
-<h4 ng-show="activePlayer.carts[1].active===false" class="tab40">You only have one active cart, click Complete Event.</h4>
+<h4 ng-show="activePlayer.nextCartId === 1" class="tab40">You only have one active cart, click Complete Event.</h4>
+<h4 ng-show="activePlayer.nextCartId > 1  && totalCartCardsFound > 0" class="tab40">You may move one group of items between carts/wagons.  Then click Complete Event.</h4>
 <ng-include src="'eventTemplateNoHeader.html'"></ng-include>	
 
 		

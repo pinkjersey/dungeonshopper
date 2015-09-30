@@ -330,7 +330,17 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        cartidstr = self.request.get('cart')        
+        playerId = self.request.get("playerId")
+        if (playerId == None or playerId == ""):
+            self.error(500)
+            return
+
+        iPlayerId = int(playerId)
+        if (iPlayerId < 1 or iPlayerId > 3):
+            self.error(500)
+            return
+
+        cartidstr = self.request.get('cartToDestroy')        
         gold = self.request.get('gold')
         what1 = self.request.get('what1')
         where1 = self.request.get('where1')
@@ -344,7 +354,7 @@ class GameHandler(webapp2.RequestHandler):
         logging.info("what2 Items Found:  {0}".format(what2))
         logging.info("where2 Items Found:  {0}".format(where2))
         logging.info("dest1 Items Found:  {0}".format(dest1))
-        result = completeEvent(game, eventId, cartidstr, gold, what1, where1, what2, where2, dest1)
+        result = completeEvent(game, eventId, iPlayerId, cartidstr, gold, what1, where1, what2, where2, dest1)
         if (result == False):
             self.error(500)
             return
@@ -352,7 +362,7 @@ class GameHandler(webapp2.RequestHandler):
         logging.info("Compelete event: done")
 
         self.appendToLog(game)
-        retstr = playerState(game, game.curPlayer)
+        retstr = playerState(game, iPlayerId)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
