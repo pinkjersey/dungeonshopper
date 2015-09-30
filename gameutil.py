@@ -150,6 +150,9 @@ def removeItems(game, what, where):
         srclen = len(srclist)
         for i in range(srclen):
             srci = srclist[i]
+            if (srci == 0):
+                srci = 10
+                
             if (whati == srci):
                 found = True
                 del srclist[i]
@@ -208,7 +211,7 @@ def move(game, what, src, dst):
         dstlist.sort()
 
     except ValueError as e:
-        logging.error("Exception ({0}): {1}".format(e.errno, e.strerror))        
+        logging.error("Exception {0}".format(e.message))        
         return False
 
     if game.gameMode == "game":
