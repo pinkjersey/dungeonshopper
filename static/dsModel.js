@@ -24,11 +24,11 @@ var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased,
 	this.height=125;
 	this.name = name;
 	this.destroyed = false;
-	this.purchaseWith = 'gold';
+	this.purchaseWith = 'items';
 	this.image = imageNotPurchased;
 
 	//set initial state of carts
-	if(active===1) {
+	if(active===true) {
 		this.image = imagePurchased;
 	}
 	else {
@@ -111,9 +111,9 @@ var Player = function (game, id, name) {
 	this.nextCartId = 0;
 	this.nextCartName = 'Hand Cart';
 	this.winner=false;
-    this.carts = [new Cart(0, 3, 1, 0, 5,'Wheelbarrow', game.cartImageBase + '0.jpg', game.cartImageBase + '0_not_purchased.jpg'), 
-				  new Cart(1, 3, 0, 1, 10, 'Hand Cart', game.cartImageBase + '1.jpg', game.cartImageBase + '1_not_purchased.jpg'), 
-				  new Cart(2, 4, 0, 2, 15, 'Horse Wagon', game.cartImageBase + '2.jpg', game.cartImageBase + '2_not_purchased.jpg'), 
-			      new Cart(3, 5, 0, 3, 20, 'War Wagon', game.cartImageBase + '3.jpg', game.cartImageBase + '3_not_purchased.jpg')]
+    this.carts = [new Cart(0, 3, true, 0, 5,'Wheelbarrow', game.cartImageBase + '0.jpg', game.cartImageBase + '0_not_purchased.jpg'), 
+				  new Cart(1, 3, false, 1, 10, 'Hand Cart', game.cartImageBase + '1.jpg', game.cartImageBase + '1_not_purchased.jpg'), 
+				  new Cart(2, 4, false, 2, 15, 'Horse Wagon', game.cartImageBase + '2.jpg', game.cartImageBase + '2_not_purchased.jpg'), 
+			      new Cart(3, 5, false, 3, 20, 'War Wagon', game.cartImageBase + '3.jpg', game.cartImageBase + '3_not_purchased.jpg')]
 				  ;
 }

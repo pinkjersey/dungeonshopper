@@ -24,6 +24,7 @@ var prepEvents = function() {
 }
 
 
+
 playerCardChecked = function(card) {
 	if(card.selected) {
 		card.image = card.imageChecked;
@@ -266,6 +267,9 @@ updatePlayerCarts = function(game, player, playerCart, dataCart) {
 		for (var i = 0; i < dataCart.inCart.length; ++i) {   
 			updatePlayerCartItems(game, playerCart, dataCart.inCart[i]);	
 		}
+	}
+	else {
+		playerCart.image = playerCart.imageNotPurchased;
 	}
 }
 	

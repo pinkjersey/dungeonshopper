@@ -174,7 +174,11 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        result = move(game, what, src, dst)
+        actionCost = self.request.get('actionCost')
+        if (actionCost == None or actionCost == ""):
+            actionCost = 1
+
+        result = move(game, what, src, dst, actionCost)
         if (result == False):
             self.error(500)
             return
@@ -336,7 +340,7 @@ class GameHandler(webapp2.RequestHandler):
             return
 
         iPlayerId = int(playerId)
-        if (iPlayerId < 1 or iPlayerId > 3):
+        if (iPlayerId < 0 or iPlayerId > 3):
             self.error(500)
             return
 

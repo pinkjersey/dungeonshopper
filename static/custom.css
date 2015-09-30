@@ -2,6 +2,7 @@
 
 .body         { padding-top:50px; }
 
+
 .label {
     display: block;
     padding-left: 15px;
@@ -35,11 +36,8 @@
     bottom: 2px;
 }
 
-[ng\:cloak], [ng-cloak], .ng-cloak {
-    display: none;
-}
 .imgPad{
-	padding: 10;
+	padding: 10px;
 }
 .right{
  width:700px;
@@ -52,6 +50,15 @@
  background:white;
  overflow:hidden;
 }
+
+.middle{
+ height:150px;
+ width:300px;
+ background:white;
+ overflow:hidden;
+}
+
+
 
 /*.img-with-text {
     text-align: center;
