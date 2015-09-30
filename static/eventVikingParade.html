@@ -6,7 +6,7 @@
 
 	<div class="row" ng-disabled="loadingData">
 		<div class="col-sm-3" ng-repeat="cart in activePlayer.carts track by $index" >
-			<img ng-if="cart.active" style="{{cart.borderColor}}" width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImageEvent(cart.id)"></img>
+			<img  class="tab10" ng-if="cart.active" style="{{cart.borderColor}}" width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}" ng-click="userClickedCartImageEvent(cart.id)"></img>
 			<span class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
 				<img  style="{{card.borderColor}}" ng-click="userClickedCartItemEvent(cart.id, $index)" ng-src="{{card.image}}"/>
 			</span>
@@ -32,6 +32,7 @@
 		</thead>
 	</table>
 </div>
+
 <h4 ng-show="activePlayer.carts[1].active===false" class="tab40">You only have one active cart, click Complete Event.</h4>
 <ng-include src="'eventTemplateNoHeader.html'"></ng-include>	
 
