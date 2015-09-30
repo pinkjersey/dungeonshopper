@@ -23,11 +23,6 @@ var prepEvents = function() {
 	return events;
 }
 
-//plays audio files
-play = function (soundId) {
-	var audio = document.getElementById(soundId);
-	audio.play();
-};
 
 playerCardChecked = function(card) {
 	if(card.selected) {

@@ -47,9 +47,31 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.playerFishButton=false;
 	$scope.refresh=false;
 	$scope.logItemCount = 0;
+	$scope.sounds = true;
+	$scope.music = true;
+	$scope.totalCartCardsFound = 0;
+	$scope.totalCardsFound = 0;
 
 
 
+
+	//plays audio files
+	play = function (soundId) {
+		if($scope.sounds) {
+			var audio = document.getElementById(soundId);
+			audio.play();
+		}
+	};
+	
+	//plays music files
+	play = function (musicId) {
+		if($scope.music) {
+			var audio = document.getElementById(musicId);
+			audio.play();
+		}
+	};
+	
+	
 	$scope.noGame = function () {
 		setupNoGame();
 	}
@@ -58,6 +80,14 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.debug = !$scope.debug;
 	}		
 
+	$scope.soundsCheck = function () {
+		$scope.sound = !$scope.sound;
+	}
+
+	$scope.musicCheck = function () {
+		$scope.music = !$scope.music;
+	}	
+	
 	$scope.autoSelectCartCheck = function () {
 		$scope.autoSelectCart = !$scope.autoSelectCart;
 	}	
@@ -970,15 +1000,15 @@ var cardColor = function(card) {
 		var event = $scope.game.activeEvent;
 		var selectedItemCards = getSelectedCards(player.cards, true);
 		var playerItemCards = getSelectedCards(player.cards, false);
-		var destroyCart = 'cart0';
 		var playerHas123InHand = checkIfPlayerHas123InHand(player.cards);
-		var gold = 0;
 		var cart0CardCount = player.carts[0].cards.playingCards.length;
 		var cart1CardCount = player.carts[1].cards.playingCards.length;
 		var cart2CardCount = player.carts[2].cards.playingCards.length;
 		var cart3CardCount = player.carts[3].cards.playingCards.length;
 		var totalCards = playerCardCount+cart0CardCount +cart1CardCount +cart2CardCount +cart3CardCount ;
 		var totalCartCards = cart0CardCount +cart1CardCount +cart2CardCount +cart3CardCount ;
+		$scope.totalCartCardsFound = totalCartCards;
+		$scope.totalCardsFound = totalCards;
 		var playerCardCountSel = getSelectedCardcount(player.cards, true);
 		var cart0CardCountSel = getSelectedCardcount(player.carts[0].cards, true);
 		var cart1CardCountSel = getSelectedCardcount(player.carts[1].cards, true);
@@ -986,6 +1016,8 @@ var cardColor = function(card) {
 		var cart3CardCountSel = getSelectedCardcount(player.carts[3].cards, true);
 		var totalCardsSelected = playerCardCountSel+cart0CardCountSel +cart1CardCountSel +cart2CardCountSel +cart3CardCountSel ;
 		var totalCartCardsSelected = cart0CardCountSel +cart1CardCountSel +cart2CardCountSel +cart3CardCountSel ;
+		var destroyCart = 'cart0';
+		var gold = 0;
 		var eventId = "";
 		var what1 = "";
 		var where1="";
@@ -1051,7 +1083,7 @@ var cardColor = function(card) {
 				case 'eventCastleTaxation':
 					 eventId = 8;
 					//discard with no actions from hand only
-					if($scope.activePlayer.gold === 0 && playerItemCards === 0 && playerCartItemCards === 0) {
+					if($scope.activePlayer.gold === 0 && totalCards === 0) {
 						gold = 0;
 						break;
 					}
@@ -1069,8 +1101,6 @@ var cardColor = function(card) {
 						if(totalCards >= 1 && (totalCardsSelected===1 || totalCardsSelected===2) ){
 							gold = 0;
 							if(playerCardCountSel >= 1) {
-								//what1 = getSelectedCard(player.cards)
-								//where1 = 'hand'
 								whatWhereArray.push(getSelectedCards(player.cards, true));
 								whatWhereArray.push('hand');
 							}
@@ -1243,7 +1273,7 @@ var cardColor = function(card) {
 			if(what2===undefined) {what2=""}
 			if(where2===undefined) {where2=""}
 			if(dest1===undefined) {dest1=""}
-			completeEvent(eventId, destroyCart, gold, what1, where1, what2, where2, dest1);
+			completeEvent(eventId, $scope.myId, destroyCart, gold, what1, where1, what2, where2, dest1);
 			resetPlayerCardsSelected(player);
 			resetDisplayMode('gameSpectator');
 			playerRefresh($scope.myId);
@@ -1489,9 +1519,9 @@ var cardColor = function(card) {
 		gameFactory.joinGame(playerId, playerName, processGameStateCallback, processGameStateErrorCallback);
 	}
 
-	function completeEvent(eventId, cartToDestroy, gold, what1, where1, what2, where2, dest1) {
+	function completeEvent(eventId, playerId, cartToDestroy, gold, what1, where1, what2, where2, dest1) {
 		$scope.loadingData=true;
-		gameFactory.completeEvent(eventId, cartToDestroy, gold, what1, where1, what2, where2, dest1, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.completeEvent(eventId, playerId, cartToDestroy, gold, what1, where1, what2, where2, dest1, processGameStateCallback, processGameStateErrorCallback);
 	}
 
 	function pass(discard) {
