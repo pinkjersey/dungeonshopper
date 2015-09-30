@@ -129,7 +129,7 @@ var cardColor = function(card) {
         $scope.timerId = setInterval(function () { 
 			if($scope.isActive===false) {
 				if($scope.refresh != false) {
-					$scope.playerRefresh();
+					playerRefresh($scope.myId);
 				}
 			}
 
@@ -671,7 +671,7 @@ var cardColor = function(card) {
 		var game = $scope.game;
 		var player = $scope.activePlayer;
 		var discardSelectedCards = getSelectedCards(player.cards, true);
-		var selectedCardCount = getSelectedCardcount(player.cards);
+		var selectedCardCount = getSelectedCardcount(player.cards,true);
 		var r = false;
 
 		if(player.actionsRemaining > 0)	{
@@ -726,7 +726,7 @@ var cardColor = function(card) {
 		var player = $scope.activePlayer;
 		var selectedItemCards = getSelectedCards(player.cards, true);
 		var selectedMarketCards = getSelectedCards(game.marketDeckInTrade, true);
-		var selectedCardCount = getSelectedCardcount(player.cards);
+		var selectedCardCount = getSelectedCardcount(player.cards, true);
 		$scope.selectedItemsCount = selectedCardCount;
 		
 		if(player.actionsRemaining === 0)	{
@@ -784,10 +784,15 @@ var cardColor = function(card) {
 	}
 	
 	prepareEventForPlayer = function(game, questCardinplay) {	
-
-		$scope.playerPaidWithItems=0;
 		var player = $scope.activePlayer;
 		var cart = player.carts[0];
+		var playerCardCount = player.cards.playingCards.length;
+		var cart0CardCount = player.carts[0].cards.playingCards.length;
+		var cart1CardCount = player.carts[1].cards.playingCards.length;
+		var cart2CardCount = player.carts[2].cards.playingCards.length;
+		var cart3CardCount = player.carts[3].cards.playingCards.length;
+		var totalCards = playerCardCount+cart0CardCount +cart1CardCount +cart2CardCount +cart3CardCount ;
+		$scope.playerPaidWithItems=0;
 		$scope.wheelbarrowCardSum = getSelectedCardSum(cart.cards, false);
 		
 		if(player===null) {
@@ -816,7 +821,7 @@ var cardColor = function(card) {
 					break;
 				case 'eventCastleTaxation':
 				//player is broke allow to complete
-					if($scope.activePlayer.gold === 0 && playerItemCards === 0 && playerCartItemCards === 0) {
+					if($scope.activePlayer.gold === 0 && totalCards === 0) {
 						$scope.playerPaidWithItems=2;
 					}
 
@@ -877,7 +882,7 @@ var cardColor = function(card) {
 	
 	
 	checkIfPlayerHas123InHand = function(playerItemCards) {
-		for (var i = 0; i < playerItemCards.length; ++i)  {
+		for (var i = 0; i < playerItemCards.playingCards.length; ++i)  {
 			var card = playerItemCards.playingCards[i];
 			if(card.number < 4) {
 				return true;
@@ -902,6 +907,16 @@ var cardColor = function(card) {
 		}
 		play("swords");
 	}  
+
+	$scope.userClickedCartImageEvent = function(id) {
+		if(!$scope.isActive){return;}
+		var player = $scope.activePlayer;
+		
+		//deselect all items in cart if cart selected
+		for (var j = 0; j < player.carts[id].cards.playingCards.length; ++j)  {
+			$scope.userClickedCartItemEvent(id, j);
+		}
+	}	
 	
 	$scope.userClickedCartItemEvent = function (cartId, cardIndex) {
 		if(!$scope.isActive){return;}
@@ -909,13 +924,18 @@ var cardColor = function(card) {
 		var player = $scope.activePlayer;
 		var card = player.carts[cartId].cards.playingCards[cardIndex];
 		var cart = player.carts[cartId];
-		
 		card.selected = !card.selected;
 		card.borderColor = cardColor(card);
 		cartCardChecked(card);
-	
 		cart.cardSumSelected = getSelectedCardSum(cart.cards, true);
-		resetCartCardsSelected(player, cartId);
+		var playerCardCountSel = getSelectedCardcount(player.cards, true);
+		var cart0CardCountSel = getSelectedCardcount(player.carts[0].cards, true);
+		var cart1CardCountSel = getSelectedCardcount(player.carts[1].cards, true);
+		var cart2CardCountSel = getSelectedCardcount(player.carts[2].cards, true);
+		var cart3CardCountSel = getSelectedCardcount(player.carts[3].cards, true);
+		var totalCardsSelected = playerCardCountSel+cart0CardCountSel +cart1CardCountSel +cart2CardCountSel +cart3CardCountSel ;
+		$scope.playerPaidWithItems=totalCardsSelected;	
+		//resetCartCardsSelected(player, cartId);
 		play("button");
 	}
 	
@@ -928,6 +948,14 @@ var cardColor = function(card) {
 		playerCardChecked(card);
 		player.cardSumSelected = getSelectedCardSum(player.cards, true);
 		$scope.selectedItemsCount = getSelectedCardcount(player.cards, true);
+		var playerCardCountSel = getSelectedCardcount(player.cards, true);
+		var cart0CardCountSel = getSelectedCardcount(player.carts[0].cards, true);
+		var cart1CardCountSel = getSelectedCardcount(player.carts[1].cards, true);
+		var cart2CardCountSel = getSelectedCardcount(player.carts[2].cards, true);
+		var cart3CardCountSel = getSelectedCardcount(player.carts[3].cards, true);
+		var totalCardsSelected = playerCardCountSel+cart0CardCountSel +cart1CardCountSel +cart2CardCountSel +cart3CardCountSel ;
+		$scope.playerPaidWithItems=totalCardsSelected;	
+
 		play("button");
 	}
 	
@@ -1030,38 +1058,52 @@ var cardColor = function(card) {
 
 					if(id==="items") {
 						gold = 0;
-						break;
+						if(totalCards >= 2 && totalCardsSelected < 2) {
+							alert("You must select 2 items for taxes.");
+							return;
+						}
+						if(totalCards === 1 && totalCardsSelected===0) {
+							alert("You must select your only card item for taxes.");
+							return;
+						}
+						if(totalCards >= 1 && (totalCardsSelected===1 || totalCardsSelected===2) ){
+							gold = 0;
+							if(playerCardCountSel >= 1) {
+								//what1 = getSelectedCard(player.cards)
+								//where1 = 'hand'
+								whatWhereArray.push(getSelectedCards(player.cards, true));
+								whatWhereArray.push('hand');
+							}
+							for (var i = 0; i < player.carts.length; ++i)  {
+								var cart = player.carts[i];
+								if(cart.active) {
+									var cartCards = getSelectedCardcount(player.carts[i].cards, true);
+									if(cartCards > 0) {
+										whatWhereArray.push(getSelectedCards(player.carts[i].cards, true));
+										whatWhereArray.push('cart' + i);
+									}
+								}
+							}	
+
+							what1=whatWhereArray.shift();
+							where1=whatWhereArray.shift();
+							what2=whatWhereArray.shift();
+							where2=whatWhereArray.shift();
+							break;
+
+						}
 					}
 					if(id==="gold") {
 						if(player.gold > 0) {
-							gold = 1;							
+							gold = 1;	
+							break;							
 						}
 						else{
 							alert("You do not have enough gold for taxation, you must lose items.");
 							return;
 						}
 					}
-					
-
-					if(playerItemCards >= 2 && playerCardCountSel < 2) {
-						alert("You must select 2 items for taxes.");
-						return;
-					}
-
-					if(playerItemCards >= 2 && playerCardCountSel===2) {
-						what1 = selectedItemCards;
-						where1 = 'hand'
-						break;
-					}
-					if(playerItemCards === 1 && playerCardCountSel===0) {
-						alert("You must select your only card item for taxes.");
-						return;
-					}
-					if(playerItemCards === 1 && playerCardCountSel===1) {
-						what1 = selectedItemCards;
-						where1 = 'hand';
-						break;
-					}
+						
 			
 					break;
 			
@@ -1118,19 +1160,17 @@ var cardColor = function(card) {
 						}
 						
 						if($scope.selectedItemsCount > 0 && playerCardsSumSelected >= 5) {			
-							if(playerItemCards === 1 && playerCardCountSel===1) {
-								what1 = selectedItemCards;
-								where1 = 'hand';
-								break;
-							}	
+							what1 = selectedItemCards;
+							where1 = 'hand';
+							break;
 						}					
 					}
 					else if(id==='N') {
 						//do nothing, nothing was destroyed
+						destroyCart="";
 					}
 					else if(id==='X') {
 						//let it be destroyed
-						var selectedItemCards = "";
 					}					
 					
 					//send in eventid, send in items to buy cart back with
@@ -1206,7 +1246,7 @@ var cardColor = function(card) {
 			completeEvent(eventId, destroyCart, gold, what1, where1, what2, where2, dest1);
 			resetPlayerCardsSelected(player);
 			resetDisplayMode('gameSpectator');
-			$scope.playerRefresh();
+			playerRefresh($scope.myId);
 		}
 
 	resetPlayerCardsSelected =  function(player) {
@@ -1327,21 +1367,8 @@ var cardColor = function(card) {
 		var len=0;
 		var o=0;
 		for (var z = 0; z < data.otherPlayers.length; ++z) {
-			/*
-			if(data.curPlayer === z) {
-				o++;
-			}
-			else {
-				if(data.curPlayer===data.numPlayers-1) {
-					o=0;
-				}
-				else {
-					o++
-				}
-			}
-			*/
+
 			game.players.push(new Player(game, data.otherPlayers[z].playerId, data.otherPlayers[z].name));
-			//game.players.push(new Player(game, o, data.otherPlayers[z].name));
 
 			var len = game.players.length - 1;
 

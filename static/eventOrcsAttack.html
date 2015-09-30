@@ -1,8 +1,15 @@
 ﻿<ng-include src="'gameEventHeader.html'"></ng-include>
-<div class="panel panel-info" >
+<div class="panel panel-primary">
 	<ng-include src="'playerHeader.html'"></ng-include>
 	<br></br>
-	<br></br>
+	<div class="row" ng-disabled="loadingData">
+		<div class="col-sm-3" ng-repeat="cart in activePlayer.carts track by $index" >
+			<img class="tab10" ng-if="cart.active" style="{{cart.borderColor}}" width="{{cart.width}}" height="{{cart.height}}" ng-src="{{cart.image}}" ></img>
+			<span class="col-sm-1" ng-repeat="card in cart.cards.playingCards track by $index" >
+				<img  style="{{card.borderColor}}" ng-src="{{card.image}}"/>
+			</span>
+		</div>
+	</div>
 
 	<table>
 		<thead>
@@ -11,10 +18,15 @@
 				<span style="padding-left: 5px; padding-right: 5px; padding-top: 5px; padding-bottom: 5px;" ng-repeat="card in activePlayer.cards.playingCards track by $index + card.positionOnStack" >
 					<img ng-click="userClickedItemImageEvent($index)" style="{{card.borderColor}}"  ng-src="{{card.image}}"/>
 				</span>
+			</td>
 			<td>
+				<div class="right"><ng-include src="'marketEvent.html'"></ng-include></div>
+			</td>
 		</tr>
-		<tr>
-	<td>
+		</thead>
+	</table>
+		
+		
 	<br></br>
 	<h4 class = "tab30" ng-if="wheelbarrowCardSum < 5">Your wheelbarrow has been D-E-S-T-R-O-Y-E-D!</h4>
 	<h4 class = "tab30" ng-if="wheelbarrowCardSum >= 5">Your had defeated the Orcs!</h4>
@@ -30,6 +42,4 @@
 		</div>
 	</div>
 </div>
-
-
 
