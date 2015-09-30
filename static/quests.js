@@ -411,18 +411,18 @@ if(level===3){
 
 if(level===4){
 	var image="../images/event";
-	this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',6,image+"BarbarianAttack",this);
-	this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',7,image+"BrokenItems",this);
-	this.addCard(level,0,0,0,0,0,0,0,'eventCastleTaxation',8,image+"CastleTaxation",this);
-	this.addCard(level,0,0,0,0,0,0,0,'eventGolbinRaid',9,image+"GolbinRaid",this);
-	this.addCard(level,0,0,0,0,0,0,0,'eventKingsFeast',10,image+"KingsFeast",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventMarketShortage',11,image+"MarketShortage",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventMarketSurplus',12,image+"MarketSurplus",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',13,image+"OrcsAttack",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventSandStorm',14,image+"SandStorm",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventThrownInTheDungeon',15,image+"ThrownInTheDungeon",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventTreasure',16,image+"Treasure",this);	
-	this.addCard(level,0,0,0,0,0,0,0,'eventVikingParade',17,image+"VikingParade",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',6,image+"barbarianattack",this);
+	this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',7,image+"brokenitems",this);
+	this.addCard(level,0,0,0,0,0,0,0,'eventCastleTaxation',8,image+"castletaxation",this);
+	this.addCard(level,0,0,0,0,0,0,0,'eventGolbinRaid',9,image+"golbinraid",this);
+	this.addCard(level,0,0,0,0,0,0,0,'eventKingsFeast',10,image+"kngsfeast",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventMarketShortage',11,image+"marketshortage",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventMarketSurplus',12,image+"marketsurplus",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',13,image+"orcsattack",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventSandStorm',14,image+"sandstorm",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventThrownInTheDungeon',15,image+"throwninthedungeon",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventTreasure',16,image+"treasure",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventVikingParade',17,image+"vikingparade",this);	
 	}
 
 }
