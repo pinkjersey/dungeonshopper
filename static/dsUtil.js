@@ -558,8 +558,13 @@ logPlayerAction = function(isActive, playersLog, playerName, logItem) {
 		var logEntry = "";
 		var sound = "";
 		
-		for (var i = 0; i < array.length; ++i) {   
-			var logActions = array[i].split("=");
+		if(array[0] === "action=completeEvent") {
+			var logActions  = array[1].split("=");
+			logEntry = " completed event " + logActions[1];
+		}
+		else {
+			for (var i = 0; i < array.length; ++i) {   
+				var logActions = array[i].split("=");
 				for (var j = 0; j < logActions.length; ++j) {   
 					switch(logActions[j]) {
 						case "action":
@@ -570,16 +575,8 @@ logPlayerAction = function(isActive, playersLog, playerName, logItem) {
 							sound = "trash";
 							break;
 						case "completeEventeventId":
-							logEntry+=" completed event "
-							logActions.splice(i,1);
-							logActions.splice(i,1);
-							logActions.splice(i,1);
-							logActions.splice(i,1);
-							logActions.splice(i,1);
-							logActions.splice(i,1);							
-							logActions.splice(i,1);							
-							logActions.splice(i,1);							
-							break
+							logEntry+=" completed event " + logActions[j]
+							break;
 						case "fish":
 							logEntry+=" fished " ;
 							sound = "fish";
@@ -598,7 +595,7 @@ logPlayerAction = function(isActive, playersLog, playerName, logItem) {
 							break;
 						case "buyCart":
 							logEntry+= "bought ";
-							sound = "buyCart";
+							playCartSound(logActions[j+1]);
 							break;
 						case "pass":
 							logEntry+=" passed ";
@@ -670,10 +667,25 @@ logPlayerAction = function(isActive, playersLog, playerName, logItem) {
 					}
 				}
 			}
-		
+		}
 		playersLog.push(new PlayersLog(playersLog.length, playerName, logEntry + '.'));
 		if(!isActive && sound != "") {
 			play(sound);
 		}
 	}
+}
+
+playCartSound = function(cartId) {
+		if(cartId===0) {
+			play("choppingWood");
+		}		
+		if(cartId===1) {
+			play("buyCart");
+		}
+		if(cartId===2) {
+			play("horseNeigh");
+		}
+		if(cartId===3) {
+			play("anvil");
+		}
 }

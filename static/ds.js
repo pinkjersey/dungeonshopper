@@ -51,7 +51,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.music = true;
 	$scope.totalCartCardsFound = 0;
 	$scope.totalCardsFound = 0;
-
+	//used for viking event
+	$scope.oneFreeMove = true;
 
 
 
@@ -413,19 +414,20 @@ var cardColor = function(card) {
 		}
 	}
 
-	$scope.moveItemsToCart = function(id ) {
-		if(!$scope.isActive){return;}
+	$scope.moveItemsToCart = function(id, actionCost ) {
+		if(!$scope.isActive){return false;}
 		//check if one to one or many to many
 		setCartActiveStatus(id);
 		var player = $scope.activePlayer;
 		var selectedCards = getSelectedCards(player.cards, true);
 		var selectedCardCount = getSelectedCardcount(player.cards, true);
 		var cart = player.carts[id];
-		var actionCost = 1;
-		if(player.actionsRemaining === 0)	{
-			alert("You have no actions.");
-			return;
-		}	
+		if(actionCost > 0) {
+			if(player.actionsRemaining === 0)	{
+				alert("You have no actions.");
+				return false;
+			}	
+		}
 		
 		if($scope.prevActiveCartId >= 0) {
 			$scope.selectedCartItems = getSelectedCards(player.carts[$scope.prevActiveCartId].cards, true);
@@ -434,18 +436,18 @@ var cardColor = function(card) {
 		//if cart cards are selected, move between carts else its player items to cart
 		//these are in the scope variable as the new cart they select is selectedCartCount
 		if($scope.selectedCartItemsCount > 0) {
-			moveItemsBetweenCarts($scope.prevActiveCartId, id, $scope.selectedCartItems );
-			return;
+			moveItemsBetweenCarts($scope.prevActiveCartId, id, $scope.selectedCartItems, actionCost );
+			return true;
 		}
 
 		if(selectedCardCount === 0){
-				alert('Select some items to move to cart.');
-				return;
+			alert('Select some items to move to cart.');
+			return false;
 		}
 		
 		if($scope.selectedCartItemsCount > cart.size - cart.cards.playingCards.length){
 			alert('Cannot move that many items into the cart.');
-			return;
+			return false;
 		}
 		
 		//when moved from player to cart
@@ -454,25 +456,28 @@ var cardColor = function(card) {
 		cart.cards.setCardSize("small");
 		resetAllSelectedCards(player);
 		play("swords");
+		return true;
 	}
 
-	moveItemsBetweenCarts = function(prevId, id, selectedCartItems ) {
+	moveItemsBetweenCarts = function(prevId, id, selectedCartItems, actionCost ) {
 		var game = $scope.game;
 		var player = $scope.activePlayer;
 		var cart = player.carts[id];
-		if(player.actionsRemaining === 0)	{
-			alert("You have no actions.");
-			return;
-		}	
+		if(actionCost>0) {
+			if(player.actionsRemaining === 0)	{
+				alert("You have no actions.");
+				return false;
+			}	
+		}
 		
 		if($scope.selectedCartItemsCount === 0){
 			alert('Select items to move between cart.');
-			return;
+			return false;
 		}	
 		
 		if($scope.selectedCartItemsCount > cart.size - cart.cards.playingCards.length){
 			alert('Cannot move that many items into the cart.');
-			return;
+			return false;
 		}
 		
 		//move cart items to cart
@@ -480,6 +485,8 @@ var cardColor = function(card) {
 		
 		cart.cards.setCardSize("small");
 		resetAllSelectedCards(player);
+		return true;
+
 	}  
 
 	$scope.playerCartFish = function (id) {
@@ -489,12 +496,12 @@ var cardColor = function(card) {
 
 		if(player.actionsRemaining === 0)	{
 			alert("You have no actions.");
-			return;
+			return false;
 		}	
 		
 		if($scope.selectedCartItemsCount != 1) {
 			alert("You must select one card when fishing for a new one!");
-			return;
+			return false;
 		}
 		
 		//if cart cards are selected, move between carts else its player items to cart
@@ -508,12 +515,12 @@ var cardColor = function(card) {
 				fish(card.number, 'cart' + cart.id);
 			}
 			else {
-				return;
+				return false;
 			}
 
 			resetCartCardsSelected(player,-1);
 			play("fish");
-			return;
+			return true;
 		}
 	}
 
@@ -524,12 +531,12 @@ var cardColor = function(card) {
 
 		if(player.actionsRemaining === 0)	{
 			alert("You have no actions.")
-			return;
+			return false;
 		}	
 		
 		if(selectedCardCount != 1) {
 			alert("You must select one card when fishing for a new one!")
-			return;
+			return false;
 		}
 
 		//returns card selected
@@ -540,11 +547,12 @@ var cardColor = function(card) {
 			fish(card.number, 'hand');
 		}
 		else {
-			return;
+			return false;
 		}
 
 		resetAllSelectedCards(player);
 		play("fish");
+		return true;
 	}
 
 	$scope.playerDiscardFromCart = function (id) {
@@ -555,12 +563,12 @@ var cardColor = function(card) {
 
 		if(player.actionsRemaining === 0)	{
 			alert("You have no actions.");
-			return;
+			return false;
 		}	
 
 		if(getSelectedCardcount(cart.cards, true) === 0) {
 			alert('Select some cart items to discard.');
-			return;
+			return false;
 		}
 		
 		//if cart cards are selected, move between carts else its player items to cart
@@ -571,12 +579,12 @@ var cardColor = function(card) {
 				discard(selectedCards, 'cart'+id)
 			}
 			else {
-				return;
+				return false;
 			}
 
 			resetCartCardsSelected(player,-1);
 			play("trash");
-			return;
+			return true;
 		}
 	}
 
@@ -665,7 +673,7 @@ var cardColor = function(card) {
 
 		resetAllSelectedCards(player);
 		if(cartId===0) {
-			play("buyCart");
+			play("choppingWood");
 		}		
 		if(cartId===1) {
 			play("buyCart");
@@ -889,6 +897,7 @@ var cardColor = function(card) {
 				case 'eventTreasure':
 					break;
 				case 'eventVikingParade':
+					
 					break;
 				default:
 					resetDisplayMode('game');
@@ -936,8 +945,20 @@ var cardColor = function(card) {
 	}
 
 	$scope.moveItemsBetweenCartsEvent = function(id) {
-		var player = $scope.activePlayer;
+		if(!$scope.oneFreeMove) {
+			alert('Only one free move during the parade!');
+			return;
+		}
+		var actionCost = 0;
+		var success = $scope.moveItemsToCart(id, actionCost );
+		if (success) {
+			$scope.oneFreeMove = false;
+		}
+		
+	}
+/*		var player = $scope.activePlayer;
 		var cart = player.carts[id];
+		var found = false;
 		$scope.activeCartId = id;
 		
 		if($scope.selectedCartItemsCount === 0){
@@ -949,8 +970,26 @@ var cardColor = function(card) {
 			alert('Cannot move that many items into the cart.');
 			return;
 		}
-		play("swords");
-	}  
+		
+		for (var i = 0; i < player.carts.length; ++i)  {
+			if(found) {
+				break;
+			}
+			var cart = player.carts[i];
+			if(cart.active) {
+				var cartCards = getSelectedCardcount(player.carts[i].cards, true);
+				if(cartCards > 0) {
+					move(getSelectedCards(player.carts[i].cards, 'cart' + id, 'cart' + id, 0));
+					
+					found = true;
+					break;
+				}
+			}
+		}
+		//move(cardsToMoveBackToHand, 'cart0', 'hand', actionCost);
+		
+		play("swords");*/
+	
 
 	$scope.userClickedCartImageEvent = function(id) {
 		if(!$scope.isActive){return;}
@@ -969,6 +1008,12 @@ var cardColor = function(card) {
 		var card = player.carts[cartId].cards.playingCards[cardIndex];
 		var cart = player.carts[cartId];
 		card.selected = !card.selected;
+		if(card.selected) {
+			$scope.selectedCartItemsCount++;
+		}
+		else {
+			$scope.selectedCartItemsCount--;
+		}
 		card.borderColor = cardColor(card);
 		cartCardChecked(card);
 		cart.cardSumSelected = getSelectedCardSum(cart.cards, true);
@@ -1258,7 +1303,9 @@ var cardColor = function(card) {
 					break;
 				case 'eventVikingParade':
 					eventId = 17;
-					for (var i = 0; i < player.carts.length; ++i)  {
+					//reset it if there are more than one viking parade in deck
+					$scope.oneFreeMove = true;
+					/*for (var i = 0; i < player.carts.length; ++i)  {
 						if(found) {
 							break;
 						}
@@ -1276,6 +1323,7 @@ var cardColor = function(card) {
 					what1=whatWhereArray.shift();
 					where1=whatWhereArray.shift();
 					dest1='cart' + $scope.activeCartId;
+					*/
 					break;
 				default:
 					resetDisplayMode('game');
@@ -1372,7 +1420,7 @@ var cardColor = function(card) {
 		//this controls the buttons to return if you are not active
 		//already doing so much in angular js buttons, did not want to add this as well
 		$scope.isActive = data.isActive;
-		$scope.numPlayers = data.numPlayers;
+		$scope.numberOfPlayers = data.numPlayers;
 	
 		$scope.otherPlayers = [];		
 		$scope.game.players = [];

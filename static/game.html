@@ -14,7 +14,7 @@
 				<img  style="{{card.borderColor}}" ng-click="userClickedCartItem(cart.id, $index)" ng-src="{{card.image}}"/>
 			</span>
 			<span ng-if="activePlayer.actionsRemaining > 0 && cart.active">
-				<button ng-disabled="loadingData===true" ng-if="cart.size - cart.cards.playingCards.length >= selectedItemsCount && cart.cardSumSelected === 0 && (selectedItemsCount+selectedCartItemsCount) > 0" class="btn btn-info" ng-click="moveItemsToCart(cart.id)" > Move to {{cart.name}}? </button>   
+				<button ng-disabled="loadingData===true" ng-if="cart.size - cart.cards.playingCards.length >= selectedItemsCount && cart.cardSumSelected === 0 && (selectedItemsCount+selectedCartItemsCount) > 0" class="btn btn-info" ng-click="moveItemsToCart(cart.id, 1)" > Move to {{cart.name}}? </button>   
 				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerDiscardFromCart($index)" ng-if="cart.cards.playingCards.length > 0 && cart.cardSumSelected > 0" >Discard </button>    
 				<button ng-disabled="loadingData===true" class="btn btn-warning" ng-click="playerCartFish($index)" ng-if="cart.cardSumSelected > 0 && selectedCartItemsCount===1" >Fish </button>    
 			</span>	
@@ -40,9 +40,7 @@
 				<td>
 					<div class="left"><ng-include src="'cardsPlayer.html'"></ng-include></div>
 				</td>
-				<td>
-					<div class="middle"></div>
-				</td>
+
 				<td>
 					<div class="right"><ng-include src="'marketPlayer.html'"></ng-include></div>
 				</td>
@@ -63,10 +61,9 @@
 
 
 </div>
+<button ng-show="numberOfPlayers > 1"class="btn btn-warning" ng-click="showOtherPlayerDataClick()" >{{showHideVar}} Other Player Info?</button>
+<div ng-show="numberOfPlayers > 1" ng-include src="'otherPlayers.html'" ></ng-include></div>
 
-
-<button ng-show="numberOfPlayers>1"class="btn btn-warning" ng-click="showOtherPlayerDataClick()" >{{showHideVar}} Other Player Info?</button>
-<span><ng-include src="'otherPlayers.html'" ></ng-include></span>
 
 			
 

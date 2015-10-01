@@ -415,7 +415,7 @@ if(level===4){
 	this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',7,image+"brokenitems",this);
 	this.addCard(level,0,0,0,0,0,0,0,'eventCastleTaxation',8,image+"castletaxation",this);
 	this.addCard(level,0,0,0,0,0,0,0,'eventGolbinRaid',9,image+"golbinraid",this);
-	this.addCard(level,0,0,0,0,0,0,0,'eventKingsFeast',10,image+"kngsfeast",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventKingsFeast',10,image+"kingsfeast",this);	
 	this.addCard(level,0,0,0,0,0,0,0,'eventMarketShortage',11,image+"marketshortage",this);	
 	this.addCard(level,0,0,0,0,0,0,0,'eventMarketSurplus',12,image+"marketsurplus",this);	
 	this.addCard(level,0,0,0,0,0,0,0,'eventOrcsAttack',13,image+"orcsattack",this);	
