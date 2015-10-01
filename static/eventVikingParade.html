@@ -11,7 +11,7 @@
 				<img  style="{{card.borderColor}}" ng-click="userClickedCartItemEvent(cart.id, $index)" ng-src="{{card.image}}"/>
 			</span>
 			<span ng-if="cart.active">
-				<button ng-disabled="loadingData===true" ng-if="cart.size - cart.cards.playingCards.length >= selectedCartItemsCount > 0" class="btn btn-info" ng-click="moveItemsBetweenCartsEvent(cart.id)" > Move to {{cart.name}}? </button>   
+				<button ng-disabled="loadingData===true" ng-if="cart.size - cart.cards.playingCards.length >= selectedItemsCount && cart.cardSumSelected === 0 && (selectedItemsCount+selectedCartItemsCount) > 0" class="btn btn-info" ng-click="moveItemsBetweenCartsEvent(cart.id, 0)" > Move to {{cart.name}}? </button>   
 			</span>	
 
 			<span ng-show="!cart.active"><p>Cart size: {{cart.size}}</p></span>
@@ -23,7 +23,7 @@
 		<thead>
 			<tr>
 				<td>
-					<div class="left"><ng-include src="'cardsEvent.html'"></ng-include></div>
+					<div class="left"><ng-include src="'cardsEventNoClick.html'"></ng-include></div>
 				</td>
 				<td>
 					<div class="right"><ng-include src="'marketEvent.html'"></ng-include></div>

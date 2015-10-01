@@ -1,13 +1,10 @@
 app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory) {
 
-	$scope.hideImagesBool = false;
+	$scope.activePlayer = null;
+	$scope.activeEvent = null;
+	$scope.isActive = false;
+
 	$scope.debug = false;
-	$scope.autoSelectHand = true;
-	$scope.autoSelectCart = true;
-	$scope.autoSelectQuest = true;
-	$scope.autoPass = true;
-	$scope.playersCompletedEventCount = 0;
-	//$scope.eventActionsRemaining=0;;
 	//gui variable to control item buttons
 	$scope.selectedItemsCount = 0;
 	//gui variable to control cart buttons
@@ -22,37 +19,43 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.questsCountRemaining = 0;
 	//used in gui to show discard count
 	$scope.discardsCount = 0;
-	$scope.activePlayer = null;
 	//used to show the last card discarded in the gui
 	$scope.lastDiscard = new playingCard();
-	//gui control of the quests
-	//$scope.questSelected=false;
-	$scope.isActive = false;
+	//more gui variables for items
 	$scope.selectedCartItems = "";
-	
+	$scope.totalCartCardsFound = 0;
+	$scope.totalCardsFound = 0;
+
+	//checkboxes, button defaults
 	$scope.showLog = false;
 	$scope.showLogText = "Show Players Log";
 	$scope.blankText = "";
-	//$scope.dots="...";
-	//gui variable to control cart buttons
-	$scope.prevActiveCartId = -1;
-	$scope.activeCartId = -1;
-	$scope.borderPXselected = "border:3px solid red";
-	$scope.borderPX = "border:1px solid black";
-	$scope.borderPXorig = "border:1px solid black";
 	$scope.showOtherPlayerData = false;
 	$scope.showMyCompletedQuests = false;
 	$scope.showHideVar = "Show";
 	$scope.showHideQuestVar = "Show";
-	$scope.playerFishButton=false;
-	$scope.refresh=false;
-	$scope.logItemCount = 0;
 	$scope.sounds = true;
 	$scope.music = true;
-	$scope.totalCartCardsFound = 0;
-	$scope.totalCardsFound = 0;
+	$scope.autoSelectHand = true;
+	$scope.autoSelectCart = true;
+	$scope.autoSelectQuest = true;
+	$scope.autoPass = true;
+	$scope.hideImagesBool = false;
 
+	//gui variable to control cart buttons
+	$scope.prevActiveCartId = -1;
+	$scope.activeCartId = -1;
 
+	//card gui variables
+	$scope.borderPXselected = "border:3px solid red";
+	$scope.borderPX = "border:1px solid black";
+	$scope.borderPXorig = "border:1px solid black";
+
+	$scope.refresh=false;
+	//control which log items to push
+	$scope.logItemCount = 0;
+	//used for viking event - this allows for Move action to not cost and action during the event
+	$scope.oneFreeMove = true;
 
 
 	//plays audio files
@@ -109,14 +112,14 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.hideImagesBool = !$scope.hideImagesBool;
 	}	
 	
-var cardColor = function(card) {
-	if(card.selected) {
-		return $scope.borderPXselected; //red
+	var cardColor = function(card) {
+		if(card.selected) {
+			return $scope.borderPXselected; //red
+		}
+		else {
+			return $scope.borderPXorig; //black
+		}
 	}
-	else {
-		return $scope.borderPXorig; //black
-	}
-}
 
 	//setup splash screen
 	setupNoGame = function() {
@@ -128,8 +131,6 @@ var cardColor = function(card) {
 		hideImages($scope);
 	}	
 
-	setupNoGame();
-	
 	$scope.joinGame = function(playerName, playerId) {
 		$scope.myId = playerId;
 		hideImages($scope);
@@ -169,6 +170,7 @@ var cardColor = function(card) {
     //this is the initial load spectator refresh 
     $(document).ready(); {
         startInterval(2000);
+		setupNoGame();
     }
 	
 
@@ -413,19 +415,20 @@ var cardColor = function(card) {
 		}
 	}
 
-	$scope.moveItemsToCart = function(id ) {
-		if(!$scope.isActive){return;}
+	$scope.moveItemsToCart = function(id, actionCost ) {
+		if(!$scope.isActive){return false;}
 		//check if one to one or many to many
 		setCartActiveStatus(id);
 		var player = $scope.activePlayer;
 		var selectedCards = getSelectedCards(player.cards, true);
 		var selectedCardCount = getSelectedCardcount(player.cards, true);
 		var cart = player.carts[id];
-		var actionCost = 1;
-		if(player.actionsRemaining === 0)	{
-			alert("You have no actions.");
-			return;
-		}	
+		if(actionCost > 0) {
+			if(player.actionsRemaining === 0)	{
+				alert("You have no actions.");
+				return false;
+			}	
+		}
 		
 		if($scope.prevActiveCartId >= 0) {
 			$scope.selectedCartItems = getSelectedCards(player.carts[$scope.prevActiveCartId].cards, true);
@@ -434,18 +437,18 @@ var cardColor = function(card) {
 		//if cart cards are selected, move between carts else its player items to cart
 		//these are in the scope variable as the new cart they select is selectedCartCount
 		if($scope.selectedCartItemsCount > 0) {
-			moveItemsBetweenCarts($scope.prevActiveCartId, id, $scope.selectedCartItems );
-			return;
+			moveItemsBetweenCarts($scope.prevActiveCartId, id, $scope.selectedCartItems, actionCost );
+			return true;
 		}
 
 		if(selectedCardCount === 0){
-				alert('Select some items to move to cart.');
-				return;
+			alert('Select some items to move to cart.');
+			return false;
 		}
 		
 		if($scope.selectedCartItemsCount > cart.size - cart.cards.playingCards.length){
 			alert('Cannot move that many items into the cart.');
-			return;
+			return false;
 		}
 		
 		//when moved from player to cart
@@ -454,25 +457,28 @@ var cardColor = function(card) {
 		cart.cards.setCardSize("small");
 		resetAllSelectedCards(player);
 		play("swords");
+		return true;
 	}
 
-	moveItemsBetweenCarts = function(prevId, id, selectedCartItems ) {
+	moveItemsBetweenCarts = function(prevId, id, selectedCartItems, actionCost ) {
 		var game = $scope.game;
 		var player = $scope.activePlayer;
 		var cart = player.carts[id];
-		if(player.actionsRemaining === 0)	{
-			alert("You have no actions.");
-			return;
-		}	
+		if(actionCost>0) {
+			if(player.actionsRemaining === 0)	{
+				alert("You have no actions.");
+				return false;
+			}	
+		}
 		
 		if($scope.selectedCartItemsCount === 0){
 			alert('Select items to move between cart.');
-			return;
+			return false;
 		}	
 		
 		if($scope.selectedCartItemsCount > cart.size - cart.cards.playingCards.length){
 			alert('Cannot move that many items into the cart.');
-			return;
+			return false;
 		}
 		
 		//move cart items to cart
@@ -480,6 +486,8 @@ var cardColor = function(card) {
 		
 		cart.cards.setCardSize("small");
 		resetAllSelectedCards(player);
+		return true;
+
 	}  
 
 	$scope.playerCartFish = function (id) {
@@ -489,12 +497,12 @@ var cardColor = function(card) {
 
 		if(player.actionsRemaining === 0)	{
 			alert("You have no actions.");
-			return;
+			return false;
 		}	
 		
 		if($scope.selectedCartItemsCount != 1) {
 			alert("You must select one card when fishing for a new one!");
-			return;
+			return false;
 		}
 		
 		//if cart cards are selected, move between carts else its player items to cart
@@ -508,12 +516,12 @@ var cardColor = function(card) {
 				fish(card.number, 'cart' + cart.id);
 			}
 			else {
-				return;
+				return false;
 			}
 
 			resetCartCardsSelected(player,-1);
 			play("fish");
-			return;
+			return true;
 		}
 	}
 
@@ -524,12 +532,12 @@ var cardColor = function(card) {
 
 		if(player.actionsRemaining === 0)	{
 			alert("You have no actions.")
-			return;
+			return false;
 		}	
 		
 		if(selectedCardCount != 1) {
 			alert("You must select one card when fishing for a new one!")
-			return;
+			return false;
 		}
 
 		//returns card selected
@@ -540,11 +548,12 @@ var cardColor = function(card) {
 			fish(card.number, 'hand');
 		}
 		else {
-			return;
+			return false;
 		}
 
 		resetAllSelectedCards(player);
 		play("fish");
+		return true;
 	}
 
 	$scope.playerDiscardFromCart = function (id) {
@@ -555,12 +564,12 @@ var cardColor = function(card) {
 
 		if(player.actionsRemaining === 0)	{
 			alert("You have no actions.");
-			return;
+			return false;
 		}	
 
 		if(getSelectedCardcount(cart.cards, true) === 0) {
 			alert('Select some cart items to discard.');
-			return;
+			return false;
 		}
 		
 		//if cart cards are selected, move between carts else its player items to cart
@@ -571,12 +580,12 @@ var cardColor = function(card) {
 				discard(selectedCards, 'cart'+id)
 			}
 			else {
-				return;
+				return false;
 			}
 
 			resetCartCardsSelected(player,-1);
 			play("trash");
-			return;
+			return true;
 		}
 	}
 
@@ -665,7 +674,7 @@ var cardColor = function(card) {
 
 		resetAllSelectedCards(player);
 		if(cartId===0) {
-			play("buyCart");
+			play("choppingWood");
 		}		
 		if(cartId===1) {
 			play("buyCart");
@@ -885,10 +894,12 @@ var cardColor = function(card) {
 				case 'eventHiddenRoom':
 					break;
 				case 'eventThrownInTheDungeon':
+					$scope.playerHas123InHand = checkIfPlayerHas123InHand(player.cards);
 					break;
 				case 'eventTreasure':
 					break;
 				case 'eventVikingParade':
+					
 					break;
 				default:
 					resetDisplayMode('game');
@@ -897,6 +908,7 @@ var cardColor = function(card) {
 		resetDisplayMode(game.activeEvent);
 		//deselect all cards
 		resetAllSelectedCards($scope.activePlayer);
+		$scope.activeEvent = events[questCardinplay.type];
 		
 	}
 
@@ -936,8 +948,20 @@ var cardColor = function(card) {
 	}
 
 	$scope.moveItemsBetweenCartsEvent = function(id) {
-		var player = $scope.activePlayer;
+		if(!$scope.oneFreeMove) {
+			alert('Only one free move during the parade!');
+			return;
+		}
+		var actionCost = 0;
+		var success = $scope.moveItemsToCart(id, actionCost );
+		if (success) {
+			$scope.oneFreeMove = false;
+		}
+		
+	}
+/*		var player = $scope.activePlayer;
 		var cart = player.carts[id];
+		var found = false;
 		$scope.activeCartId = id;
 		
 		if($scope.selectedCartItemsCount === 0){
@@ -949,8 +973,26 @@ var cardColor = function(card) {
 			alert('Cannot move that many items into the cart.');
 			return;
 		}
-		play("swords");
-	}  
+		
+		for (var i = 0; i < player.carts.length; ++i)  {
+			if(found) {
+				break;
+			}
+			var cart = player.carts[i];
+			if(cart.active) {
+				var cartCards = getSelectedCardcount(player.carts[i].cards, true);
+				if(cartCards > 0) {
+					move(getSelectedCards(player.carts[i].cards, 'cart' + id, 'cart' + id, 0));
+					
+					found = true;
+					break;
+				}
+			}
+		}
+		//move(cardsToMoveBackToHand, 'cart0', 'hand', actionCost);
+		
+		play("swords");*/
+	
 
 	$scope.userClickedCartImageEvent = function(id) {
 		if(!$scope.isActive){return;}
@@ -969,6 +1011,12 @@ var cardColor = function(card) {
 		var card = player.carts[cartId].cards.playingCards[cardIndex];
 		var cart = player.carts[cartId];
 		card.selected = !card.selected;
+		if(card.selected) {
+			$scope.selectedCartItemsCount++;
+		}
+		else {
+			$scope.selectedCartItemsCount--;
+		}
 		card.borderColor = cardColor(card);
 		cartCardChecked(card);
 		cart.cardSumSelected = getSelectedCardSum(cart.cards, true);
@@ -1014,7 +1062,7 @@ var cardColor = function(card) {
 		var event = $scope.game.activeEvent;
 		var selectedItemCards = getSelectedCards(player.cards, true);
 		var playerItemCards = getSelectedCards(player.cards, false);
-		var playerHas123InHand = checkIfPlayerHas123InHand(player.cards);
+		var playerHas123InHand = $scope.playerHas123InHand;
 		var cart0CardCount = player.carts[0].cards.playingCards.length;
 		var cart1CardCount = player.carts[1].cards.playingCards.length;
 		var cart2CardCount = player.carts[2].cards.playingCards.length;
@@ -1039,6 +1087,7 @@ var cardColor = function(card) {
 		var whatWhereArray = [];
 		var found = false;
 		var dest1 = "";
+		var items = 0;
 	/*events.push(new Event(6,"BarbarianAttack"));
 	events.push(new Event(7,"BrokenItems"));
 	events.push(new Event(8,"CastleTaxation"));
@@ -1228,9 +1277,15 @@ var cardColor = function(card) {
 					break;
 				case 'eventHiddenRoom':
 					eventId = 19;
+					if(id=='gold') {
+						gold==1;
+					}
+					if(id=='items') {
+						items = 2;
+					}
+					
 					break;
 				case 'eventThrownInTheDungeon':
-				
 					eventId = 15;
 					
 					if(!playerHas123InHand) {
@@ -1238,7 +1293,7 @@ var cardColor = function(card) {
 					}
 						
 					//player does have 1,2 or 3
-					if(playerCardCountSel != 1 && playerCardsSumSelected > 3) {
+					if(playerCardCountSel != 1 || playerCardsSumSelected > 3) {
 						alert("Select one item - Club, Shield or Hammer to lose.");
 						return;
 					}
@@ -1258,24 +1313,8 @@ var cardColor = function(card) {
 					break;
 				case 'eventVikingParade':
 					eventId = 17;
-					for (var i = 0; i < player.carts.length; ++i)  {
-						if(found) {
-							break;
-						}
-						var cart = player.carts[i];
-						if(cart.active) {
-							var cartCards = getSelectedCardcount(player.carts[i].cards, true);
-							if(cartCards > 0) {
-								whatWhereArray.push(getSelectedCards(player.carts[i].cards, true));
-								whatWhereArray.push('cart' + i);
-								found = true;
-								break;
-							}
-						}
-					}
-					what1=whatWhereArray.shift();
-					where1=whatWhereArray.shift();
-					dest1='cart' + $scope.activeCartId;
+					//reset it if there are more than one viking parade in deck
+					$scope.oneFreeMove = true;
 					break;
 				default:
 					resetDisplayMode('game');
@@ -1286,10 +1325,9 @@ var cardColor = function(card) {
 			if(what2===undefined) {what2=""}
 			if(where2===undefined) {where2=""}
 			if(dest1===undefined) {dest1=""}
-			completeEvent(eventId, $scope.myId, destroyCart, gold, what1, where1, what2, where2, dest1);
+			completeEvent(eventId, $scope.myId, destroyCart, gold, items, what1, where1, what2, where2, dest1);
 			resetPlayerCardsSelected(player);
-			//resetDisplayMode('gameSpectator');
-			//playerRefresh($scope.myId);
+
 		}
 
 	resetPlayerCardsSelected =  function(player) {
@@ -1372,7 +1410,7 @@ var cardColor = function(card) {
 		//this controls the buttons to return if you are not active
 		//already doing so much in angular js buttons, did not want to add this as well
 		$scope.isActive = data.isActive;
-		$scope.numPlayers = data.numPlayers;
+		$scope.numberOfPlayers = data.numPlayers;
 	
 		$scope.otherPlayers = [];		
 		$scope.game.players = [];
@@ -1535,9 +1573,9 @@ var cardColor = function(card) {
 		gameFactory.joinGame(playerId, playerName, processGameStateCallback, processGameStateErrorCallback);
 	}
 
-	function completeEvent(eventId, playerId, cartToDestroy, gold, what1, where1, what2, where2, dest1) {
+	function completeEvent(eventId, playerId, cartToDestroy, gold, items, what1, where1, what2, where2, dest1) {
 		$scope.loadingData=true;
-		gameFactory.completeEvent(eventId, playerId, cartToDestroy, gold, what1, where1, what2, where2, dest1, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.completeEvent(eventId, playerId, cartToDestroy, gold, items, what1, where1, what2, where2, dest1, processGameStateCallback, processGameStateErrorCallback);
 	}
 
 	function pass(discard) {
