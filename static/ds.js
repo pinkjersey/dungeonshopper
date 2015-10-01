@@ -893,6 +893,7 @@ var cardColor = function(card) {
 				case 'eventHiddenRoom':
 					break;
 				case 'eventThrownInTheDungeon':
+					$scope.playerHas123InHand = checkIfPlayerHas123InHand(player.cards);
 					break;
 				case 'eventTreasure':
 					break;
@@ -1059,7 +1060,7 @@ var cardColor = function(card) {
 		var event = $scope.game.activeEvent;
 		var selectedItemCards = getSelectedCards(player.cards, true);
 		var playerItemCards = getSelectedCards(player.cards, false);
-		var playerHas123InHand = checkIfPlayerHas123InHand(player.cards);
+		var playerHas123InHand = $scope.playerHas123InHand;
 		var cart0CardCount = player.carts[0].cards.playingCards.length;
 		var cart1CardCount = player.carts[1].cards.playingCards.length;
 		var cart2CardCount = player.carts[2].cards.playingCards.length;
@@ -1283,7 +1284,7 @@ var cardColor = function(card) {
 					}
 						
 					//player does have 1,2 or 3
-					if(playerCardCountSel != 1 && playerCardsSumSelected > 3) {
+					if(playerCardCountSel != 1 || playerCardsSumSelected > 3) {
 						alert("Select one item - Club, Shield or Hammer to lose.");
 						return;
 					}
