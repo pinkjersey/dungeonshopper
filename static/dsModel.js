@@ -1,8 +1,9 @@
 
-var Event = function (type, name ) {
+var Event = function (type, name, eventText ) {
 	var eventImageBase="../images/event";
 	this.id = type;
 	this.name = name;
+	this.eventText = eventText;
 	this.displayMode = 'event' + name;
 	this.image = eventImageBase + name + '.jpg';
 }

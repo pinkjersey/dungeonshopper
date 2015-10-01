@@ -1,0 +1,33 @@
+﻿<div class="row" ng-repeat="player in game.players" >
+	<div class="panel panel-primary">  
+		<div class="panel-heading">  
+			<div class="panel-body">
+			
+					<table class="table table-condensed">
+
+						
+							<tr>
+								<th><big>{{player.name}}</big></th>
+								<th><big>VP: {{player.vp}}</big></th>
+								<th><big>Bonus: {{player.bonus}}</big></th>
+								<th><big>Gold: {{player.gold}}</big></th>								
+								<th><big>Total: {{player.gold + player.vp + player.bonus}}</big></th>								
+								<th><big>Turns: {{player.turns}}</big></th>
+							</tr>
+							<tr>
+							<span ng-show="player.winner===true"><h1 style="color:red">WINNER</h1></span>
+
+							</tr>
+						
+					</table>
+ 
+				<div>{{player.name}}'s has completed event {{activeEvent.eventText}}</div>
+				<span ng-repeat="questcard in player.questsCompleted.playingCards track by $index">
+					<img ng-src="{{questcard.image}}"></img>
+				</span>					
+				<p></p>
+				{{activeEvent.name}}
+			</div>
+		</div>
+	</div>	
+</div>

@@ -1,13 +1,10 @@
 app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory) {
 
-	$scope.hideImagesBool = false;
+	$scope.activePlayer = null;
+	$scope.activeEvent = null;
+	$scope.isActive = false;
+
 	$scope.debug = false;
-	$scope.autoSelectHand = true;
-	$scope.autoSelectCart = true;
-	$scope.autoSelectQuest = true;
-	$scope.autoPass = true;
-	$scope.playersCompletedEventCount = 0;
-	//$scope.eventActionsRemaining=0;;
 	//gui variable to control item buttons
 	$scope.selectedItemsCount = 0;
 	//gui variable to control cart buttons
@@ -22,38 +19,43 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.questsCountRemaining = 0;
 	//used in gui to show discard count
 	$scope.discardsCount = 0;
-	$scope.activePlayer = null;
 	//used to show the last card discarded in the gui
 	$scope.lastDiscard = new playingCard();
-	//gui control of the quests
-	//$scope.questSelected=false;
-	$scope.isActive = false;
+	//more gui variables for items
 	$scope.selectedCartItems = "";
-	
+	$scope.totalCartCardsFound = 0;
+	$scope.totalCardsFound = 0;
+
+	//checkboxes, button defaults
 	$scope.showLog = false;
 	$scope.showLogText = "Show Players Log";
 	$scope.blankText = "";
-	//$scope.dots="...";
-	//gui variable to control cart buttons
-	$scope.prevActiveCartId = -1;
-	$scope.activeCartId = -1;
-	$scope.borderPXselected = "border:3px solid red";
-	$scope.borderPX = "border:1px solid black";
-	$scope.borderPXorig = "border:1px solid black";
 	$scope.showOtherPlayerData = false;
 	$scope.showMyCompletedQuests = false;
 	$scope.showHideVar = "Show";
 	$scope.showHideQuestVar = "Show";
-	$scope.playerFishButton=false;
-	$scope.refresh=false;
-	$scope.logItemCount = 0;
 	$scope.sounds = true;
 	$scope.music = true;
-	$scope.totalCartCardsFound = 0;
-	$scope.totalCardsFound = 0;
-	//used for viking event
-	$scope.oneFreeMove = true;
+	$scope.autoSelectHand = true;
+	$scope.autoSelectCart = true;
+	$scope.autoSelectQuest = true;
+	$scope.autoPass = true;
+	$scope.hideImagesBool = false;
 
+	//gui variable to control cart buttons
+	$scope.prevActiveCartId = -1;
+	$scope.activeCartId = -1;
+
+	//card gui variables
+	$scope.borderPXselected = "border:3px solid red";
+	$scope.borderPX = "border:1px solid black";
+	$scope.borderPXorig = "border:1px solid black";
+
+	$scope.refresh=false;
+	//control which log items to push
+	$scope.logItemCount = 0;
+	//used for viking event - this allows for Move action to not cost and action during the event
+	$scope.oneFreeMove = true;
 
 
 	//plays audio files
@@ -110,14 +112,14 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.hideImagesBool = !$scope.hideImagesBool;
 	}	
 	
-var cardColor = function(card) {
-	if(card.selected) {
-		return $scope.borderPXselected; //red
+	var cardColor = function(card) {
+		if(card.selected) {
+			return $scope.borderPXselected; //red
+		}
+		else {
+			return $scope.borderPXorig; //black
+		}
 	}
-	else {
-		return $scope.borderPXorig; //black
-	}
-}
 
 	//setup splash screen
 	setupNoGame = function() {
@@ -129,8 +131,6 @@ var cardColor = function(card) {
 		hideImages($scope);
 	}	
 
-	setupNoGame();
-	
 	$scope.joinGame = function(playerName, playerId) {
 		$scope.myId = playerId;
 		hideImages($scope);
@@ -170,6 +170,7 @@ var cardColor = function(card) {
     //this is the initial load spectator refresh 
     $(document).ready(); {
         startInterval(2000);
+		setupNoGame();
     }
 	
 
@@ -907,6 +908,7 @@ var cardColor = function(card) {
 		resetDisplayMode(game.activeEvent);
 		//deselect all cards
 		resetAllSelectedCards($scope.activePlayer);
+		$scope.activeEvent = events[questCardinplay.type];
 		
 	}
 
@@ -1085,6 +1087,7 @@ var cardColor = function(card) {
 		var whatWhereArray = [];
 		var found = false;
 		var dest1 = "";
+		var items = 0;
 	/*events.push(new Event(6,"BarbarianAttack"));
 	events.push(new Event(7,"BrokenItems"));
 	events.push(new Event(8,"CastleTaxation"));
@@ -1274,9 +1277,15 @@ var cardColor = function(card) {
 					break;
 				case 'eventHiddenRoom':
 					eventId = 19;
+					if(id=='gold') {
+						gold==1;
+					}
+					if(id=='items') {
+						items = 2;
+					}
+					
 					break;
 				case 'eventThrownInTheDungeon':
-				
 					eventId = 15;
 					
 					if(!playerHas123InHand) {
@@ -1306,25 +1315,6 @@ var cardColor = function(card) {
 					eventId = 17;
 					//reset it if there are more than one viking parade in deck
 					$scope.oneFreeMove = true;
-					/*for (var i = 0; i < player.carts.length; ++i)  {
-						if(found) {
-							break;
-						}
-						var cart = player.carts[i];
-						if(cart.active) {
-							var cartCards = getSelectedCardcount(player.carts[i].cards, true);
-							if(cartCards > 0) {
-								whatWhereArray.push(getSelectedCards(player.carts[i].cards, true));
-								whatWhereArray.push('cart' + i);
-								found = true;
-								break;
-							}
-						}
-					}
-					what1=whatWhereArray.shift();
-					where1=whatWhereArray.shift();
-					dest1='cart' + $scope.activeCartId;
-					*/
 					break;
 				default:
 					resetDisplayMode('game');
@@ -1335,10 +1325,9 @@ var cardColor = function(card) {
 			if(what2===undefined) {what2=""}
 			if(where2===undefined) {where2=""}
 			if(dest1===undefined) {dest1=""}
-			completeEvent(eventId, $scope.myId, destroyCart, gold, what1, where1, what2, where2, dest1);
+			completeEvent(eventId, $scope.myId, destroyCart, gold, items, what1, where1, what2, where2, dest1);
 			resetPlayerCardsSelected(player);
-			//resetDisplayMode('gameSpectator');
-			//playerRefresh($scope.myId);
+
 		}
 
 	resetPlayerCardsSelected =  function(player) {
@@ -1584,9 +1573,9 @@ var cardColor = function(card) {
 		gameFactory.joinGame(playerId, playerName, processGameStateCallback, processGameStateErrorCallback);
 	}
 
-	function completeEvent(eventId, playerId, cartToDestroy, gold, what1, where1, what2, where2, dest1) {
+	function completeEvent(eventId, playerId, cartToDestroy, gold, items, what1, where1, what2, where2, dest1) {
 		$scope.loadingData=true;
-		gameFactory.completeEvent(eventId, playerId, cartToDestroy, gold, what1, where1, what2, where2, dest1, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.completeEvent(eventId, playerId, cartToDestroy, gold, items, what1, where1, what2, where2, dest1, processGameStateCallback, processGameStateErrorCallback);
 	}
 
 	function pass(discard) {

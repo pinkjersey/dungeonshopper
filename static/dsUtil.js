@@ -1,25 +1,25 @@
 var prepEvents = function() {
 	var events = [];
-	events.push(new Event(0,"unknown"));
-	events.push(new Event(1,"BattleOfCastillon"));
-	events.push(new Event(2,"CaptureOfLusignan"));
-	events.push(new Event(3,"CombatOfTheThirty"));
-	events.push(new Event(4,"LoireCampaign"));
-	events.push(new Event(5,"SiegeOfHarfleur"));
-	events.push(new Event(6,"BarbarianAttack"));
-	events.push(new Event(7,"BrokenItems"));
-	events.push(new Event(8,"CastleTaxation"));
-	events.push(new Event(9,"GolbinRaid"));
-	events.push(new Event(10,"KingsFeast"));
-	events.push(new Event(11,"MarketShortage"));
-	events.push(new Event(12,"MarketSurplus"));
-	events.push(new Event(13,"OrcsAttack"));
-	events.push(new Event(14,"SandStorm"));
-	events.push(new Event(15,"ThrownInTheDungeon"));
-	events.push(new Event(16,"Treasure"));
-	events.push(new Event(17,"VikingParade"));
-	events.push(new Event(18,"HailStorm"));
-	events.push(new Event(19,"HiddenRoom"));
+	events.push(new Event(0,"unknown","unknown"));
+	events.push(new Event(1,"BattleOfCastillon","Battle of Castillon"));
+	events.push(new Event(2,"CaptureOfLusignan","Capture of Lusignan"));
+	events.push(new Event(3,"CombatOfTheThirty","Combat of the Thirty"));
+	events.push(new Event(4,"LoireCampaign","Loire Campaign"));
+	events.push(new Event(5,"SiegeOfHarfleur","Siege of Harfleur"));
+	events.push(new Event(6,"BarbarianAttack","Barbarian Attack"));
+	events.push(new Event(7,"BrokenItems","Broken Items"));
+	events.push(new Event(8,"CastleTaxation","Castle Taxation"));
+	events.push(new Event(9,"GolbinRaid","Goblin Raid"));
+	events.push(new Event(10,"KingsFeast","Kings Feast"));
+	events.push(new Event(11,"MarketShortage","Market Shortage"));
+	events.push(new Event(12,"MarketSurplus","Market Surplus"));
+	events.push(new Event(13,"OrcsAttack","Orcs Attack"));
+	events.push(new Event(14,"SandStorm","Sand Storm"));
+	events.push(new Event(15,"ThrownInTheDungeon","Thrown in the Dungeon"));
+	events.push(new Event(16,"Treasure","Treasure"));
+	events.push(new Event(17,"VikingParade","Viking Parade"));
+	events.push(new Event(18,"HailStorm","Hail Storm"));
+	events.push(new Event(19,"HiddenRoom","Hidden Room"));
 	return events;
 }
 

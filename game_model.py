@@ -21,6 +21,7 @@ class Event(ndb.Model):
     fromWhere2 = ndb.StringProperty(required=False)
     cartToDestroy = ndb.StringProperty(required=False)
     gold = ndb.IntegerProperty(required=False, default=0)
+    items = ndb.IntegerProperty(required=False, default=0)
     moveDest = ndb.StringProperty(required=False)
 
 class Cart(ndb.Model):
