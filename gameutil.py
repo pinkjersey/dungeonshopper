@@ -164,9 +164,13 @@ def removeItems(game, what, where):
     return
             
 
-def move(game, what, src, dst):
+def move(game, what, src, dst, actionCost):
     """Moves cards from src to dst"""
-    if (game.actionsRemaining == 0 and game.gameMode == "game"):
+    """There is the pending event logic that moves items back to hand before the event starts"""
+    """This is for the orcs attack.  Use game.pendingMode != event to bypass action cost validation"""
+    actionCost = int(actionCost)
+
+    if (game.actionsRemaining == 0 and game.gameMode == "game" and actionCost == 1):
         # no actions remaining
         logging.error("No actions remaining")        
         return False
@@ -214,7 +218,7 @@ def move(game, what, src, dst):
         logging.error("Exception {0}".format(e.message))        
         return False
 
-    if game.gameMode == "game":
+    if (game.gameMode == "game" and actionCost == 1):
         game.actionsRemaining = game.actionsRemaining -1
 
     game.put()
@@ -418,16 +422,20 @@ def getIntersection(list1, list2):
 def completeEvent(game, eventId, playerId, cartidstr, gold, what1, where1, what2, where2, dest1):
 #note that the gameMode has been added to the game object
 #this controls if the game is in game or event mode
+#special event orcs attack number 13
+#pass in -1 to show cart will be destroyed
 #game.gameMode = "game"	
 #game.gameMode = "event"	
     eventId=int(eventId)
     gold=int(gold)
+    playerId=int(playerId)
     #player = game.players[game.curPlayer]
     player = game.players[playerId]
     #playerId = game.players[game.curPlayer].playerId
     logging.info("Entered Logic for Events")
     logging.info("playerid is: {0}".format(playerId)) 
-    what1arr = whatToArray(what1)
+    if what1 != '-1':
+        what1arr = whatToArray(what1)
     what2arr = whatToArray(what2)
     game.gameMode = "event"
     if cartidstr != "":
@@ -437,6 +445,8 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, what1, where1, what2
             logging.error("Invalid cart id")
             return False
         cart = game.players[playerId].carts[cartid]
+    else:
+        cartidstr = "undefined"
 
     try:
         #destroy market and re-seed if you are the first to get here        
@@ -491,19 +501,23 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, what1, where1, what2
     
         #orcs attack.  Wheelbarrow destroyed.  if handItems present don't destroy, but discard them
         if eventId == 13:
+            logging.info("Entered event {0}".format(eventId))
             if cartidstr == None:
-                pass
+                logging.info("Cart not passed in to destroy {0}".format(cartidstr))
             else:
+                logging.info("Destroy Cart {0} if not defended".format(cartidstr))
+                logging.info("What was in cart0: ".format(what1))
                 #destroy it	if no cards passed in
-                if (cart.purchased and what1==None):
+                if what1=='-1':
                     # destroy it
+                    logging.info("Destroy Cart {0}, it was not defended".format(cartidstr))
                     cart.destroyed = True
                     cart.purchased = False
                 #discard items if buying it back
-                if len(what1arr) > 0:
-                    for whati in what1arr:
-                        logging.info("Discarding {0} from {1}".format(whati, where1))
-                        found = discardItem(game, whati, where1)
+                if len(what2arr) > 0:
+                    for whati in what2arr:
+                        logging.info("Discarding {0} from {1}".format(whati, where2))
+                        found = discardItem(game, whati, where2)
                         if (found == False):
                             logging.error("Couldn't find all what1arr {0}".format(whati))        
                             return False
@@ -532,7 +546,7 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, what1, where1, what2
         #VikingParade
         if eventId == 17:
             logging.info("Viking Parade start Event Id:  {0}".format(eventId))
-            move(game, what1, where1, dest1)
+            move(game, what1, where1, dest1, 0)
         #HailStorm not done
         if eventId == 18:
             logging.info("Sandstorm start Event Id:  {0}".format(eventId))

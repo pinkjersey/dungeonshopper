@@ -33,10 +33,10 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               move: function (what, src, dst, callback, errorcallback) {
+               move: function (what, src, dst, actionCost, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=move&what=' + what + '&src=' + src + '&dst=' + dst,
+                       url: '/game?action=move&what=' + what + '&src=' + src + '&dst=' + dst + '&actionCost=' + actionCost,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
