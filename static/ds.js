@@ -825,7 +825,10 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		play("market");
 	}
 	
-	prepareEventForPlayer = function(game, questCardinplay) {	
+	prepareEventForPlayer = function(game, questCardinplay) {
+		if(!$scope.isActive){
+			return;
+		}
 		var player = $scope.activePlayer;
 		var cart = player.carts[0];
 		var playerCardCount = player.cards.playingCards.length;
@@ -921,6 +924,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			case "gameSpectator":
 				$scope.displayModeName = " - Game Spectating";
 				break;
+			case "eventCompleted":				
+				$scope.displayModeName = " - Event Results";
+				break;
 			case "gameover":
 				$scope.displayModeName = "Game Over";
 				break;
@@ -959,40 +965,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 		
 	}
-/*		var player = $scope.activePlayer;
-		var cart = player.carts[id];
-		var found = false;
-		$scope.activeCartId = id;
-		
-		if($scope.selectedCartItemsCount === 0){
-			alert('Select items to move between cart.');
-			return;
-		}	
-		
-		if($scope.selectedCartItemsCount > cart.size - cart.cards.playingCards.length){
-			alert('Cannot move that many items into the cart.');
-			return;
-		}
-		
-		for (var i = 0; i < player.carts.length; ++i)  {
-			if(found) {
-				break;
-			}
-			var cart = player.carts[i];
-			if(cart.active) {
-				var cartCards = getSelectedCardcount(player.carts[i].cards, true);
-				if(cartCards > 0) {
-					move(getSelectedCards(player.carts[i].cards, 'cart' + id, 'cart' + id, 0));
-					
-					found = true;
-					break;
-				}
-			}
-		}
-		//move(cardsToMoveBackToHand, 'cart0', 'hand', actionCost);
-		
-		play("swords");*/
-	
+
 
 	$scope.userClickedCartImageEvent = function(id) {
 		if(!$scope.isActive){return;}
@@ -1051,6 +1024,11 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		play("button");
 	}
 	
+	$scope.playerCompletedEvent = function() {
+		resetDisplayMode('game');
+	}
+
+
 	$scope.playerCompleteEvent = function(index, id) {
 		if(!$scope.isActive){return;}
 		var game = $scope.game;
@@ -1331,6 +1309,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			if(items===undefined) {items=0;}
 			completeEvent(eventId, $scope.myId, destroyCart, gold, items, what1, where1, what2, where2, dest1);
 			resetPlayerCardsSelected(player);
+			resetDisplayMode("eventCompleted");
 
 		}
 
@@ -1410,6 +1389,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	function getObjectResults(data) {
 		var text = "";
 		var game = $scope.game;
+		game.activeEvent = 'game';
 		// players = game.players;
 		//this controls the buttons to return if you are not active
 		//already doing so much in angular js buttons, did not want to add this as well
@@ -1480,7 +1460,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	
 
 		
-		resetDisplayMode(mode(data.isActive));
+		resetDisplayMode(game.activeEvent);
 		$scope.itemsCountRemaining = data.itemsCountRemaining;
 		$scope.questsCountRemaining = data.questsCountRemaining;
 		$scope.discardsCount = data.discardsCount;
