@@ -423,6 +423,8 @@ if(level===4){
 	this.addCard(level,0,0,0,0,0,0,0,'eventThrownInTheDungeon',15,image+"throwninthedungeon",this);	
 	this.addCard(level,0,0,0,0,0,0,0,'eventTreasure',16,image+"treasure",this);	
 	this.addCard(level,0,0,0,0,0,0,0,'eventVikingParade',17,image+"vikingparade",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventHailStorm',18,image+"hailstorm",this);	
+	this.addCard(level,0,0,0,0,0,0,0,'eventHiddenRoom',19,image+"hiddenroom",this);	
 	}
 
 }

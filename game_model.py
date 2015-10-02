@@ -15,14 +15,14 @@ class QuestCard(ndb.Model):
 
 class Event(ndb.Model):    
     eventId = ndb.IntegerProperty(required=True, default=0)
-    whatitems1 = ndb.IntegerProperty(repeated=False)
-    fromWhere1 = ndb.StringProperty(required=False)
-    whatitems2 = ndb.IntegerProperty(repeated=False)
-    fromWhere2 = ndb.StringProperty(required=False)
-    cartToDestroy = ndb.StringProperty(required=False)
+    whatitems1 = ndb.StringProperty(required=False, default="")
+    fromWhere1 = ndb.StringProperty(required=False, default="")
+    whatitems2 = ndb.StringProperty(required=False, default="")
+    fromWhere2 = ndb.StringProperty(required=False, default="")
+    cartToDestroy = ndb.StringProperty(required=False, default="cart0")
     gold = ndb.IntegerProperty(required=False, default=0)
-    items = ndb.IntegerProperty(required=False, default=0)
-    moveDest = ndb.StringProperty(required=False)
+    itemsCount = ndb.IntegerProperty(required=False, default=0)
+    moveDest = ndb.StringProperty(required=False, default="")
 
 class Cart(ndb.Model):
     purchased = ndb.BooleanProperty(required=True, default=False)
@@ -42,12 +42,12 @@ class Player(ndb.Model):
     maxHand = ndb.IntegerProperty(required=True, default=5)
     turns = ndb.IntegerProperty(required=True, default=0)
     questsCompleted = ndb.LocalStructuredProperty(QuestCard, repeated=True)
-    curEvent = ndb.LocalStructuredProperty(Event, repeated=False)
+    curEvent = ndb.LocalStructuredProperty(Event, repeated=True)
 
 class PlayerLog(ndb.Model):
     playerId = ndb.IntegerProperty(required=True)
     event = ndb.StringProperty(required=True)
-    eventDetail = ndb.LocalStructuredProperty(Event, repeated=False)
+    eventDetail = ndb.LocalStructuredProperty(Event, repeated=True)
 
 class Game(ndb.Model):
     gameMode = ndb.StringProperty(required=True, default="game") 

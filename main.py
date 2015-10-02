@@ -150,7 +150,7 @@ class GameHandler(webapp2.RequestHandler):
         there must be enough space. Otherwise an error is returned
         returns error 500 when there is an error
         """
-        logging.error("move")        
+        logging.info("move")        
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
@@ -292,7 +292,7 @@ class GameHandler(webapp2.RequestHandler):
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
-        logging.error("Compelete quest: loaded quest")
+        logging.info("Compelete quest: loaded quest")
 
         where = self.request.get('where')
         if (where == None or where == ""):
@@ -304,7 +304,7 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        logging.error("Compelete quest: running")
+        logging.info("Compelete quest: running")
         result = completeQuest(game, what, where)
         if (result == False):
             self.error(500)
@@ -320,7 +320,7 @@ class GameHandler(webapp2.RequestHandler):
 
     def completeEvent(self):
         """
-        USAGE: /game?action=completeEvent&eventId=<eventId>&cart=<cart0>&gold=<0>&what1=<>&where1=<>&what2=<>&where2=<>&dest1=<>
+        USAGE: /game?action=completeEvent&eventId=<eventId>&cart=<cart0>&gold=<0>&items=<0>&what1=<>&where1=<>&what2=<>&where2=<>&dest1=<>
         Complete an event. 
         """
         logging.info("Compelete Event: begin")
@@ -346,12 +346,15 @@ class GameHandler(webapp2.RequestHandler):
 
         cartidstr = self.request.get('cartToDestroy')        
         gold = self.request.get('gold')
+        igold = int(gold)
         items = self.request.get('items')
+        iitemsCount = int(items)
         what1 = self.request.get('what1')
         where1 = self.request.get('where1')
         what2 = self.request.get('what2')
         where2 = self.request.get('where2')
         dest1 = self.request.get('dest1')
+        ieventId = int(eventId)
         logging.info("EventId found:  {0}".format(eventId))
         logging.info("gold found:  {0}".format(gold))
         logging.info("items found:  {0}".format(items))
@@ -360,7 +363,7 @@ class GameHandler(webapp2.RequestHandler):
         logging.info("what2 Items Found:  {0}".format(what2))
         logging.info("where2 Items Found:  {0}".format(where2))
         logging.info("dest1 Items Found:  {0}".format(dest1))
-        result = completeEvent(game, eventId, iPlayerId, cartidstr, gold, items, what1, where1, what2, where2, dest1)
+        result = completeEvent(game, ieventId, iPlayerId, cartidstr, igold, iitemsCount, what1, where1, what2, where2, dest1)
         if (result == False):
             self.error(500)
             return
