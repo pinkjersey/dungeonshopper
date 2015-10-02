@@ -346,6 +346,7 @@ class GameHandler(webapp2.RequestHandler):
 
         cartidstr = self.request.get('cartToDestroy')        
         gold = self.request.get('gold')
+        items = self.request.get('items')
         what1 = self.request.get('what1')
         where1 = self.request.get('where1')
         what2 = self.request.get('what2')
@@ -353,12 +354,13 @@ class GameHandler(webapp2.RequestHandler):
         dest1 = self.request.get('dest1')
         logging.info("EventId found:  {0}".format(eventId))
         logging.info("gold found:  {0}".format(gold))
+        logging.info("items found:  {0}".format(items))
         logging.info("what1 Items Found:  {0}".format(what1))
         logging.info("where1 Items Found:  {0}".format(where1))
         logging.info("what2 Items Found:  {0}".format(what2))
         logging.info("where2 Items Found:  {0}".format(where2))
         logging.info("dest1 Items Found:  {0}".format(dest1))
-        result = completeEvent(game, eventId, iPlayerId, cartidstr, gold, what1, where1, what2, where2, dest1)
+        result = completeEvent(game, eventId, iPlayerId, cartidstr, gold, items, what1, where1, what2, where2, dest1)
         if (result == False):
             self.error(500)
             return
@@ -370,7 +372,7 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
-		
+
     def passPlayer(self):
         """
         USAGE: /game?action=passPlayer&items=<items to discard>
