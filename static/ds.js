@@ -908,7 +908,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		resetDisplayMode(game.activeEvent);
 		//deselect all cards
 		resetAllSelectedCards($scope.activePlayer);
-		$scope.activeEvent = events[questCardinplay.type];
+		$scope.activeEvent = $scope.events[questCardinplay.type];
 		
 	}
 
@@ -1277,10 +1277,12 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					break;
 				case 'eventHiddenRoom':
 					eventId = 19;
-					if(id=='gold') {
-						gold==1;
+					if(id==='gold') {
+						items = 0;
+						gold = 1;
 					}
-					if(id=='items') {
+					if(id==='items') {
+						gold = 0;
 						items = 2;
 					}
 					
@@ -1320,11 +1322,13 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					resetDisplayMode('game');
 			}
 			
-			if(what1===undefined) {what1=""}
-			if(where1===undefined) {where1=""}
-			if(what2===undefined) {what2=""}
-			if(where2===undefined) {where2=""}
-			if(dest1===undefined) {dest1=""}
+			if(what1===undefined) {what1="";}
+			if(where1===undefined) {where1="";}
+			if(what2===undefined) {what2="";}
+			if(where2===undefined) {where2="";}
+			if(dest1===undefined) {dest1="";}
+			if(gold===undefined) {gold=0;}
+			if(items===undefined) {items=0;}
 			completeEvent(eventId, $scope.myId, destroyCart, gold, items, what1, where1, what2, where2, dest1);
 			resetPlayerCardsSelected(player);
 
