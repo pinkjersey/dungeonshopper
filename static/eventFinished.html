@@ -1,11 +1,16 @@
-﻿<div class="row" ng-repeat="player in game.players" >
+﻿<div class="container">
+	<div class="row" >
+			<div  style="float:right; padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 5px;">
+				<button class="btn btn-warning" ng-click="playerRefresh()" >Refresh</button>    
+				<button ng-disabled="loadingData===true" class="btn btn-danger" ng-click="endGame()">Quit</button>
+			</div>
+	</div>
+</div>
+<div class="row" ng-repeat="player in game.players" >
 	<div class="panel panel-primary">  
 		<div class="panel-heading">  
 			<div class="panel-body">
-			
 					<table class="table table-condensed">
-
-						
 							<tr>
 								<th><big>{{player.name}}</big></th>
 								<th><big>VP: {{player.vp}}</big></th>
@@ -14,19 +19,14 @@
 								<th><big>Total: {{player.gold + player.vp + player.bonus}}</big></th>								
 								<th><big>Turns: {{player.turns}}</big></th>
 							</tr>
-							<tr>
-							<span ng-show="player.winner===true"><h1 style="color:red">WINNER</h1></span>
-
-							</tr>
-						
 					</table>
  
+			<div class="row">
 				<div>{{player.name}}'s has completed event {{activeEvent.eventText}}</div>
-				<span ng-repeat="questcard in player.questsCompleted.playingCards track by $index">
-					<img ng-src="{{questcard.image}}"></img>
+				<span ng-repeat="eventcard in game.questsInPlay.playingCards track by $index">
+					<eventcard ng-show="eventcard.level===4" info="eventcard"></eventcard>
 				</span>					
 				<p></p>
-				{{activeEvent.name}}
 			</div>
 		</div>
 	</div>	
