@@ -34,13 +34,13 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.showMyCompletedQuests = false;
 	$scope.showHideVar = "Show";
 	$scope.showHideQuestVar = "Show";
-	$scope.sounds = true;
+	$scope.sounds = false;
 	$scope.music = true;
 	$scope.autoSelectHand = true;
 	$scope.autoSelectCart = true;
 	$scope.autoSelectQuest = true;
 	$scope.autoPass = true;
-	$scope.hideImagesBool = false;
+	$scope.hideImagesBool = true;
 
 	//gui variable to control cart buttons
 	$scope.prevActiveCartId = -1;

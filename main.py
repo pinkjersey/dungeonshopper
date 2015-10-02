@@ -150,7 +150,7 @@ class GameHandler(webapp2.RequestHandler):
         there must be enough space. Otherwise an error is returned
         returns error 500 when there is an error
         """
-        logging.error("move")        
+        logging.info("move")        
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
@@ -292,7 +292,7 @@ class GameHandler(webapp2.RequestHandler):
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
-        logging.error("Compelete quest: loaded quest")
+        logging.info("Compelete quest: loaded quest")
 
         where = self.request.get('where')
         if (where == None or where == ""):
@@ -304,7 +304,7 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        logging.error("Compelete quest: running")
+        logging.info("Compelete quest: running")
         result = completeQuest(game, what, where)
         if (result == False):
             self.error(500)

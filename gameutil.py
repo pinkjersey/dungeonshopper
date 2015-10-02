@@ -196,12 +196,16 @@ def move(game, what, src, dst, actionCost):
     """There is the pending event logic that moves items back to hand before the event starts"""
     """This is for the orcs attack.  """
     actionCost = int(actionCost)
-
+    logging.info("what = ".format(what))
+    logging.info("src = ".format(src))
+    logging.info("dst = ".format(dst))
+    logging.info("actionCost = ".format(actionCost))
     if (game.actionsRemaining == 0 and game.gameMode == "game" and actionCost == 1):
         # no actions remaining
         logging.error("No actions remaining")        
         return False
 
+    logging.info("starting move, getting array of what")
     # convert input to array
     whats = whatToArray(what)
     whatlen = len(whats)
@@ -213,6 +217,7 @@ def move(game, what, src, dst, actionCost):
 
     try:        
         # discard items from src
+        logging.info("removing items")
         removeItems(game, what, src)             
 
         if dst == "hand":
@@ -563,25 +568,29 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, itemsCount, what1, w
                     cart.purchased = True
         #hailstorm players pass hand to the right
         if eventId == 18:
-            logging.info("hailstorm start Event Id:  {0}".format(eventId))
-            p = len(game.players)
-            if(p==1):
-                logging.info("only one player, skipping event:  {0}".format(eventId))
-            nextPlayerId = 0
-            for i in range(p):
-                playersId = i-1
-                curPlayer = game.players[playersId]
-                if (nextPlayerId == 0):
-                    nextPlayerId = game.numPlayers
-                del curPlayer.hand
-                curPlayer.hand = game.players[nextPlayerId-1].hand
-                numItemsInHand = len(curPlayer.hand)
-                if numItemsInHand < curPlayer.maxHand:
-                    diff = curPlayer.maxHand - numItemsInHand
-                    for i in range(diff):
-                        dealItemCard(playersId, game)
-                        player.hand.sort()
-                nextPlayerId += 1
+            if game.eventCompletedCount == 0:
+                logging.info("hailstorm start Event Id:  {0}".format(eventId))
+                p = len(game.players)
+                if(p==1):
+                    logging.info("only one player, skipping event:  {0}".format(eventId))
+                nextPlayerId = 1
+                tmp = game.players[0].hand
+                for i in range(p):
+                    logging.info("game.players[i]: {0}".format(i))
+                    if (nextPlayerId == game.numPlayers):
+                        nextPlayerId = 0
+                        del game.players[i].hand
+                        game.players[i].hand = tmp
+                    else:
+                        del game.players[i].hand
+                        game.players[i].hand = game.players[nextPlayerId].hand
+                    numItemsInHand = len(game.players[i].hand)
+                    if numItemsInHand < game.players[i].maxHand:
+                        diff = game.players[i].maxHand - numItemsInHand
+                        for d in range(diff):
+                            dealItemCard(i, game)
+                            game.players[i].hand.sort()
+                    nextPlayerId += 1
 
         #ThrownInTheDungeon
         if eventId == 15:
@@ -605,25 +614,33 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, itemsCount, what1, w
             move(game, what1, where1, dest1, 0)
         #sandstorm PASS CARDS TO LEFT
         if eventId == 14:
-            logging.info("Sandstorm start Event Id:  {0}".format(eventId))
-            p = len(game.players)
-            if(p==1):
-                logging.info("only one player, skipping event:  {0}".format(eventId))
-            nextPlayerId = 0
-            for i in range(p):
-                playersId = i-1
-                curPlayer = game.players[playersId]
-                if (nextPlayerId == game.numPlayers-1):
-                    nextPlayerId = -1
-                del curPlayer.hand
-                curPlayer.hand = game.players[nextPlayerId+1].hand
-                numItemsInHand = len(curPlayer.hand)
-                if numItemsInHand < curPlayer.maxHand:
-                    diff = curPlayer.maxHand - numItemsInHand
-                    for i in range(diff):
-                        dealItemCard(playersId, game)
-                        player.hand.sort()
-                nextPlayerId -= 1
+            if game.eventCompletedCount == 0:
+                logging.info("Sandstorm start Event Id:  {0}".format(eventId))
+                p = len(game.players)
+                if(p==1):
+                    logging.info("only one player, skipping event:  {0}".format(eventId))
+                prevPlayerId = game.numPlayers-1
+                tmp = game.players[0].hand
+                for i in range(p):
+                    logging.info("game.players[i]: {0}".format(i))
+                    logging.info("prevPlayerId before: {0}".format(prevPlayerId))
+                    if (prevPlayerId == game.numPlayers):
+                        prevPlayerId = 0
+                        del game.players[i].hand
+                        game.players[i].hand = tmp
+                    else:
+                        logging.info("curPlayer: {0}".format(i))
+                        logging.info("prevPlayerId after: {0}".format(prevPlayerId))
+                        del game.players[i].hand
+                        game.players[i].hand = game.players[prevPlayerId].hand
+                    numItemsInHand = len(game.players[i].hand)
+                    if numItemsInHand < game.players[i].maxHand:
+                        diff = game.players[i].maxHand - numItemsInHand
+                        for d in range(diff):
+                            logging.info("pre dealing card! {0}".format(d))  
+                            dealItemCard(i, game)
+                            game.players[i].hand.sort()
+                    prevPlayerId += 1
         #HiddenRoom not done
         if eventId == 19:
             if gold == 1:
@@ -978,7 +995,9 @@ def getFirstItemCard(game):
         return card
 
 def dealItemCard(playerIndex, game):
-    card = getFirstItemCard(game)    
+    card = getFirstItemCard(game)   
+    logging.info("dealing card to player! {0}".format(playerIndex))  
+	
     game.players[playerIndex].hand.append(card)
     game.players[playerIndex].hand.sort()
 
@@ -1087,18 +1106,18 @@ def newQuestDeck(numPlayers):
     level3Cards.append(createQuestCard(3,False,[3,4,7,8,9],6,5))
     #simulate treasure event only for now
 
-    level4Cards.append(createQuestCard(4,False,[],0,14))
-    level4Cards.append(createQuestCard(4,False,[],0,14))
-    level4Cards.append(createQuestCard(4,False,[],0,14))
     level4Cards.append(createQuestCard(4,False,[],0,18))
     level4Cards.append(createQuestCard(4,False,[],0,18))
     level4Cards.append(createQuestCard(4,False,[],0,18))
-    level4Cards.append(createQuestCard(4,False,[],0,19))
-    level4Cards.append(createQuestCard(4,False,[],0,19))
-    level4Cards.append(createQuestCard(4,False,[],0,19))
-    level4Cards.append(createQuestCard(4,False,[],0,19))
-    level4Cards.append(createQuestCard(4,False,[],0,19))
-    level4Cards.append(createQuestCard(4,False,[],0,19))
+    level4Cards.append(createQuestCard(4,False,[],0,18))
+    level4Cards.append(createQuestCard(4,False,[],0,18))
+    level4Cards.append(createQuestCard(4,False,[],0,18))
+    level4Cards.append(createQuestCard(4,False,[],0,18))
+    level4Cards.append(createQuestCard(4,False,[],0,18))
+    level4Cards.append(createQuestCard(4,False,[],0,18))
+    level4Cards.append(createQuestCard(4,False,[],0,18))
+    level4Cards.append(createQuestCard(4,False,[],0,18))
+    level4Cards.append(createQuestCard(4,False,[],0,18))
 
 
     level1Cards = shuffle(level1Cards)
