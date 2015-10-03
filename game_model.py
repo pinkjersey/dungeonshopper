@@ -41,6 +41,7 @@ class Player(ndb.Model):
     maxHand = ndb.IntegerProperty(required=True, default=5)
     turns = ndb.IntegerProperty(required=True, default=0)
     questsCompleted = ndb.LocalStructuredProperty(QuestCard, repeated=True)
+    curEventStatus = ndb.StringProperty(required=False, default="completed")
     curEvent = ndb.LocalStructuredProperty(Event, repeated=True)
 
 class PlayerLog(ndb.Model):
@@ -61,6 +62,7 @@ class Game(ndb.Model):
     questsInPlay = ndb.LocalStructuredProperty(QuestCard, repeated=True)
     playerLog = ndb.LocalStructuredProperty(PlayerLog, repeated=True)
     eventCompletedCount = ndb.IntegerProperty(default=0)
+    eventPendingCompletedCount = ndb.IntegerProperty(default=0)
 
 
 

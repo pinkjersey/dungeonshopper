@@ -452,11 +452,17 @@ def getIntersection(list1, list2):
 
 
 def prepEvents(game, eventId):
+    if game.gameMode != "eventStarted":
+        return False
     game.gameMode = "eventPending"
     logging.info("GameMode pending: {0}".format(game.gameMode))
     gold = 1
+    p = len(game.players)
+    for playerId in range(p):
+        logging.info("playerId set event status to eventInProgress: {0}".format(playerId))
+        game.players[playerId].curEventStatus="eventInProgress"
     #currentEvent=Event(eventId = eventId, whatitems1 = what1, fromWhere1 = where1, whatitems2 = what2, fromWhere2 = where2, gold = gold, itemsCount = itemsCount, moveDest = dest1)
-
+    #this should only happen for the first player that is active that caused it.  it applies to all players
     try:
         #destroy market and re-seed       
         if eventId == 6:
@@ -504,10 +510,9 @@ def prepEvents(game, eventId):
         #orcs attack.  Wheelbarrow destroyed.  if handItems present don't destroy, but discard them
         if eventId == 13:
             logging.info("Entered Orc Attack event {0}".format(eventId))
-            logging.info("Destroy Cart {0}, it was not defended".format(cartidstr))
             p = len(game.players)
             for playerId in range(p):
-                cart = playerId.carts[0]
+                cart = game.players[playerId].carts[0]
                 logging.info("playerId: {0}".format(playerId))
                 sumItems = sum(cart.inCart)
                 if sumItems < 5:
@@ -594,7 +599,11 @@ def prepEvents(game, eventId):
 
     except ValueError as e:
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
+        game.gameMode = "game"
         return False  
+
+    game.gameMode = "eventPending"
+    return True
 
 #result = completeEvent(game, eventId, iPlayerId, igold, iitemsCount, what1, where1, what2, where2, dest1)
 def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what2, where2, dest1):
@@ -603,7 +612,8 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
 #special event orcs attack number 13
 #pass in -1 to show cart will be destroyed
 
-    game.gameMode = "eventPending"
+    if game.gameMode != "eventPending":
+        return True
     playerId=int(playerId)
     currentEvent=Event(eventId = eventId, whatitems1 = what1, fromWhere1 = where1, whatitems2 = what2, fromWhere2 = where2, gold = gold, itemsCount = itemsCount, moveDest = dest1)
     game.players[playerId].curEvent.append(currentEvent)
@@ -646,7 +656,7 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
         if eventId == 9:
             logging.info("GolbinRaid start Event Id:  {0}".format(eventId))
             #discard items first
-            if len(what1arr > 0):
+            if len(what1arr) > 0:
                 for whati in what1arr:        
                     found = discardItem(game, whati, where1)
                     if (found == False):
@@ -717,12 +727,17 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
         return False  
 
-    logging.info("Event count increased to:  {0}".format(game.eventCompletedCount))
-    game.curPlayer += 1
-    if game.curPlayer == game.numPlayers:
-        game.curPlayer = 0
-    logging.info("CurPlayer changed to:  {0}".format(game.curPlayer))		
-    game.gameMode = "eventCompleted"
+    logging.info("eventPendingCompletedCount increased to:  {0}".format(game.eventPendingCompletedCount))
+    #game.curPlayer += 1
+    #if game.curPlayer == game.numPlayers:
+    #    game.curPlayer = 0
+    #logging.info("CurPlayer changed to:  {0}".format(game.curPlayer))
+    game.players[playerId].curEventStatus = "eventCompleted"
+    game.eventPendingCompletedCount += 1
+
+    if(game.eventPendingCompletedCount==game.numPlayers):
+        game.gameMode = "eventCompleted"
+        game.eventPendingCompletedCount = 0
     # save game to data store
     game.put()
     return True	
@@ -1073,6 +1088,7 @@ def dealQuest(game):
         del game.questDeck[0]
         game.questsInPlay.append(quest)
         if quest.level == 4:
+            game.gameMode = "eventStarted"
             prepEvents(game, quest.type)
         else:
             game.gameMode = "game"
@@ -1167,7 +1183,7 @@ def newQuestDeck(numPlayers):
 
     level4Cards.append(createQuestCard(4,False,[],0,6))
     level4Cards.append(createQuestCard(4,False,[],0,7))
-    level4Cards.append(createQuestCard(4,False,[],0,87))
+    level4Cards.append(createQuestCard(4,False,[],0,8))
     level4Cards.append(createQuestCard(4,False,[],0,9))
     level4Cards.append(createQuestCard(4,False,[],0,10))
     level4Cards.append(createQuestCard(4,False,[],0,11))

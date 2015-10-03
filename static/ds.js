@@ -3,7 +3,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.activePlayer = null;
 	$scope.activeEvent = null;
 	$scope.isActive = false;
-
+	$scope.clickedCompletePendingEvent = false;
 	$scope.debug = false;
 	//gui variable to control item buttons
 	$scope.selectedItemsCount = 0;
@@ -826,9 +826,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	}
 	
 	prepareEventForPlayer = function(game, questCardinplay) {
-		if(!$scope.isActive){
-			return;
-		}
+		//if(!$scope.isActive){
+		//	return;
+		//}
 		game.activeEvent = questCardinplay.name;
 		var player = $scope.activePlayer;
 		var cart = player.carts[0];
@@ -1014,11 +1014,12 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	
 	$scope.playerCompletedEvent = function() {
 		completeEventDealQuest($scope.activeEventId, $scope.myId);
+		$scope.clickedCompletePendingEvent = true;
 	}
 
 
 	$scope.playerCompleteEvent = function(index, id) {
-		if(!$scope.isActive){return;}
+		//if(!$scope.isActive){return;}
 		var game = $scope.game;
 		var player = $scope.activePlayer;
 		var playerCardCount = player.cards.playingCards.length;
@@ -1278,7 +1279,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			completeEvent(eventId, $scope.myId, gold, items, what1, where1, what2, where2, dest1);
 			resetPlayerCardsSelected(player);
 			//resetDisplayMode("eventCompleted");
-
+			
 		}
 
 	resetPlayerCardsSelected =  function(player) {
@@ -1357,11 +1358,12 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	function getObjectResults(data) {
 		var text = "";
 		var game = $scope.game;
-		
+		$scope.clickedCompletePendingEvent = false;
 		// players = game.players;
 		//this controls the buttons to return if you are not active
 		//already doing so much in angular js buttons, did not want to add this as well
 		$scope.isActive = data.isActive;
+		var playerEventStatus = data.curEventStatus;
 		$scope.numberOfPlayers = data.numPlayers;
 	
 		$scope.otherPlayers = [];		
@@ -1461,11 +1463,25 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.logItemCount = data.playerLog.length;
 
 		//game, eventPending, eventCompleted
-		$scope.displayMode = data.gameMode;
-		if(data.gameMode === 'eventPending') {
+
+		if(playerEventStatus === "eventInProgress" && data.gameMode === "eventPending") {
 			prepareEventForPlayer(game, game.activeEventCard);
 		}
-		resetDisplayModeName(data.gameMode);
+		else if(playerEventStatus === "eventCompleted" && data.gameMode === "eventPending") {
+			$scope.displayMode = playerEventStatus;
+		}
+		else {		
+			if(data.isActive) {
+				$scope.displayMode = data.gameMode;
+			} 
+			else {
+				$scope.displayMode = 'gameSpectator';
+			}
+		}	
+
+
+		resetDisplayModeName($scope.displayMode);
+		
 
 		
 		if(data.gameOver===true)	{
