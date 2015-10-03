@@ -31,7 +31,7 @@
 	</table>
 </div>
 
-
+<h4 class="tab40" ng-show="activePlayer.gold === 0 && totalCardsFound === 0">Event! Castle Taxation - Click Complete Event you poor bum.</h4>
 <h4 class="tab40" ng-show="activePlayer.gold >= 1 && totalCardsFound === 1">Event! Castle Taxation - Select your only item for Castle Tax or pay one gold.</h4>
 <h4 class="tab40" ng-show="activePlayer.gold === 0 && totalCardsFound >= 2">Event! Castle Taxation - Select any two items for Castle Tax.</h4>
 <h4 class="tab40" ng-show="activePlayer.gold >= 1 && totalCardsFound >= 2">Event! Castle Taxation - Select either: Any two items or Pay one Gold for Castle Tax.</h4>
@@ -41,6 +41,7 @@
 				<eventcard ng-show="eventcard.level===4" info="eventcard"></eventcard>
 				<span class = "tab40" ng-show="eventcard.level===4" ng-if="activePlayer.gold > 0"></span>
 				<button ng-show="eventcard.level===4" ng-if="activePlayer.gold > 0" class="btn btn-warning" ng-click="playerCompleteEvent($index, 'gold')">Pay with gold & Complete Event</button>
+				<button ng-show="eventcard.level===4" ng-if="activePlayer.gold === 0 && totalCardsFound === 0" class="btn btn-warning" ng-click="playerCompleteEvent($index, 'none')">Complete Event</button>
 				<button ng-show="eventcard.level===4" ng-if="totalCardsFound >= 1" class="btn btn-warning" ng-click="playerCompleteEvent($index,'items')">Pay with items & Complete Event</button>   
 			</span>	
 		</div>

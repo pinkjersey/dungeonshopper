@@ -6,12 +6,26 @@
 			</div>
 	</div>
 </div>
+
 <div>
-{{clickedCompleteEvent}}
-<button ng-show = "!clickedCompleteEvent" class="btn btn-danger" ng-click="playerCompletedEvent()">Back to Game?</button>
-<label ng-show = "clickedCompleteEvent" ">Waiting on other players</label>
-<p></p>
+	<button ng-show = "!clickedCompleteEvent" class="btn btn-danger" ng-click="playerCompletedEvent()">Back to Game?</button>
+	<label ng-show = "clickedCompleteEvent" ">Waiting on other players</label>
+
+<div class="panel panel-primary">
+		<br></br>
+		<div class="container-fluid">
+			<div class="row">
+				<span ng-repeat="eventcard in game.questsInPlay.playingCards track by $index">
+					<eventcardorig ng-show="eventcard.level===4" info="eventcard"></eventcardorig>
+				</span>	
+			</div>
+		</div>
 </div>
+
+
+	<p></p>
+</div>
+
 <div class="row" ng-repeat="player in game.players" >
 	<div class="panel panel-primary">  
 		<div class="panel-heading">  
@@ -28,11 +42,14 @@
 					</table>
  
 			<div class="row">
-				<div>{{player.name}}'s has completed event {{activeEvent.eventText}}</div>
-				<span ng-repeat="eventcard in game.questsInPlay.playingCards track by $index">
-					<eventcardsmall ng-show="eventcard.level===4" info="eventcard"></eventcardsmall>
-				</span>					
+				<div ng-show="player.curEvent != eventCompleted">{{player.name}} has not completed event {{player.lastEvent.eventText}}!</div>
+				<div ng-show="player.curEvent === eventCompleted">{{player.name}} has completed event {{player.lastEvent.eventText}}!</div>
 				<p></p>
+
+				<label>{{player.lastEvent.eventCompletedText}}</label>
+				<!--<span ng-show="player.lastEvent.id === 9" ng-repeat "card in player.lastEvent.whatItems.playingCards track by $index ">
+					<img style="{{card.borderColor}}"  ng-src="{{card.image}}"/>
+				</span>-->
 			</div>
 		</div>
 	</div>	

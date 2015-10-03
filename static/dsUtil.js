@@ -409,6 +409,21 @@ getSelectedCards = function(deck, selectedCardsOnly){
 
 }
 
+parseToArray = function(items) {
+	var s = [];
+	var num = "";
+	for (var i = 0; i < items.length; i++) {
+		if (items.charAt(i) === '0') {
+			num = '10'
+		}
+		else {
+			num = items.charAt(i);
+		}
+		s[i] = num;
+	}
+	return s;
+}
+
 logSelectedCards = function(items) {
 	var s = "";
 	var num = "";
@@ -496,7 +511,7 @@ setMarketCounts = function(game) {
 var convertToName = function(params) {
 	switch(params) {
 		case "hand":
-			return "player's hand";
+			return "hand";
 			break;
 		case "cart0":
 			return "wheelbarrow";

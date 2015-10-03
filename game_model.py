@@ -15,9 +15,9 @@ class QuestCard(ndb.Model):
 
 class Event(ndb.Model):    
     eventId = ndb.IntegerProperty(required=True, default=0)
-    whatitems1 = ndb.StringProperty(required=False, default="")
+    whatItems1 = ndb.StringProperty(required=False, default="")
     fromWhere1 = ndb.StringProperty(required=False, default="")
-    whatitems2 = ndb.StringProperty(required=False, default="")
+    whatItems2 = ndb.StringProperty(required=False, default="")
     fromWhere2 = ndb.StringProperty(required=False, default="")
     gold = ndb.IntegerProperty(required=False, default=0)
     itemsCount = ndb.IntegerProperty(required=False, default=0)

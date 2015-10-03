@@ -71,7 +71,6 @@ class GameHandler(webapp2.RequestHandler):
             return
 
         game.players[iPlayerId].name = name
-        #game.players[iPlayerId].playerId = playerId
         
         game.put()
         retstr = playerState(game, iPlayerId)        
@@ -95,6 +94,16 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
+        playerId = self.request.get("playerId")
+        if (playerId == None or playerId == ""):
+            self.error(500)
+            return
+
+        iPlayerId = int(playerId)
+        if (iPlayerId < 0 or iPlayerId > 3):
+            self.error(500)
+            return
+
         what = self.request.get('what')
         if (what == None or what == ""):
             self.error(500)
@@ -104,7 +113,9 @@ class GameHandler(webapp2.RequestHandler):
         if (actionCost == None or actionCost == ""):
             actionCost = 1
 
-        result = fish(game, what, where, actionCost)
+        iActionCost = int(actionCost)
+
+        result = fish(game, iPlayerId, what, where, iActionCost)
         if (result == False):
             self.error(500)
             return
@@ -135,11 +146,21 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
+        playerId = self.request.get("playerId")
+        if (playerId == None or playerId == ""):
+            self.error(500)
+            return
+
+        iPlayerId = int(playerId)
+        if (iPlayerId < 0 or iPlayerId > 3):
+            self.error(500)
+            return
+
         actionCost = self.request.get('actionCost')
         if (actionCost == None or actionCost == ""):
             actionCost = 1
-
-        result = discard(game, what, where, actionCost)
+        iActionCost = int(actionCost)
+        result = discard(game, iPlayerId, what, where, iActionCost)
         if (result == False):
             self.error(500)
             return
@@ -162,6 +183,16 @@ class GameHandler(webapp2.RequestHandler):
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
+        playerId = self.request.get("playerId")
+        if (playerId == None or playerId == ""):
+            self.error(500)
+            return
+
+        iPlayerId = int(playerId)
+        if (iPlayerId < 0 or iPlayerId > 3):
+            self.error(500)
+            return
+			
         src = self.request.get('src')
         if (src == None or src == ""):
             self.error(500)
@@ -172,11 +203,6 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        dst = self.request.get('dst')
-        if (dst == None or dst == ""):
-            self.error(500)
-            return        
-
         what = self.request.get('what')
         if (what == None or what == ""):
             self.error(500)
@@ -186,7 +212,9 @@ class GameHandler(webapp2.RequestHandler):
         if (actionCost == None or actionCost == ""):
             actionCost = 1
 
-        result = move(game, what, src, dst, actionCost)
+        iActionCost = int(actionCost)
+
+        result = move(game, iPlayerId, what, src, dst, iActionCost)
         if (result == False):
             self.error(500)
             return
@@ -212,6 +240,16 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
+        playerId = self.request.get("playerId")
+        if (playerId == None or playerId == ""):
+            self.error(500)
+            return
+
+        iPlayerId = int(playerId)
+        if (iPlayerId < 0 or iPlayerId > 3):
+            self.error(500)
+            return
+
         items = self.request.get('items')
         if (items == None):
             self.error(500)
@@ -229,8 +267,8 @@ class GameHandler(webapp2.RequestHandler):
         actionCost = self.request.get('actionCost')
         if (actionCost == None or actionCost == ""):
             actionCost = 1
-
-        result = buyCart(game, cartidstr, withGold, items, actionCost)
+        iActionCost = int(actionCost)
+        result = buyCart(game, iPlayerId, cartidstr, withGold, items, iActionCost)
         if (result == False):
             self.error(500)
             return
@@ -251,12 +289,22 @@ class GameHandler(webapp2.RequestHandler):
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
+        playerId = self.request.get("playerId")
+        if (playerId == None or playerId == ""):
+            self.error(500)
+            return
+
+        iPlayerId = int(playerId)
+        if (iPlayerId < 0 or iPlayerId > 3):
+            self.error(500)
+            return
+
         result = buyAction(game)
         if (result == False):
             self.error(500)
             return
         self.appendToLog(game)
-        retstr = playerState(game, game.curPlayer)
+        retstr = playerState(game, iPlayerId)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
@@ -274,6 +322,17 @@ class GameHandler(webapp2.RequestHandler):
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
+ 
+        playerId = self.request.get("playerId")
+        if (playerId == None or playerId == ""):
+            self.error(500)
+            return
+
+        iPlayerId = int(playerId)
+        if (iPlayerId < 0 or iPlayerId > 3):
+            self.error(500)
+            return
+
         handItems = self.request.get('handItems')
         if (handItems == None):
             self.error(500)
@@ -287,8 +346,8 @@ class GameHandler(webapp2.RequestHandler):
         actionCost = self.request.get('actionCost')
         if (actionCost == None or actionCost == ""):
             actionCost = 1
-
-        result = marketTrade(game, handItems, marketItems, actionCost)
+        iActionCost = int(actionCost)
+        result = marketTrade(game, iPlayerId, handItems, marketItems, iActionCost)
         if (result == False):
             self.error(500)
             return
@@ -310,6 +369,16 @@ class GameHandler(webapp2.RequestHandler):
 
         logging.info("Compelete quest: loaded quest")
 
+        playerId = self.request.get("playerId")
+        if (playerId == None or playerId == ""):
+            self.error(500)
+            return
+
+        iPlayerId = int(playerId)
+        if (iPlayerId < 0 or iPlayerId > 3):
+            self.error(500)
+            return
+
         where = self.request.get('where')
         if (where == None or where == ""):
             self.error(500)
@@ -321,7 +390,7 @@ class GameHandler(webapp2.RequestHandler):
             return
 
         logging.info("Compelete quest: running")
-        result = completeQuest(game, what, where)
+        result = completeQuest(game, iPlayerId, what, where)
         if (result == False):
             self.error(500)
             return
@@ -350,6 +419,7 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
         ieventId = int(eventId)
+
 
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
@@ -390,6 +460,7 @@ class GameHandler(webapp2.RequestHandler):
         if (eventId == None or eventId == ""):
             self.error(500)
             return
+
 
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
@@ -448,6 +519,16 @@ class GameHandler(webapp2.RequestHandler):
         game_k = ndb.Key('Game', 'theGame')
         game = game_k.get()
 
+        playerId = self.request.get("playerId")
+        if (playerId == None or playerId == ""):
+            self.error(500)
+            return
+
+        iPlayerId = int(playerId)
+        if (iPlayerId < 0 or iPlayerId > 3):
+            self.error(500)
+            return
+
         items = self.request.get('items')
         if (items == None):
             self.error(500)
@@ -456,7 +537,7 @@ class GameHandler(webapp2.RequestHandler):
         self.appendToLog(game)
 
         try:
-            priorPlayer = passPlayer(game, items)
+            priorPlayer = passPlayer(game, iPlayerId, items)
         except ValueError as e:
             self.error(500)
             return
@@ -475,16 +556,17 @@ class GameHandler(webapp2.RequestHandler):
             self.response.headers["Content-Type"] = "application/json"
             self.response.write("") 
 
-        playerId = int(self.request.get('player'))
-        if (playerId == None):
+        playerId = self.request.get("playerId")
+        if (playerId == None or playerId == ""):
             self.error(500)
             return
 
-        if (playerId < 0 or playerId > game.numPlayers):
+        iPlayerId = int(playerId)
+        if (iPlayerId < 0 or iPlayerId > 3):
             self.error(500)
             return
 
-        retstr = playerState(game, playerId)
+        retstr = playerState(game, iPlayerId)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)        

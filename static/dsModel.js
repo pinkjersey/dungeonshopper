@@ -6,6 +6,18 @@ var Event = function (type, name, eventText ) {
 	this.eventText = eventText;
 	this.displayMode = 'event' + name;
 	this.image = eventImageBase + name + '.jpg';
+    this.whatItems1 = null;
+	this.whatItems1cards = new cardSet();
+    this.fromWhere1 = null;
+    this.whatItems2 = null;
+	this.whatItems2cards = new cardSet();
+    this.fromWhere2 = null;
+    this.gold = null;
+	this.goldImage = "../images/event/gold.jpg"
+    this.itemsCount = null;
+    this.moveDest = null;
+	this.moveDestCards = new cardSet();
+	this.whatFound = new cardSet();
 }
 
 var QuestReady = function (items, questCard, cartId, questIndex) {
@@ -82,6 +94,7 @@ var Game = function(blankMarketImageBase, questImageBase, cartImageBase) {
 	this.autoSelectHand=false;
 	this.activeEvent = null;
 	this.activeEventCard = null;
+	this.lastEvent = null;
 	//event id, event type, event name
 	
 
