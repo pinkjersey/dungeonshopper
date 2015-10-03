@@ -34,13 +34,13 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.showMyCompletedQuests = false;
 	$scope.showHideVar = "Show";
 	$scope.showHideQuestVar = "Show";
-	$scope.sounds = false;
+	$scope.sounds = true;
 	$scope.music = true;
 	$scope.autoSelectHand = true;
 	$scope.autoSelectCart = true;
 	$scope.autoSelectQuest = true;
 	$scope.autoPass = true;
-	$scope.hideImagesBool = true;
+	$scope.hideImagesBool = false;
 
 	//gui variable to control cart buttons
 	$scope.prevActiveCartId = -1;
@@ -863,15 +863,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		switch (questCardinplay.name)
 		{
 				case 'eventOrcsAttack':
-					if ($scope.wheelbarrowCardSum > 0  && $scope.wheelbarrowCardSum < 5) {
-						//discard all items from cart to hand
-						var cardsToMoveBackToHand = getSelectedCards(cart.cards,false);
-						move(cardsToMoveBackToHand, 'cart0', 'hand', actionCost);
-						}					
-					
 					break;
 				case 'eventBarbarianAttack':
-				//market has been destroyed
 					break;
 				case 'eventBrokenItems':
 					break;
@@ -1097,8 +1090,6 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 						break;
 					}
 					if(playerCardCountSel >= 1) {
-						//what1 = getSelectedCard(player.cards)
-						//where1 = 'hand'
 						whatWhereArray.push(getSelectedCards(player.cards, true));
 						whatWhereArray.push('hand');
 					}
@@ -1237,14 +1228,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 							break;
 						}					
 					}
-					else if(id==='N') {
-						destroyCart="cart0";
-						what1 = -1;
-						where1 = "cart0"
-					}
 					
-					//send in eventid, send in items to buy cart back with
-					//the prepevents already moved the cards back to hand first
 					break;
 					
 				case 'eventSandStorm':
@@ -1289,7 +1273,6 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				case 'eventTreasure':
 					//give active player a gold
 					eventId = 16;
-					gold = 1;
 					break;
 				case 'eventVikingParade':
 					eventId = 17;

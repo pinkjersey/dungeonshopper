@@ -452,7 +452,152 @@ def getIntersection(list1, list2):
 
     ret.sort()
     return ret
-	
+
+
+
+def prepEvents(game, eventId):
+    game.pendingMode = "event"
+    logging.info("GameMode pending: {0}".format(game.gameMode))
+    gold = 1
+
+    try:
+        #destroy market and re-seed       
+        if eventId == 6:
+            logging.info("Barb Attack start Event Id:  {0}".format(eventId))
+            resetMarket(game)
+
+        #BrokenItems
+        if eventId == 7:
+            logging.info("Entered Logic for event BrokenItems")
+
+        #CastleTaxation
+        if eventId == 8:
+            logging.info("Entered Logic for event CastleTaxation")
+
+        #GolbinRaid
+        if eventId == 9:
+            logging.info("Entered Logic for event GolbinRaid")
+
+        #KingsFeast
+            logging.info("KingsFeast start Event Id:  {0}".format(eventId))
+            if eventId == 10:
+                p = len(game.players)
+                for playerId in range(p):
+                    logging.info("playerId: {0}".format(playerId))
+                    dealItemCard(playerId, game)
+
+        #MarketShortage	
+        if eventId == 11:
+            logging.info("MarketShortage start Event Id:  {0}".format(eventId))
+            dealItemCardToMarket(game)
+            #get the number on the card, go through the market, discard all that match
+            mlen = len(game.market)
+            marketShortageNum = game.market[mlen-1]
+            for itemi in range(mlen):
+                if itemi == marketShortageNum:
+                    discard(game,itemi,"market")
+
+        #MarketSurplus
+        if eventId == 12:
+            logging.info("MarketSurplus start Event Id:  {0}".format(eventId))
+            # deal card to market
+            for i in range(5):
+                dealItemCardToMarket(game)
+    
+        #orcs attack.  Wheelbarrow destroyed.  if handItems present don't destroy, but discard them
+        if eventId == 13:
+            logging.info("Entered Orc Attack event {0}".format(eventId))
+            logging.info("Destroy Cart {0}, it was not defended".format(cartidstr))
+            p = len(game.players)
+            for playerId in range(p):
+                cart = playerId.carts[0]
+                logging.info("playerId: {0}".format(playerId))
+                sumItems = sum(cart.inCart)
+                if sumItems < 5:
+                    cart.destroyed = True
+                    cart.purchased = False
+                    r = len(cart.inCart)
+                    for cartItem in range(r):
+                        #move cards back to hand
+                        #move(game, what, src, dst, actionCost):
+                        move(game, cartItem, 'cart0', 'hand', 0)
+
+        #hailstorm players pass hand to the right
+        if eventId == 18:
+            logging.info("Hailstorm start Event Id:  {0}".format(eventId))
+            p = len(game.players)
+            if(p==1):
+                logging.info("only one player, skipping event:  {0}".format(eventId))
+            nextPlayerId = 1
+            tmp = game.players[0].hand
+            for i in range(p):
+                logging.info("game.players[i]: {0}".format(i))
+                if (nextPlayerId == game.numPlayers):
+                    nextPlayerId = 0
+                    del game.players[i].hand
+                    game.players[i].hand = tmp
+                else:
+                    del game.players[i].hand
+                    game.players[i].hand = game.players[nextPlayerId].hand
+                numItemsInHand = len(game.players[i].hand)
+                if numItemsInHand < game.players[i].maxHand:
+                    diff = game.players[i].maxHand - numItemsInHand
+                    for d in range(diff):
+                        dealItemCard(i, game)
+                        game.players[i].hand.sort()
+                nextPlayerId += 1
+
+        #ThrownInTheDungeon
+        if eventId == 15:
+            logging.info("Thrown in the dungeon start Event Id:  {0}".format(eventId))
+
+        #Treasure
+        if eventId == 16:
+            logging.info("Starting Treasure Event Id:  {0}".format(eventId))
+            logging.info("Gold Found! {0}".format(gold))    
+            player.gold += gold
+
+        #VikingParade
+        if eventId == 17:
+            logging.info("Viking Parade start Event Id:  {0}".format(eventId))
+
+        #sandstorm PASS CARDS TO LEFT
+        if eventId == 14:
+            logging.info("Sandstorm start Event Id:  {0}".format(eventId))
+            p = len(game.players)
+            if(p==1):
+                logging.info("only one player, skipping event:  {0}".format(eventId))
+            prevPlayerId = game.numPlayers-1
+            tmp = game.players[0].hand
+            for i in range(p):
+                logging.info("game.players[i]: {0}".format(i))
+                logging.info("prevPlayerId before: {0}".format(prevPlayerId))
+                if (prevPlayerId == game.numPlayers):
+                    prevPlayerId = 0
+                    del game.players[i].hand
+                    game.players[i].hand = tmp
+                else:
+                    logging.info("curPlayer: {0}".format(i))
+                    logging.info("prevPlayerId after: {0}".format(prevPlayerId))
+                    del game.players[i].hand
+                    game.players[i].hand = game.players[prevPlayerId].hand
+                numItemsInHand = len(game.players[i].hand)
+                if numItemsInHand < game.players[i].maxHand:
+                    diff = game.players[i].maxHand - numItemsInHand
+                    for d in range(diff):
+                        logging.info("pre dealing card! {0}".format(d))  
+                        dealItemCard(i, game)
+                        game.players[i].hand.sort()
+                prevPlayerId += 1
+        
+        #HiddenRoom 
+        if eventId == 19:
+            logging.info("HiddenRoom start Event Id:  {0}".format(eventId))
+
+    except ValueError as e:
+        logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
+        return False  
+
 #result = completeEvent(game, eventId, iPlayerId, cartidstr, igold, iitemsCount, what1, where1, what2, where2, dest1)
 def completeEvent(game, eventId, playerId, cartidstr, gold, itemsCount, what1, where1, what2, where2, dest1):
 #note that the gameMode has been added to the game object
@@ -461,14 +606,10 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, itemsCount, what1, w
 #pass in -1 to show cart will be destroyed
 
     game.gameMode = "event"
-    #gold=int(gold)
-    #items=int(items)
     playerId=int(playerId)
     currentEvent=Event(eventId = eventId, whatitems1 = what1, fromWhere1 = where1, whatitems2 = what2, fromWhere2 = where2, cartToDestroy = cartidstr, gold = gold, itemsCount = itemsCount, moveDest = dest1)
     game.players[playerId].curEvent.append(currentEvent)
-    #player = game.players[game.curPlayer]
     player = game.players[playerId]
-    #playerId = game.players[game.curPlayer].playerId
     logging.info("Entered Logic for Events")
     logging.info("playerid is: {0}".format(playerId)) 
     if what1 != '-1':
@@ -486,14 +627,12 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, itemsCount, what1, w
         cartidstr = "undefined"
 
     try:
-        #destroy market and re-seed if you are the first to get here        
+        #Barb Attack destroy market and re-seed if you are the first to get here        
         if eventId == 6:
-            logging.info("Entered Logic for event barb attack")
-            if game.eventCompletedCount == 0:
-                resetMarket(game)
+            logging.info("Barb Attack start Event Id:  {0}".format(eventId))
         #BrokenItems
         if eventId == 7:
-            logging.info("Entered Logic for event BrokenItems")
+            logging.info("BrokenItems start Event Id:  {0}".format(eventId))
             if len(what1arr) > 0:
                 for whati in what1arr:
                     logging.info("whati {0}".format(whati)) 
@@ -506,6 +645,7 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, itemsCount, what1, w
                     fish(game, whati2, where2)
         #CastleTaxation
         if eventId == 8:
+            logging.info("CastleTaxation start Event Id:  {0}".format(eventId))
             #discard items first
             if len(what1arr) > 0:
                 for whati in what1arr:        
@@ -516,6 +656,7 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, itemsCount, what1, w
             player.gold -= gold
         #GolbinRaid
         if eventId == 9:
+            logging.info("GolbinRaid start Event Id:  {0}".format(eventId))
             #discard items first
             if len(what1arr > 0):
                 for whati in what1arr:        
@@ -525,73 +666,30 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, itemsCount, what1, w
                         return False
         #KingsFeast
         if eventId == 10:
-            dealItemCard(playerId, game)
+            logging.info("KingsFeast start Event Id:  {0}".format(eventId))
         #MarketShortage	
         if eventId == 11:
-            dealItemCardToMarket(game)
-            #get the number on the card, go through the market, discard all that match
-            mlen = len(game.market)
-            marketShortageNum = game.market[mlen-1]
-            for itemi in range(mlen):
-                if itemi == marketShortageNum:
-                    discard(game,itemi,"market")
+            logging.info("MarketShortage start Event Id:  {0}".format(eventId))
         #MarketSurplus
         if eventId == 12:
-            # deal card to market
-            if (game.eventCompletedCount == 0):
-                for i in range(5):
-                    dealItemCardToMarket(game)
-    
+            logging.info("MarketSurplus start Event Id:  {0}".format(eventId))
+   
         #orcs attack.  Wheelbarrow destroyed.  if handItems present don't destroy, but discard them
         if eventId == 13:
-            logging.info("Entered event {0}".format(eventId))
-            if cartidstr == None:
-                logging.info("Cart not passed in to destroy {0}".format(cartidstr))
-            else:
-                logging.info("Destroy Cart {0} if not defended".format(cartidstr))
-                logging.info("What was in cart0: ".format(what1))
-                #destroy it	if no cards passed in
-                if what1=='-1':
-                    # destroy it
-                    logging.info("Destroy Cart {0}, it was not defended".format(cartidstr))
-                    cart.destroyed = True
-                    cart.purchased = False
-                #discard items if buying it back
-                if len(what2arr) > 0:
-                    for whati in what2arr:
-                        logging.info("Discarding {0} from {1}".format(whati, where2))
-                        found = discardItem(game, whati, where2)
-                        if (found == False):
-                            logging.error("Couldn't find all what1arr {0}".format(whati))        
-                            return False
-                    cart.destroyed = False
-                    cart.purchased = True
+            logging.info("orcs attack start Event Id:  {0}".format(eventId))
+            #discard items if buying it back
+            if len(what2arr) > 0:
+                for whati in what2arr:
+                    logging.info("Discarding {0} from {1}".format(whati, where2))
+                    found = discardItem(game, whati, where2)
+                    if (found == False):
+                        logging.error("Couldn't find all what1arr {0}".format(whati))        
+                        return False
+                cart.destroyed = False
+                cart.purchased = True
         #hailstorm players pass hand to the right
         if eventId == 18:
-            if game.eventCompletedCount == 0:
-                logging.info("hailstorm start Event Id:  {0}".format(eventId))
-                p = len(game.players)
-                if(p==1):
-                    logging.info("only one player, skipping event:  {0}".format(eventId))
-                nextPlayerId = 1
-                tmp = game.players[0].hand
-                for i in range(p):
-                    logging.info("game.players[i]: {0}".format(i))
-                    if (nextPlayerId == game.numPlayers):
-                        nextPlayerId = 0
-                        del game.players[i].hand
-                        game.players[i].hand = tmp
-                    else:
-                        del game.players[i].hand
-                        game.players[i].hand = game.players[nextPlayerId].hand
-                    numItemsInHand = len(game.players[i].hand)
-                    if numItemsInHand < game.players[i].maxHand:
-                        diff = game.players[i].maxHand - numItemsInHand
-                        for d in range(diff):
-                            dealItemCard(i, game)
-                            game.players[i].hand.sort()
-                    nextPlayerId += 1
-
+            logging.info("hailstorm start Event Id:  {0}".format(eventId))
         #ThrownInTheDungeon
         if eventId == 15:
             logging.info("Thrown in the dungeon start Event Id:  {0}".format(eventId))
@@ -606,43 +704,21 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, itemsCount, what1, w
         #Treasure
         if eventId == 16:
             logging.info("Starting Event Id:  {0}".format(eventId))
-            logging.info("Gold Found! {0}".format(gold))    
-            player.gold += gold
         #VikingParade
         if eventId == 17:
             logging.info("Viking Parade start Event Id:  {0}".format(eventId))
-            move(game, what1, where1, dest1, 0)
+            whats = whatToArray(what1)
+            whatlen = len(whats)
+            if (whatlen == 0):
+                logging.info("Nothing to move")  
+            else:
+                move(game, what1, where1, dest1, 0)
         #sandstorm PASS CARDS TO LEFT
         if eventId == 14:
-            if game.eventCompletedCount == 0:
-                logging.info("Sandstorm start Event Id:  {0}".format(eventId))
-                p = len(game.players)
-                if(p==1):
-                    logging.info("only one player, skipping event:  {0}".format(eventId))
-                prevPlayerId = game.numPlayers-1
-                tmp = game.players[0].hand
-                for i in range(p):
-                    logging.info("game.players[i]: {0}".format(i))
-                    logging.info("prevPlayerId before: {0}".format(prevPlayerId))
-                    if (prevPlayerId == game.numPlayers):
-                        prevPlayerId = 0
-                        del game.players[i].hand
-                        game.players[i].hand = tmp
-                    else:
-                        logging.info("curPlayer: {0}".format(i))
-                        logging.info("prevPlayerId after: {0}".format(prevPlayerId))
-                        del game.players[i].hand
-                        game.players[i].hand = game.players[prevPlayerId].hand
-                    numItemsInHand = len(game.players[i].hand)
-                    if numItemsInHand < game.players[i].maxHand:
-                        diff = game.players[i].maxHand - numItemsInHand
-                        for d in range(diff):
-                            logging.info("pre dealing card! {0}".format(d))  
-                            dealItemCard(i, game)
-                            game.players[i].hand.sort()
-                    prevPlayerId += 1
-        #HiddenRoom not done
+            logging.info("sandstorm start Event Id:  {0}".format(eventId))
+        #HiddenRoom 
         if eventId == 19:
+            logging.info("HiddenRoom start Event Id:  {0}".format(eventId))
             if gold == 1:
                 player.gold += 1
             if itemsCount > 0:
@@ -911,11 +987,20 @@ def createQuestCard(level, coin, items, vp, type):
     card = QuestCard(level=level, coin=coin, items=items, vp=vp, type=type)
     return card
 
-def createQuestStacks(top, middle, bottom, level1, level2, level3, level4,l1t, l1m, l2m, l1b, l2b, l3b, em, eb):
+def createQuestStacks(tippytop, top, middle, bottom, level1, level2, level3, level4, l0t, l1t, l1m, l2m, l1b, l2b, l3b, et, em, eb):
+    # tippytop
+    for i in range(l0t):
+        tippytop.append(level1[i])
+        del level1[i]
+
     # top
     for i in range(l1t):
         top.append(level1[i])
         del level1[i]
+
+    for i in range(et):
+        top.append(level4[i])
+        del level4[i]
 
     # middle
     for i in range(l1m):
@@ -975,8 +1060,6 @@ def resetMarket(game):
     if (len(game.itemDeck) < 5):
         raise ValueError("Newly created itemdeck has a size less than 5")
 
-
-
     # deal to market
     for i in range(4):
         dealItemCardToMarket(game)
@@ -1014,8 +1097,7 @@ def dealQuest(game):
         del game.questDeck[0]
         game.questsInPlay.append(quest)
         if quest.level == 4:
-            game.pendingMode = "event"
-            logging.info("GameMode pending: {0}".format(game.gameMode))
+            prepEvents(game, quest.type)
         else:
             game.gameMode = "game"
 
@@ -1025,6 +1107,7 @@ def newQuestDeck(numPlayers):
     level2Cards = []
     level3Cards = []
     level4Cards = []
+    tippytop = []
     top = []
     middle = []
     bottom = []
@@ -1104,7 +1187,7 @@ def newQuestDeck(numPlayers):
     level3Cards.append(createQuestCard(3,False,[1,2,2,4,4],5,5))
     level3Cards.append(createQuestCard(3,True,[1,3,5,6,9],5,5))
     level3Cards.append(createQuestCard(3,False,[3,4,7,8,9],6,5))
-    #simulate treasure event only for now
+    
 
     level4Cards.append(createQuestCard(4,False,[],0,6))
     level4Cards.append(createQuestCard(4,False,[],0,7))
@@ -1127,19 +1210,21 @@ def newQuestDeck(numPlayers):
     level3Cards = shuffle(level3Cards)
     level4Cards = shuffle(level4Cards)
 
+	#def createQuestStacks(tippytop, top, middle, bottom, level1, level2, level3, level4, l0t, l1t, l1m, l2m, l1b, l2b, l3b, et, em, eb):
     if numPlayers == "1":
-        #createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,5,1,2,1,1,2,1,1)
-        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,1,1,1,1,1,4,4)
+        #createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards, 4,  4,1,2,1,1,2,   1,1,1)
+        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,     2,2,2)
     elif numPlayers == "2":
-        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,7,1,4,1,2,4,2,2)
-		#createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,4,0,1,0,1,0,2,2)
+        #createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  6,1,4,1,2,4,   2,2,2)
+		createQuestStacks(tippytop,top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,   2,2,2)
     elif numPlayers == "3":
-        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,10,3,7,2,3,5,2,2)
+        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  7,3,7,2,3,5,   3,3,3)
     elif numPlayers == "4":
-        createQuestStacks(top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,12,4,10,2,4,6,3,3)
-        
+        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  10,4,10,2,4,6, 4,4,4)
+
+    tippytop = shuffle(tippytop)
     top = shuffle(top)
     middle = shuffle(middle)
     bottom = shuffle(bottom)        
 
-    return top + middle + bottom
+    return tippytop + top + middle + bottom
