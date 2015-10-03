@@ -100,7 +100,11 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        result = fish(game, what, where)
+        actionCost = self.request.get('actionCost')
+        if (actionCost == None or actionCost == ""):
+            actionCost = 1
+
+        result = fish(game, what, where, actionCost)
         if (result == False):
             self.error(500)
             return
@@ -131,7 +135,11 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        result = discard(game, what, where)
+        actionCost = self.request.get('actionCost')
+        if (actionCost == None or actionCost == ""):
+            actionCost = 1
+
+        result = discard(game, what, where, actionCost)
         if (result == False):
             self.error(500)
             return
@@ -218,7 +226,11 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        result = buyCart(game, cartidstr, withGold, items)
+        actionCost = self.request.get('actionCost')
+        if (actionCost == None or actionCost == ""):
+            actionCost = 1
+
+        result = buyCart(game, cartidstr, withGold, items, actionCost)
         if (result == False):
             self.error(500)
             return
@@ -272,7 +284,11 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return        
 
-        result = marketTrade(game, handItems, marketItems)
+        actionCost = self.request.get('actionCost')
+        if (actionCost == None or actionCost == ""):
+            actionCost = 1
+
+        result = marketTrade(game, handItems, marketItems, actionCost)
         if (result == False):
             self.error(500)
             return
@@ -318,6 +334,47 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
+
+    def completeEventDealQuest(self):
+        """
+        USAGE: /game?action=completeEventDealQuest&eventId=<eventId>playerId=<playerId>
+        """
+        logging.info("Players Compeleting Event Deal Quest: begin")
+        game_k = ndb.Key('Game', 'theGame')
+        game = game_k.get()
+
+        logging.info("Players Compeleting event: loaded event")
+
+        eventId = self.request.get('eventId')
+        if (eventId == None or eventId == ""):
+            self.error(500)
+            return
+        ieventId = int(eventId)
+
+        playerId = self.request.get("playerId")
+        if (playerId == None or playerId == ""):
+            self.error(500)
+            return
+
+        iPlayerId = int(playerId)
+        if (iPlayerId < 0 or iPlayerId > 3):
+            self.error(500)
+            return
+
+        logging.info("EventId found:  {0}".format(eventId))
+        result = completeEventDealQuest(game, iPlayerId, ieventId)
+        if (result == False):
+            self.error(500)
+            return
+
+        logging.info("Compelete event: done")
+
+        self.appendToLog(game)
+        retstr = playerState(game, iPlayerId)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(retstr)
+
     def completeEvent(self):
         """
         USAGE: /game?action=completeEvent&eventId=<eventId>&cart=<cart0>&gold=<0>&items=<0>&what1=<>&where1=<>&what2=<>&where2=<>&dest1=<>
@@ -344,7 +401,6 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        cartidstr = self.request.get('cartToDestroy')        
         gold = self.request.get('gold')
         igold = int(gold)
         items = self.request.get('items')
@@ -363,7 +419,7 @@ class GameHandler(webapp2.RequestHandler):
         logging.info("what2 Items Found:  {0}".format(what2))
         logging.info("where2 Items Found:  {0}".format(where2))
         logging.info("dest1 Items Found:  {0}".format(dest1))
-        result = completeEvent(game, ieventId, iPlayerId, cartidstr, igold, iitemsCount, what1, where1, what2, where2, dest1)
+        result = completeEvent(game, ieventId, iPlayerId, igold, iitemsCount, what1, where1, what2, where2, dest1)
         if (result == False):
             self.error(500)
             return
@@ -482,6 +538,9 @@ class GameHandler(webapp2.RequestHandler):
 
             if action == "completeEvent":
                 return self.completeEvent()
+
+            if action == "completeEventDealQuest":
+                return self.completeEventDealQuest()
 
             if action == "refresh":
                 return self.refresh()

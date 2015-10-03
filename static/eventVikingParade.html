@@ -32,9 +32,8 @@
 		</thead>
 	</table>
 </div>
-
 <h4 ng-show="activePlayer.nextCartId === 1" class="tab40">Can't move items, click Complete Event.</h4>
-<h4 ng-show="totalCartCards === 0 && activePlayer.nextCartId > 1 " class="tab40">You have no items in your carts, click Complete Event.</h4>
+<h4 ng-show="totalCartCardsFound === 0 && activePlayer.nextCartId > 1 " class="tab40">You have no items in your carts, click Complete Event.</h4>
 <h4 ng-show="activePlayer.nextCartId > 1  && totalCartCardsFound > 0" class="tab40">You may move one group of items between carts/wagons.  Then click Complete Event.</h4>
 <ng-include src="'eventTemplateNoHeader.html'"></ng-include>	
 

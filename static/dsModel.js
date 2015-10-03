@@ -81,6 +81,7 @@ var Game = function(blankMarketImageBase, questImageBase, cartImageBase) {
 	this.autoSelectCart=false;
 	this.autoSelectHand=false;
 	this.activeEvent = null;
+	this.activeEventCard = null;
 	//event id, event type, event name
 	
 

@@ -348,8 +348,8 @@ dealQuestCard = function(game, items, level, type) {
 		}
 		
 		if(level === 4) {
-			game.activeEvent = card.name;
-			prepareEventForPlayer(game, card);
+			game.activeEventCard = card;
+			//prepareEventForPlayer(game, card);
 		}
 	}
 }

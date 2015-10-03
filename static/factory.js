@@ -9,10 +9,18 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               completeEvent: function (eventId, playerId, cartToDestroy, gold, items, what1, where1, what2, where2, dest1, callback, errorcallback) {
+			   completeEventDealQuest: function (eventId, playerId, callback, errorcallback) {
                    $http({
                        method: 'GET',
-					   url: '/game?action=completeEvent&eventId=' + eventId + '&playerId=' + playerId + '&cartToDestroy=' + cartToDestroy + '&gold=' + gold + '&items=' + items + '&what1=' + what1 + '&where1=' + where1 + '&what2=' + what2 + '&where2=' + where2 + '&dest1=' + dest1,
+					   url: '/game?action=completeEventDealQuest&eventId=' + eventId + '&playerId=' + playerId,
+                       cache: false
+                   }).success(callback)
+                     .error(errorcallback);
+               },
+               completeEvent: function (eventId, playerId, gold, items, what1, where1, what2, where2, dest1, callback, errorcallback) {
+                   $http({
+                       method: 'GET',
+					   url: '/game?action=completeEvent&eventId=' + eventId + '&playerId=' + playerId + '&gold=' + gold + '&items=' + items + '&what1=' + what1 + '&where1=' + where1 + '&what2=' + what2 + '&where2=' + where2 + '&dest1=' + dest1,
                        cache: false
                    }).success(callback)
                      .error(errorcallback);
@@ -25,7 +33,7 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               discard: function (what, where, callback, errorcallback) {
+               discard: function (actionCost, what, where, callback, errorcallback) {
                    $http({
                        method: 'GET',
                        url: '/game?action=discard&what=' + what + '&where=' + where,
@@ -33,7 +41,7 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               move: function (what, src, dst, actionCost, callback, errorcallback) {
+               move: function (actionCost, what, src, dst, callback, errorcallback) {
                    $http({
                        method: 'GET',
                        url: '/game?action=move&what=' + what + '&src=' + src + '&dst=' + dst + '&actionCost=' + actionCost,
@@ -49,7 +57,7 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               buyCart: function (cart, goldFlag, items, callback, errorcallback) {
+               buyCart: function (actionCost, cart, goldFlag, items, callback, errorcallback) {
                    $http({
                        method: 'GET',
                        url: '/game?action=buyCart&withGold=' + goldFlag + '&items=' + items + '&cart=' + cart,
@@ -73,7 +81,7 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               marketTrade: function (handItems, marketItems, callback, errorcallback) {
+               marketTrade: function (actionCost, handItems, marketItems, callback, errorcallback) {
                    $http({
                        method: 'GET',
                        url: '/game?action=marketTrade&handItems=' + handItems + '&marketItems=' + marketItems,
@@ -89,7 +97,7 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               fish: function (what, where, callback, errorcallback) {
+               fish: function (actionCost, what, where, callback, errorcallback) {
                    $http({
                        method: 'GET',
                        url: '/game?action=fish&what=' + what + '&where=' + where,

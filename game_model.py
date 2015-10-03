@@ -19,7 +19,6 @@ class Event(ndb.Model):
     fromWhere1 = ndb.StringProperty(required=False, default="")
     whatitems2 = ndb.StringProperty(required=False, default="")
     fromWhere2 = ndb.StringProperty(required=False, default="")
-    cartToDestroy = ndb.StringProperty(required=False, default="cart0")
     gold = ndb.IntegerProperty(required=False, default=0)
     itemsCount = ndb.IntegerProperty(required=False, default=0)
     moveDest = ndb.StringProperty(required=False, default="")
@@ -51,7 +50,6 @@ class PlayerLog(ndb.Model):
 
 class Game(ndb.Model):
     gameMode = ndb.StringProperty(required=True, default="game") 
-    pendingMode = ndb.StringProperty(required=True, default="game") 
     curPlayer = ndb.IntegerProperty(default=0)
     actionsRemaining = ndb.IntegerProperty(default=2)        
     numPlayers = ndb.IntegerProperty(required=True)

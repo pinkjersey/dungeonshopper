@@ -24,7 +24,7 @@ def playerState(game, playerId):
     thedict["questsCountRemaining"] = len(game.questDeck)
     thedict["market"] = game.market
     thedict["playerId"] = playerId
-
+    thedict["gameMode"] = game.gameMode
     eventList = []
     for e in player.curEvent:
         eventList.append(e.to_dict())	
@@ -200,7 +200,7 @@ def move(game, what, src, dst, actionCost):
     logging.info("src = ".format(src))
     logging.info("dst = ".format(dst))
     logging.info("actionCost = ".format(actionCost))
-    if (game.actionsRemaining == 0 and game.gameMode == "game" and actionCost == 1):
+    if (game.actionsRemaining == 0 and actionCost > 0):
         # no actions remaining
         logging.error("No actions remaining")        
         return False
@@ -250,14 +250,13 @@ def move(game, what, src, dst, actionCost):
         logging.error("Exception {0}".format(e.message))        
         return False
 
-    if (game.gameMode == "game" and actionCost == 1):
-        game.actionsRemaining = game.actionsRemaining -1
+    game.actionsRemaining = game.actionsRemaining - actionCost
 
     game.put()
 
     return True
 
-def buyCart(game, cartidstr, withGold, items):
+def buyCart(game, cartidstr, withGold, items, actionCost):
     """Buys cart with gold or items"""
     logging.info("1")	
     if game.actionsRemaining == 0:
@@ -313,14 +312,13 @@ def buyCart(game, cartidstr, withGold, items):
     elif cartid == 3:
         player.maxHand += 1
 
-    if game.gameMode == "game":
-        game.actionsRemaining = game.actionsRemaining -1
+    game.actionsRemaining = game.actionsRemaining - actionCost
 		
     game.put()    
 
     return True
 
-def marketTrade(game, handItems, marketItems):
+def marketTrade(game, handItems, marketItems, actionCost):
     if game.actionsRemaining == 0:
         # no actions remaining
         logging.error("No actions remaining")  
@@ -380,15 +378,14 @@ def marketTrade(game, handItems, marketItems):
     player.hand.extend(addToHand)
     player.hand.sort()
     
-    if game.gameMode == "game":
-        game.actionsRemaining = game.actionsRemaining -1
+    game.actionsRemaining = game.actionsRemaining - actionCost
 
     game.put()
 
     return True                
 
-def discard(game, what, where):
-    if (game.actionsRemaining == 0 and game.gameMode == "game"):
+def discard(game, what, where, actionCost):
+    if (game.actionsRemaining == 0 and actionCost > 0):
         # no actions remaining
         logging.error("No actions remaining")  
         return False
@@ -415,8 +412,7 @@ def discard(game, what, where):
         # couldn't find 'what'
         return False
 
-    if game.gameMode == "game":
-        game.actionsRemaining = game.actionsRemaining -1
+    game.actionsRemaining = game.actionsRemaining - actionCost
 
     game.put()
 
@@ -456,39 +452,40 @@ def getIntersection(list1, list2):
 
 
 def prepEvents(game, eventId):
-    game.pendingMode = "event"
+    game.gameMode = "eventPending"
     logging.info("GameMode pending: {0}".format(game.gameMode))
     gold = 1
+    #currentEvent=Event(eventId = eventId, whatitems1 = what1, fromWhere1 = where1, whatitems2 = what2, fromWhere2 = where2, gold = gold, itemsCount = itemsCount, moveDest = dest1)
 
     try:
         #destroy market and re-seed       
         if eventId == 6:
             logging.info("Barb Attack start Event Id:  {0}".format(eventId))
+            currentEvent=Event(eventId = eventId)
             resetMarket(game)
 
         #BrokenItems
         if eventId == 7:
             logging.info("Entered Logic for event BrokenItems")
-
         #CastleTaxation
         if eventId == 8:
             logging.info("Entered Logic for event CastleTaxation")
-
         #GolbinRaid
         if eventId == 9:
             logging.info("Entered Logic for event GolbinRaid")
-
         #KingsFeast
+        if eventId == 10:
             logging.info("KingsFeast start Event Id:  {0}".format(eventId))
-            if eventId == 10:
-                p = len(game.players)
-                for playerId in range(p):
-                    logging.info("playerId: {0}".format(playerId))
-                    dealItemCard(playerId, game)
+            currentEvent=Event(eventId = eventId, itemsCount = 2, moveDest = 'hand')
+            p = len(game.players)
+            for playerId in range(p):
+                logging.info("playerId: {0}".format(playerId))
+                dealItemCard(playerId, game)
 
         #MarketShortage	
         if eventId == 11:
             logging.info("MarketShortage start Event Id:  {0}".format(eventId))
+            currentEvent=Event(eventId = eventId)
             dealItemCardToMarket(game)
             #get the number on the card, go through the market, discard all that match
             mlen = len(game.market)
@@ -555,6 +552,7 @@ def prepEvents(game, eventId):
         if eventId == 16:
             logging.info("Starting Treasure Event Id:  {0}".format(eventId))
             logging.info("Gold Found! {0}".format(gold))    
+            currentEvent=Event(eventId = eventId, gold = 1)
             player.gold += gold
 
         #VikingParade
@@ -598,33 +596,23 @@ def prepEvents(game, eventId):
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
         return False  
 
-#result = completeEvent(game, eventId, iPlayerId, cartidstr, igold, iitemsCount, what1, where1, what2, where2, dest1)
-def completeEvent(game, eventId, playerId, cartidstr, gold, itemsCount, what1, where1, what2, where2, dest1):
+#result = completeEvent(game, eventId, iPlayerId, igold, iitemsCount, what1, where1, what2, where2, dest1)
+def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what2, where2, dest1):
 #note that the gameMode has been added to the game object
 #this controls if the game is in game or event mode
 #special event orcs attack number 13
 #pass in -1 to show cart will be destroyed
 
-    game.gameMode = "event"
+    game.gameMode = "eventPending"
     playerId=int(playerId)
-    currentEvent=Event(eventId = eventId, whatitems1 = what1, fromWhere1 = where1, whatitems2 = what2, fromWhere2 = where2, cartToDestroy = cartidstr, gold = gold, itemsCount = itemsCount, moveDest = dest1)
+    currentEvent=Event(eventId = eventId, whatitems1 = what1, fromWhere1 = where1, whatitems2 = what2, fromWhere2 = where2, gold = gold, itemsCount = itemsCount, moveDest = dest1)
     game.players[playerId].curEvent.append(currentEvent)
     player = game.players[playerId]
     logging.info("Entered Logic for Events")
     logging.info("playerid is: {0}".format(playerId)) 
-    if what1 != '-1':
-        what1arr = whatToArray(what1)
+    cart = game.players[playerId].carts[0]
+    what1arr = whatToArray(what1)
     what2arr = whatToArray(what2)
-
-    if cartidstr != "":
-        cartid = getCartId(cartidstr)
-        #validate cart passed in
-        if (cartid <0 or cartid > 3):
-            logging.error("Invalid cart id")
-            return False
-        cart = game.players[playerId].carts[cartid]
-    else:
-        cartidstr = "undefined"
 
     try:
         #Barb Attack destroy market and re-seed if you are the first to get here        
@@ -637,12 +625,12 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, itemsCount, what1, w
                 for whati in what1arr:
                     logging.info("whati {0}".format(whati)) 
                     logging.info("where1 {0}".format(where1)) 
-                    fish(game, whati, where1)
+                    fish(game, whati, where1, 0)
             if len(what2arr) > 0:
                 for whati2 in what2arr:
                     logging.info("whati2 {0}".format(whati2)) 
                     logging.info("where2 {0}".format(where2)) 
-                    fish(game, whati2, where2)
+                    fish(game, whati2, where2, 0)
         #CastleTaxation
         if eventId == 8:
             logging.info("CastleTaxation start Event Id:  {0}".format(eventId))
@@ -729,16 +717,19 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, itemsCount, what1, w
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
         return False  
 
-    #advance event to next player, deal new quest if done
-    game.eventCompletedCount += 1
-
     logging.info("Event count increased to:  {0}".format(game.eventCompletedCount))
     game.curPlayer += 1
     if game.curPlayer == game.numPlayers:
         game.curPlayer = 0
     logging.info("CurPlayer changed to:  {0}".format(game.curPlayer))		
-    
+    game.gameMode = "eventCompleted"
+    # save game to data store
+    game.put()
+    return True	
 
+def completeEventDealQuest(game, playerId, eventId):
+    #advance event to next player, deal new quest if done
+    game.eventCompletedCount += 1
 
     if(game.eventCompletedCount==game.numPlayers):
         game.gameMode = "game"		
@@ -750,15 +741,6 @@ def completeEvent(game, eventId, playerId, cartidstr, gold, itemsCount, what1, w
             del game.questsInPlay[decklen-1]
 
         dealQuest(game)
-
-    if game.pendingMode == "event":
-        game.gameMode == "event"
-        game.pendingMode == "game"
-
-    # save game to data store
-    game.put()
-    return True	
-
 
 def completeQuest(game, what, where):
     # completing quests require no actions
@@ -802,10 +784,6 @@ def completeQuest(game, what, where):
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
         return False
 
-    if game.pendingMode == "event":
-        game.gameMode == "event"
-        game.pendingMode == "game"
-		
     game.put()
 
     return True
@@ -854,8 +832,8 @@ def passPlayer(game, items):
 
     return priorPlayer
 
-def fish(game, what, where):
-    if (game.actionsRemaining == 0 and game.gameMode == "game"):
+def fish(game, what, where, actionCost):
+    if (game.actionsRemaining == 0 and actionCost > 0):
         # no actions remaining
         return False
 
@@ -877,8 +855,7 @@ def fish(game, what, where):
 
     dealItemCard(game.curPlayer, game)
 
-    if game.gameMode == "game":
-        game.actionsRemaining = game.actionsRemaining -1
+    game.actionsRemaining = game.actionsRemaining - actionCost
 
     game.put()
 
@@ -892,8 +869,7 @@ def buyAction(game):
         return False
 
     player.gold = player.gold - buyCost
-    if game.gameMode == "game":
-        game.actionsRemaining = game.actionsRemaining + 1
+    game.actionsRemaining = game.actionsRemaining + 1
 
     game.put()
 
@@ -1191,7 +1167,7 @@ def newQuestDeck(numPlayers):
 
     level4Cards.append(createQuestCard(4,False,[],0,6))
     level4Cards.append(createQuestCard(4,False,[],0,7))
-    level4Cards.append(createQuestCard(4,False,[],0,8))
+    level4Cards.append(createQuestCard(4,False,[],0,87))
     level4Cards.append(createQuestCard(4,False,[],0,9))
     level4Cards.append(createQuestCard(4,False,[],0,10))
     level4Cards.append(createQuestCard(4,False,[],0,11))
@@ -1213,7 +1189,7 @@ def newQuestDeck(numPlayers):
 	#def createQuestStacks(tippytop, top, middle, bottom, level1, level2, level3, level4, l0t, l1t, l1m, l2m, l1b, l2b, l3b, et, em, eb):
     if numPlayers == "1":
         #createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards, 4,  4,1,2,1,1,2,   1,1,1)
-        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,     2,2,2)
+        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  2,2,2,2,2,2,     2,2,2)
     elif numPlayers == "2":
         #createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  6,1,4,1,2,4,   2,2,2)
 		createQuestStacks(tippytop,top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,   2,2,2)
