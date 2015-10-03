@@ -367,7 +367,7 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        logging.info("Compelete event: done")
+        logging.info("Player {0}'s compeleting event".format(iPlayerId))
 
         self.appendToLog(game)
         retstr = playerState(game, iPlayerId)

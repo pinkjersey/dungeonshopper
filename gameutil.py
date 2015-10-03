@@ -602,7 +602,7 @@ def prepEvents(game, eventId):
         game.gameMode = "game"
         return False  
 
-    game.gameMode = "eventPending"
+    #game.gameMode = "eventPending"
     return True
 
 #result = completeEvent(game, eventId, iPlayerId, igold, iitemsCount, what1, where1, what2, where2, dest1)
@@ -727,31 +727,39 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
         return False  
 
-    logging.info("eventPendingCompletedCount increased to:  {0}".format(game.eventPendingCompletedCount))
+    #logging.info("eventPendingCompletedCount increased to:  {0}".format(game.eventPendingCompletedCount))
     #game.curPlayer += 1
     #if game.curPlayer == game.numPlayers:
     #    game.curPlayer = 0
     #logging.info("CurPlayer changed to:  {0}".format(game.curPlayer))
     game.players[playerId].curEventStatus = "eventCompleted"
-    game.eventPendingCompletedCount += 1
+    #game.eventPendingCompletedCount += 1
 
-    if(game.eventPendingCompletedCount==game.numPlayers):
-        game.gameMode = "eventCompleted"
-        game.eventPendingCompletedCount = 0
+    #if(game.eventPendingCompletedCount==game.numPlayers):
+    #    game.gameMode = "eventCompleted"
+    #    game.eventPendingCompletedCount = 0
     # save game to data store
     game.put()
     return True	
 
 def completeEventDealQuest(game, playerId, eventId):
     #advance event to next player, deal new quest if done
-    game.eventCompletedCount += 1
+    #game.eventCompletedCount += 1
+    logging.info("playerId event status to eventInProgress: {0}".format(game.players[playerId].curEventStatus))
+    if game.players[playerId].curEventStatus == "eventCompleted":
+        #game.players[playerId].curEventStatus = "eventCompleted"		
+        game.eventCompletedCount += 1
+        logging.info("eventCompletedCount: {0}".format(game.eventCompletedCount))
+        logging.info("game.numPlayers: {0}".format(game.numPlayers))
+    else:
+        return True
 
-    if(game.eventCompletedCount==game.numPlayers):
+    if game.eventCompletedCount==game.numPlayers:
         game.gameMode = "game"		
         game.eventCompletedCount = 0	
         decklen = len(game.questsInPlay)
         if(decklen == 0):
-            return
+            return True
         else:
             del game.questsInPlay[decklen-1]
 

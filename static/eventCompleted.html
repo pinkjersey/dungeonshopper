@@ -7,8 +7,9 @@
 	</div>
 </div>
 <div>
-<button ng-show = "!clickedCompletePendingEvent" class="btn btn-danger" ng-click="playerCompletedEvent()">Back to Game?</button>
-<label ng-show = "clickedCompletePendingEvent" ">Waiting on other players</label>
+{{clickedCompleteEvent}}
+<button ng-show = "!clickedCompleteEvent" class="btn btn-danger" ng-click="playerCompletedEvent()">Back to Game?</button>
+<label ng-show = "clickedCompleteEvent" ">Waiting on other players</label>
 <p></p>
 </div>
 <div class="row" ng-repeat="player in game.players" >

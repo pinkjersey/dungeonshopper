@@ -3,7 +3,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.activePlayer = null;
 	$scope.activeEvent = null;
 	$scope.isActive = false;
-	$scope.clickedCompletePendingEvent = false;
+	$scope.clickedCompleteEvent = false;
 	$scope.debug = false;
 	//gui variable to control item buttons
 	$scope.selectedItemsCount = 0;
@@ -1014,7 +1014,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	
 	$scope.playerCompletedEvent = function() {
 		completeEventDealQuest($scope.activeEventId, $scope.myId);
-		$scope.clickedCompletePendingEvent = true;
+		$scope.clickedCompleteEvent = true;
+		playerRefresh($scope.myId)
 	}
 
 
@@ -1358,7 +1359,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	function getObjectResults(data) {
 		var text = "";
 		var game = $scope.game;
-		$scope.clickedCompletePendingEvent = false;
+		
 		// players = game.players;
 		//this controls the buttons to return if you are not active
 		//already doing so much in angular js buttons, did not want to add this as well
@@ -1466,16 +1467,21 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 		if(playerEventStatus === "eventInProgress" && data.gameMode === "eventPending") {
 			prepareEventForPlayer(game, game.activeEventCard);
+			$scope.clickedCompleteEvent = false;
+			$scope.refresh = false;
 		}
 		else if(playerEventStatus === "eventCompleted" && data.gameMode === "eventPending") {
 			$scope.displayMode = playerEventStatus;
+			$scope.refresh = true;
 		}
 		else {		
 			if(data.isActive) {
 				$scope.displayMode = data.gameMode;
+				$scope.refresh = false;
 			} 
 			else {
 				$scope.displayMode = 'gameSpectator';
+				$scope.refresh = true;
 			}
 		}	
 
@@ -1515,7 +1521,6 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			checkAutoPass(data.actionsRemaining);
 		}
 
-		$scope.refresh = true;
 		
 	}
 	
