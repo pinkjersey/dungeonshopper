@@ -424,7 +424,7 @@ parseToArray = function(items) {
 	return s;
 }
 
-logSelectedCards = function(items) {
+parseFromArray = function(items) {
 	var s = "";
 	var num = "";
 	for (var i = 0; i < items.length; i++) {

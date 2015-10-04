@@ -403,7 +403,7 @@ def discard(game, aPlayerId, what, where, actionCost):
         # no actions remaining
         logging.error("No actions remaining")  
         return False
-
+    logging.info("discarding  {0} from {1}".format(what, where))
     if game.gameMode == "game":
         player = game.players[game.curPlayer]
     else:
@@ -501,7 +501,7 @@ def prepEvents(game, eventId):
         #KingsFeast
         if eventId == 10:
             logging.info("KingsFeast start Event Id:  {0}".format(eventId))
-            currentEvent=Event(eventId = eventId, itemsCount = 2, moveDest = 'hand')
+            currentEvent=Event(eventId = eventId, itemsCount = 1, moveDest = 'hand')
             p = len(game.players)
             for playerId in range(p):
                 logging.info("playerId: {0}".format(playerId))
@@ -510,27 +510,32 @@ def prepEvents(game, eventId):
         #MarketShortage	
         if eventId == 11:
             logging.info("MarketShortage start Event Id:  {0}".format(eventId))
-            currentEvent=Event(eventId = eventId)
-            dealItemCardToMarket(game)
+            card = str(dealItemCardToMarket(game))
+            logging.info("card dealt:  {0}".format(card))
             #get the number on the card, go through the market, discard all that match
             mlen = len(game.market)
-            marketShortageNum = game.market[mlen-1]
+            currentEvent=Event(eventId = eventId, whatItems1 = str(card), fromWhere1 = "market")
             for itemi in range(mlen):
-                if itemi == marketShortageNum:
-                    discard(game,-1,itemi,"market",0)
+                if itemi == card:
+                    discard(game,0,card,"market",0)
 
         #MarketSurplus
         if eventId == 12:
             logging.info("MarketSurplus start Event Id:  {0}".format(eventId))
+            whatItems1 = ""
             # deal card to market
             for i in range(5):
-                dealItemCardToMarket(game)
-    
+                cards = str(dealItemCardToMarket(game))
+                whatItems1 += cards
+                logging.info("market surplus items: {0}".format(cards))
+            currentEvent=Event(eventId = eventId, whatItems1 = whatItems1, fromWhere1 = "market")
+
         #orcs attack.  Wheelbarrow destroyed.  if handItems present don't destroy, but discard them
         if eventId == 13:
             logging.info("Entered Orc Attack event {0}".format(eventId))
             p = len(game.players)
             for playerId in range(p):
+                whatItems1 = ""
                 cart = game.players[playerId].carts[0]
                 logging.info("playerId: {0}".format(playerId))
                 sumItems = sum(cart.inCart)
@@ -541,8 +546,10 @@ def prepEvents(game, eventId):
                     for cartItem in range(r):
                         #move cards back to hand
                         #move(game, what, src, dst, actionCost):
-                        move(game, playerId, cartItem, 'cart0', 'hand', 0)
-
+                        whatItems1 += str(cartItem)
+                    #dont think move is working here
+                    move(game, playerId, whatItems1, "cart0", "hand", 0)
+            currentEvent=Event(eventId = eventId, prepWhatItems1 = whatItems1, prepFromWhere1 = "cart0", prepMoveDest = "hand")
         #hailstorm players pass hand to the right
         if eventId == 18:
             logging.info("Hailstorm start Event Id:  {0}".format(eventId))
@@ -621,6 +628,9 @@ def prepEvents(game, eventId):
         game.gameMode = "game"
         return False  
 
+    p = len(game.players)
+    for playerId in range(p):
+        game.players[playerId].curEvent.append(currentEvent)
     #game.gameMode = "eventPending"
     return True
 
@@ -634,8 +644,24 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
     if game.gameMode != "eventPending":
         return True
     playerId=int(playerId)
-    currentEvent=Event(eventId = eventId, whatItems1 = what1, fromWhere1 = where1, whatItems2 = what2, fromWhere2 = where2, gold = gold, itemsCount = itemsCount, moveDest = dest1)
-    game.players[playerId].curEvent.append(currentEvent)
+    #currentEvent=Event(eventId = eventId, whatItems1 = what1, fromWhere1 = where1, whatItems2 = what2, fromWhere2 = where2, gold = gold, itemsCount = itemsCount, moveDest = dest1)
+    #game.players[playerId].curEvent.append(currentEvent)
+    eventCount = len(game.players[playerId].curEvent)
+    game.players[playerId].curEvent[eventCount-1].eventId = eventId
+    if game.players[playerId].curEvent[eventCount-1].whatItems1 == None:
+        game.players[playerId].curEvent[eventCount-1].whatItems1 = what1
+    if game.players[playerId].curEvent[eventCount-1].fromWhere1 == None:
+        game.players[playerId].curEvent[eventCount-1].fromWhere1 = where1	
+    if game.players[playerId].curEvent[eventCount-1].whatItems2 == None:
+        game.players[playerId].curEvent[eventCount-1].whatItems2 = what2
+    if game.players[playerId].curEvent[eventCount-1].fromWhere2 == None:
+        game.players[playerId].curEvent[eventCount-1].fromWhere2 = where2
+    if game.players[playerId].curEvent[eventCount-1].gold == None:
+        game.players[playerId].curEvent[eventCount-1].gold = gold
+    if game.players[playerId].curEvent[eventCount-1].itemsCount == None:
+        game.players[playerId].curEvent[eventCount-1].itemsCount = itemsCount
+    if game.players[playerId].curEvent[eventCount-1].moveDest == None:
+        game.players[playerId].curEvent[eventCount-1].moveDest = dest1
     player = game.players[playerId]
     logging.info("Entered Logic for Events")
     logging.info("playerid is: {0}".format(playerId)) 
@@ -654,12 +680,12 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
                 for whati in what1arr:
                     logging.info("whati {0}".format(whati)) 
                     logging.info("where1 {0}".format(where1)) 
-                    fish(game, whati, where1, 0)
+                    fish(game, playerId, whati, where1, 0)
             if len(what2arr) > 0:
                 for whati2 in what2arr:
                     logging.info("whati2 {0}".format(whati2)) 
                     logging.info("where2 {0}".format(where2)) 
-                    fish(game, whati2, where2, 0)
+                    fish(game, playerId, whati2, where2, 0)
         #CastleTaxation
         if eventId == 8:
             logging.info("Castle Taxation start Event Id:  {0}".format(eventId))
@@ -883,7 +909,7 @@ def passPlayer(game, aPlayerId, items):
 
     return priorPlayer
 
-def fish(game, aplayerId, what, where, actionCost):
+def fish(game, aPlayerId, what, where, actionCost):
     if (game.actionsRemaining == 0 and actionCost > 0):
         # no actions remaining
         return False
@@ -1121,6 +1147,7 @@ def dealItemCard(playerIndex, game):
 def dealItemCardToMarket(game):
     card = getFirstItemCard(game)
     game.market.append(card)
+    return card
         
 def dealQuest(game):
     decklen = len(game.questDeck)
@@ -1224,20 +1251,20 @@ def newQuestDeck(numPlayers):
     level3Cards.append(createQuestCard(3,False,[3,4,7,8,9],6,5))
     
 
-    level4Cards.append(createQuestCard(4,False,[],0,6))
-    level4Cards.append(createQuestCard(4,False,[],0,7))
-    level4Cards.append(createQuestCard(4,False,[],0,8))
-    level4Cards.append(createQuestCard(4,False,[],0,9))
-    level4Cards.append(createQuestCard(4,False,[],0,10))
-    level4Cards.append(createQuestCard(4,False,[],0,11))
+    level4Cards.append(createQuestCard(4,False,[],0,12))
+    level4Cards.append(createQuestCard(4,False,[],0,12))
+    level4Cards.append(createQuestCard(4,False,[],0,12))
+    level4Cards.append(createQuestCard(4,False,[],0,12))
+    level4Cards.append(createQuestCard(4,False,[],0,12))
     level4Cards.append(createQuestCard(4,False,[],0,12))
     level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,14))
-    level4Cards.append(createQuestCard(4,False,[],0,15))
-    level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,17))
-    level4Cards.append(createQuestCard(4,False,[],0,18))
-    level4Cards.append(createQuestCard(4,False,[],0,19))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
 
 
     level1Cards = shuffle(level1Cards)
@@ -1250,8 +1277,8 @@ def newQuestDeck(numPlayers):
         createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards, 4,  4,1,2,1,1,2,   1,1,1)
         #createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  2,2,2,2,2,2,     2,2,2)
     elif numPlayers == "2":
-        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  6,1,4,1,2,4,   2,2,2)
-		#createQuestStacks(tippytop,top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,   2,2,2)
+        #createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  6,1,4,1,2,4,   2,2,2)
+		createQuestStacks(tippytop,top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,   2,2,2)
     elif numPlayers == "3":
         createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  7,3,7,2,3,5,   3,3,3)
     elif numPlayers == "4":

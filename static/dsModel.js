@@ -18,6 +18,9 @@ var Event = function (type, name, eventText ) {
     this.moveDest = null;
 	this.moveDestCards = new cardSet();
 	this.whatFound = new cardSet();
+    this.prepWhatItems1 = null;
+    this.prepFromWhere1 = null;
+    this.prepMoveDest = null;
 }
 
 var QuestReady = function (items, questCard, cartId, questIndex) {

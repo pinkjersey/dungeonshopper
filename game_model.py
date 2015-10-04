@@ -22,6 +22,9 @@ class Event(ndb.Model):
     gold = ndb.IntegerProperty(required=False, default=0)
     itemsCount = ndb.IntegerProperty(required=False, default=0)
     moveDest = ndb.StringProperty(required=False, default="")
+    prepWhatItems1 = ndb.StringProperty(required=False, default="")
+    prepFromWhere1 = ndb.StringProperty(required=False, default="")
+    prepMoveDest = ndb.StringProperty(required=False, default="")
 
 class Cart(ndb.Model):
     purchased = ndb.BooleanProperty(required=True, default=False)

@@ -158,11 +158,11 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	//interval method to update game spectators
    	function startInterval(params) {
         $scope.timerId = setInterval(function () { 
-			if($scope.isActive===false) {
-				if($scope.refresh != false) {
+			//if($scope.isActive===false) {
+				if($scope.refresh === true) {
 					playerRefresh($scope.myId);
 				}
-			}
+			//}
 
 		}	, params	)
 	}
@@ -728,7 +728,11 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			if(player.actionsRemaining > 0)	{
 				var r = confirm("You are trying to pass with remaining actions - Continue?");
 				if (r === true) {
-					discardSelectedCards = "";
+					if(player.cards.playingCards.length - selectedCardCount > player.maxHand) {	
+						alert("You have no actions remaining.  Only select card(s) to discard to get back to max hand size of " + player.maxHand + ".");
+						resetAllSelectedCards(player);
+						return;
+					}
 				}
 				else {
 					return;
@@ -802,7 +806,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		
 
 		//move player items to market
-			text = "Market trade with " + logSelectedCards(selectedItemCards) + ' for ' + logSelectedCards(selectedMarketCards);
+			text = "Market trade with " + parseFromArray(selectedItemCards) + ' for ' + parseFromArray(selectedMarketCards);
 		
 			var r =  confirm(text + "?");
 			if(r===true) {
@@ -1371,8 +1375,13 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		var arr1 = [];
 		var arr2 = [];
 		var whatWhereArray = [];
-		var text = null;
+		var text1 = "";
+		var text2 = "";
+		var prep1 = "";
 		var len = 0;
+		event.fromWhere1 = convertToName(event.fromWhere1);
+		event.fromWhere2 = convertToName(event.fromWhere2);
+		event.moveDest = convertToName(event.moveDest);
 	/**events.push(new Event(6,"BarbarianAttack"));
 	events.push(new Event(7,"BrokenItems"));
 	events.push(new Event(8,"CastleTaxation"));
@@ -1391,70 +1400,147 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				if (event.gold === 1) {
 						whatWhereArray.push('1 gold')
 				}
+
+				//from prep event
+				if (event.whatItems1.length > 0) {
+					arr1 = parseToArray(event.whatItems1);
+					for (var c = 0; c < arr1.length; ++c) {
+						prep1 += "item " + arr1[c] + " from their " + event.prepFromWhere1
+						if(c+1 < event.prepWhatItems1.length) {
+							prep1 += " and ";
+						}
+					}
+					whatWhereArray.push(prep1);
+				}
+				
 				
 				if (event.whatItems1.length > 0) {
 					arr1 = parseToArray(event.whatItems1);
 					for (var c = 0; c < arr1.length; ++c) {
-						text += "item " + arr1[c] + " from their shaky" + event.fromWhere1
+						text1 += "item " + arr1[c] + " from their shaky " + event.fromWhere1
 						if(c+1 < event.whatItems1.length) {
-							text += " and ";
+							text1 += " and ";
 						}
 					}
-					whatWhereArray.push(text);
+					whatWhereArray.push(text1);
 				}
 				if (event.whatItems2.length > 0) {
 					arr2 = parseToArray(event.whatItems2);
 					for (var c = 0; c < arr2.length; ++c) {
-						text += "item " + arr2[c] + " from their dope " + event.fromWhere2
+						text2 += "item " + arr2[c] + " from their dope " + event.fromWhere2
 						if(c+1 < event.whatItems2.length) {
-							text += " and ";
+							text2 += " and ";
 						}
 					}
-					whatWhereArray.push(text);
+					whatWhereArray.push(text2);
 				}			
 
 			switch (event.id) {
 				case 6:
+				eventCompletedText = player.name + " survived.";
 					break;
 				case 7:
+					if(whatWhereArray.length === 0) {
+						eventCompletedText = player.name + " had no broken items to replace!";
+					}
+					else {
+						eventCompletedText = player.name + " replaced ";
+						for (var t = 0; t < whatWhereArray.length; ++t) {
+							eventCompletedText += whatWhereArray[t]
+							if(t+1 < whatWhereArray.length) {
+								eventCompletedText += " and ";
+							}
+						}
+						eventCompletedText += "!"
+					}
 					break;
 				case 8:
-					eventCompletedText = player.name + " paid taxes with "; 
-					for (var t = 0; t < whatWhereArray.length; ++t) {
-						eventCompletedText += whatWhereArray[t]
-						if(t+1 < whatWhereArray.length) {
-							eventCompletedText += " and ";
-						}
+					if(whatWhereArray.length === 0) {
+						eventCompletedText = player.name + " had nothing left to pay for taxes!";
 					}
-					eventCompletedText += "!"
+					else {
+						eventCompletedText = player.name + " paid taxes with "; 
+						for (var t = 0; t < whatWhereArray.length; ++t) {
+							eventCompletedText += whatWhereArray[t]
+							if(t+1 < whatWhereArray.length) {
+								eventCompletedText += " and ";
+							}
+						}
+						eventCompletedText += "!"
+					}
 					break;
 				case 9:
+					if(whatWhereArray.length === 0) {
+						eventCompletedText = player.name + " had nothing to steal!";
+					}
+					else {
+						eventCompletedText = player.name + " lost "; 
+						for (var t = 0; t < whatWhereArray.length; ++t) {
+							eventCompletedText += whatWhereArray[t]
+							if(t+1 < whatWhereArray.length) {
+								eventCompletedText += " and ";
+							}
+						}
+						eventCompletedText += "!"
+					}
 					break;
 				case 10:
+					eventCompletedText = player.name + " received " + event.itemsCount + " new item during the Kings Feast!";
 					break;
 				case 11:
+					eventCompletedText = "Market has lost all " + event.whatItems1 + "'s." ;
 					break;
 				case 12:
+					//market surplus
+					
+					if (event.whatItems1.length > 0) {
+						arr1 = parseToArray(event.whatItems1);
+						for (var c = 0; c < arr1.length; ++c) {
+							text1 += arr1[c]
+							if(c+1 < event.whatItems1.length) {
+								text1 += " , ";
+							}
+						}
+					}
+					eventCompletedText = "Market has new stuff!  " + parseFromArray(event.whatItems1);
 					break;
 				case 13:
+					if(whatWhereArray.length === 0) {
+						eventCompletedText = player.name + " defeated the Orcs!";
+					}
+					else {
+						eventCompletedText = player.name + " recieved " ; 
+						for (var t = 0; t < whatWhereArray.length; ++t) {
+							eventCompletedText += whatWhereArray[t]
+							if(t+1 < whatWhereArray.length) {
+								eventCompletedText += " and ";
+							}
+						}
+						eventCompletedText += " from their destroyed cart!"
+					}
 					break;
 				case 14:
+					eventCompletedText = player.name;
 					break;
 				case 15:
+					eventCompletedText = player.name;
 					break;
 				case 16:
+					eventCompletedText = player.name;
 					break;
 				case 17:
+					eventCompletedText = player.name;
 					break;
 				case 18:
+					eventCompletedText = player.name;
 					break;
 				case 19:
 					eventCompletedText = player.name + " found "; 
 					if(event.itemsCount > 0) {
-						eventCompletedText += event.itemsCount + " items";
+						eventCompletedText += event.itemsCount + " items ";
 						} 
 					else {
-						eventCompletedText += event.gold + " gold";
+						eventCompletedText += event.gold + " gold ";
 					}
 					eventCompletedText += "in the hidden room!";
 
@@ -1470,7 +1556,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	function getObjectResults(data) {
 		var text = "";
 		var game = $scope.game;
-		
+		var events = prepEvents();
+				
 		// players = game.players;
 		//this controls the buttons to return if you are not active
 		//already doing so much in angular js buttons, did not want to add this as well
@@ -1487,16 +1574,20 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		game.players[p].active = data.isActive;
 		$scope.activePlayer = game.players[p];
 		var player = $scope.activePlayer;
-		
+		player.lastEvent = null;
 		//for events only
 		if (data.curEvent.length > 0 && data.gameMode != "game") {
 			eventFound = data.curEvent.length - 1;
-			player.lastEvent = $scope.events[data.curEvent[eventFound].eventId];
+			var eventCopy = events[data.curEvent[eventFound].eventId];
+			player.lastEvent = eventCopy;
 			player.lastEvent.whatItems1 = data.curEvent[eventFound].whatItems1;
 			player.lastEvent.whatItems2 = data.curEvent[eventFound].whatItems2;
-			player.lastEvent.fromWhere1 = convertToName(data.curEvent[eventFound].fromWhere1);
-			player.lastEvent.fromWhere2 = convertToName(data.curEvent[eventFound].fromWhere2);
-			player.lastEvent.moveDest = convertToName(data.curEvent[eventFound].moveDest);
+			player.lastEvent.fromWhere1 = data.curEvent[eventFound].fromWhere1;
+			player.lastEvent.fromWhere2 = data.curEvent[eventFound].fromWhere2;
+			player.lastEvent.moveDest = data.curEvent[eventFound].moveDest;
+			player.lastEvent.prepWhatItems1 = data.curEvent[eventFound].prepWhatItems1;
+			player.lastEvent.prepFromWhere1 = data.curEvent[eventFound].prepFromWhere1;
+			player.lastEvent.prepMoveDest = data.curEvent[eventFound].prepMoveDest;
 			player.lastEvent.gold = data.curEvent[eventFound].gold;
 			player.lastEvent.itemsCount = data.curEvent[eventFound].itemsCount;
 			player.lastEvent.eventCompletedText = getEventCompletedText(game, player, player.lastEvent);
@@ -1533,18 +1624,31 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 			game.players[len].cards = new cardSet();
 			game.players[len].questsCompleted =  new cardSet();
+			game.players[len].lastEvent = null;
+			var events = prepEvents();
 			if (data.otherPlayers[z].curEvent.length > 0) {
 				eventFound = data.otherPlayers[z].curEvent.length - 1;
-				game.players[len].lastEvent = $scope.events[data.otherPlayers[z].curEvent[eventFound].eventId];
+				var eventCopy = events[data.otherPlayers[z].curEvent[eventFound].eventId];
+				game.players[len].lastEvent = eventCopy;
 				game.players[len].lastEvent.whatItems1 = data.otherPlayers[z].curEvent[eventFound].whatItems1;
 				game.players[len].lastEvent.whatItems2 = data.otherPlayers[z].curEvent[eventFound].whatItems2;
 				game.players[len].lastEvent.fromWhere1 = data.otherPlayers[z].curEvent[eventFound].fromWhere1;
 				game.players[len].lastEvent.fromWhere2 = data.otherPlayers[z].curEvent[eventFound].fromWhere2;
 				game.players[len].lastEvent.moveDest = data.otherPlayers[z].curEvent[eventFound].moveDest;
+				game.players[len].lastEvent.prepWhatItems1 = data.otherPlayers[z].curEvent[eventFound].prepWhatItems1;
+				game.players[len].lastEvent.prepFromWhere1 = data.otherPlayers[z].curEvent[eventFound].prepFromWhere1;
+				game.players[len].lastEvent.prepMoveDest = data.otherPlayers[z].curEvent[eventFound].prepMoveDest;
 				game.players[len].lastEvent.gold = data.otherPlayers[z].curEvent[eventFound].gold;
 				game.players[len].lastEvent.itemsCount = data.otherPlayers[z].curEvent[eventFound].itemsCount;
-		
+				game.players[len].lastEvent.eventCompletedText = getEventCompletedText(game, game.players[len], game.players[len].lastEvent);
 			}
+			
+				
+				game.players[len].gold = data.otherPlayers[z].gold;
+				game.players[len].turns = data.otherPlayers[z].turns;
+				game.players[len].vp = data.otherPlayers[z].points;
+				game.players[len].maxHand = data.otherPlayers[z].maxHand;
+
 			
 			for (var i = 0; i < data.otherPlayers[z].hand.length; ++i) {   
 				//dealNumberToPlayer(game, game.players[len], data.otherPlayers[z].hand[i]);	
