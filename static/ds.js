@@ -1378,8 +1378,51 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		alert("Error Occurred: " + returnVal);
 	};
 	
+	getCardName = function (number) {
+		switch (parseInt(number)) {
+		   case 0:
+			   name = "Ballista";
+			   break;
+		  	case 1: 
+			   name = "Club";
+			    break;
+		   case 2:
+			   name = "Shield";
+				break;
+		   case 3:
+			   name = "Mace";
+			   break;
+		   case 4:
+			   name = "Flail";
+			   break;
+		   case 5:
+			   name = "Sword";
+			   break;
+		   case 6:
+			   name = "Axe";
+			   break;
+		   case 7:
+			   name = "Crossbow";
+			   break;
+		   case 8:
+			   name = "Armor";
+			   break;
+		   case 9:
+			   name = "Trebuchet";
+			   break;
+		   case 10:
+			   name = "Ballista";
+			   break;
+		   default:
+			   name = "Unknown";
+			   break;
+	   }
+		return name;
+	}
+	
 	getEventCompletedText = function(game, player, event){
 		var eventCompletedText = null;
+		var parr1 = [];
 		var arr1 = [];
 		var arr2 = [];
 		var whatWhereArray = [];
@@ -1393,6 +1436,10 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		event.moveDest = convertToName(event.moveDest);
 		event.prepFromWhere1 = convertToName(event.prepFromWhere1);
 		event.prepMoveDest = convertToName(event.prepMoveDest);
+//		card.setCardSize("orig");
+		var cardGold = game.itemMarketHolders.playingCards[11];
+		var card = null;
+//		player.lastEvent.images.push("../images/1_gold.jpg");
 	/**events.push(new Event(6,"BarbarianAttack"));
 	events.push(new Event(7,"BrokenItems"));
 	events.push(new Event(8,"CastleTaxation"));
@@ -1414,9 +1461,11 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 				//from prep event
 				if (event.prepWhatItems1.length > 0) {
-					arr1 = parseToArray(event.prepWhatItems1);
-					for (var c = 0; c < arr1.length; ++c) {
-						prep1 += "item " + arr1[c] + " from their " + event.prepFromWhere1;
+					parr1 = parseToArray(event.prepWhatItems1);
+					for (var c = 0; c < parr1.length; ++c) {
+						prep1 += "item " + getCardName(parr1[c]) + " from their " + event.prepFromWhere1;
+						card = game.itemMarketHolders.playingCards[parr1[c]-1];
+						player.lastEvent.images.addCardc(card);						
 						if(c+1 < event.prepWhatItems1.length) {
 							prep1 += " and ";
 						}
@@ -1428,7 +1477,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				if (event.whatItems1.length > 0) {
 					arr1 = parseToArray(event.whatItems1);
 					for (var c = 0; c < arr1.length; ++c) {
-						text1 += "item " + arr1[c] + " from their shaky " + event.fromWhere1;
+						text1 += "item " + getCardName(arr1[c]) + " from their shaky " + event.fromWhere1;
+						card = game.itemMarketHolders.playingCards[arr1[c]-1];
+						player.lastEvent.images.addCardc(card);						
 						if(c+1 < event.whatItems1.length) {
 							text1 += " and ";
 						}
@@ -1438,7 +1489,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				if (event.whatItems2.length > 0) {
 					arr2 = parseToArray(event.whatItems2);
 					for (var c = 0; c < arr2.length; ++c) {
-						text2 += "item " + arr2[c] + " from their dope " + event.fromWhere2;
+						text2 += "item " + getCardName(arr2[c]) + " from their dope " + event.fromWhere2;
+						card = game.itemMarketHolders.playingCards[arr2[c]-1];
+						player.lastEvent.images.addCardc(card);						
 						if(c+1 < event.whatItems2.length) {
 							text2 += " and ";
 						}
@@ -1496,24 +1549,28 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					}
 					break;
 				case 10:
-					eventCompletedText = player.name + " received " + event.itemsCount + " new item during the Kings Feast!";
+					eventCompletedText = player.name + " received 1 new item during the Kings Feast!";
+					card = game.itemMarketHolders.playingCards[10];
+					player.lastEvent.images.addCardc(card);
 					break;
 				case 11:
-					eventCompletedText = "Market has lost all " + event.prepWhatItems1 + "'s." ;
+					eventCompletedText = "Market has lost all " +  getCardName(event.prepWhatItems1) + "'s." ;
 					break;
 				case 12:
 					//market surplus
-					
+					player.lastEvent.images = new cardSet();
 					if (event.prepWhatItems1.length > 0) { 
 						arr1 = parseToArray(event.prepWhatItems1);
 						for (var c = 0; c < arr1.length; ++c) {
-							text1 += arr1[c];
+							text1 +=  getCardName(arr1[c]);
+							card = game.itemMarketHolders.playingCards[arr1[c]-1];
+							player.lastEvent.images.addCardc(card);
 							if(c+1 < event.prepWhatItems1.length) {
 								text1 += " , ";
 							}
 						}
 					}
-					eventCompletedText = "Market has new stuff!  " + parseFromArray(event.prepWhatItems1);
+					eventCompletedText = "Market has new stuff!  " + " Stuff:  " + text1; //parseFromArray(event.prepWhatItems1);
 					break;
 				case 13:
 					if(player.carts[0].cards.playingCards.length > 0) {
@@ -1522,10 +1579,10 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					else {
 						eventCompletedText = "Orcs have destroyed " + player.name + "'s wheelbarrow.  ";
 						if(event.prepWhatItems1.length > 0) {
-							eventCompletedText += player.name + " received " + parseFromArray(event.prepWhatItems1) + " from their destroyed cart!  ";
+							eventCompletedText += player.name + " received " + parseFromArrayIntoNames(parr1) + " from their destroyed cart!  ";
 						}
 						if(event.whatItems1.length > 0) {
-							eventCompletedText += player.name + " bought back the cart by trading item(s) " + parseFromArray(event.whatItems1) + ".";
+							eventCompletedText += player.name + " bought back the cart by trading item(s) " + parseFromArrayIntoNames(arr1) + ".";
 						}
 						if(event.whatItems1.length === 0) {
 							eventCompletedText += player.name + " did not buy a new wheelbarrow.";
@@ -1537,7 +1594,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					break;
 				case 15:
 					if (event.whatItems1.length > 0) {
-						eventCompletedText = player.name + " was thrown in the Dungeon.  " + player.name + " lost their " + event.whatItems1 + ".";
+						eventCompletedText = player.name + " was thrown in the Dungeon.  " + player.name + " lost their " +  getCardName(event.whatItems1) + ".";
 					}
 					else {
 						eventCompletedText = player.name + " fended off the soldiers and kept all items.";
@@ -1546,6 +1603,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					break;
 				case 16:
 					eventCompletedText = player.name + " found 1 gold!";
+					card = game.itemMarketHolders.playingCards[11];
+					player.lastEvent.images.addCardc(card);
 					break;
 				case 17:
 					//$scope.myLastWhatItems1 = null;
@@ -1557,7 +1616,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					if ($scope.myLastWhatItems1.length > 0) {
 						arr1 = parseToArray($scope.myLastWhatItems1);
 						for (var c = 0; c < arr1.length; ++c) {
-							move1 += "item " + arr1[c] + " from their " + convertToName($scope.myLastFromWhere1);
+							move1 += " " + getCardName(arr1[c]) + " from their " + convertToName($scope.myLastFromWhere1);
 							if(c+1 < $scope.myLastWhatItems1.length) {
 								move1 += " and ";
 							}
@@ -1583,9 +1642,16 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					eventCompletedText = player.name + " found "; 
 					if(event.itemsCount > 0) {
 						eventCompletedText += event.itemsCount + " items ";
+						card = game.itemMarketHolders.playingCards[10];
+						player.lastEvent.images.addCardc(card);
+						card = game.itemMarketHolders.playingCards[10];
+						player.lastEvent.images.addCardc(card);
 						} 
 					else {
 						eventCompletedText += event.gold + " gold ";
+						card = game.itemMarketHolders.playingCards[11];
+						player.lastEvent.images.addCardc(card);
+
 					}
 					eventCompletedText += "in the hidden room!";
 

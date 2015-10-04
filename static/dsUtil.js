@@ -424,15 +424,16 @@ parseToArray = function(items) {
 	return s;
 }
 
+
 parseFromArray = function(items) {
 	var s = "";
 	var num = "";
 	for (var i = 0; i < items.length; i++) {
-		if (items.charAt(i) === '0') {
+		if (items[i] === '0') {
 			num = '10'
 		}
 		else {
-			num = items.charAt(i);
+			num = items[i];
 		}
 		s += num;
 		if(i+1 < items.length) {
@@ -441,6 +442,25 @@ parseFromArray = function(items) {
 }
 	return s;
 }
+
+parseFromArrayIntoNames = function(items) {
+	var s = "";
+	var num = "";
+	for (var i = 0; i < items.length; i++) {
+		if (items[1] === '0') {
+			num = '10'
+		}
+		else {
+			num = items[i];
+		}
+		s += getCardName(num);
+		if(i+1 < items.length) {
+			s+=", ";
+		}
+}
+	return s;
+}
+
 
 //returns number of cards selected for deck
 getSelectedCardcount = function(deck, selectedCardsOnly){

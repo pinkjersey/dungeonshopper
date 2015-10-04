@@ -47,9 +47,9 @@
 				<p></p>
 
 				<label>{{player.lastEvent.eventCompletedText}}</label>
-				<!--<span ng-show="player.lastEvent.id === 9" ng-repeat "card in player.lastEvent.whatItems.playingCards track by $index ">
-					<img style="{{card.borderColor}}"  ng-src="{{card.image}}"/>
-				</span>-->
+				<span ng-repeat = "card in player.lastEvent.images.playingCards track by $index">
+					<img ng-src="{{card.image}}"/>
+				</span>
 			</div>
 		</div>
 	</div>	
