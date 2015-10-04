@@ -299,7 +299,7 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        result = buyAction(game)
+        result = buyAction(game, iPlayerId)
         if (result == False):
             self.error(500)
             return
