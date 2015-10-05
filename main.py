@@ -439,7 +439,6 @@ class GameHandler(webapp2.RequestHandler):
 
         logging.info("Player {0}'s compeleting event".format(iPlayerId))
 
-        self.appendToLog(game)
         retstr = playerState(game, iPlayerId)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
@@ -497,7 +496,6 @@ class GameHandler(webapp2.RequestHandler):
 
         logging.info("Compelete event: done")
 
-        self.appendToLog(game)
         retstr = playerState(game, iPlayerId)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
@@ -572,7 +570,7 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(retstr)        
 
     def appendToLog(self, game):        
-        el = PlayerLog(playerId=game.curPlayer, event=self.request.url)
+        el = PlayerLog(playerId=iPlayerId, event=self.request.url)
         game.playerLog.append(el)
         game.put()
 
