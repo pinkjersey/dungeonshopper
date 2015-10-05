@@ -55,7 +55,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	//control which log items to push
 	$scope.logItemCount = 0;
 	//used for viking event - this allows for Move action to not cost and action during the event
-	$scope.oneFreeMove = true;
+	//$scope.oneFreeMove = true;
 	$scope.myLastWhatItems1 = null;
 	$scope.myLastFromWhere1 = null;
 	$scope.myLastMoveDest = null;
@@ -485,9 +485,11 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		
 		//special event, need to capture these elements
 		if($scope.displayMode === "eventVikingParade") {
-			$scope.myLastWhatItems1 = selectedCartItems;
-			$scope.myLastFromWhere1 = 'cart'+prevId;
-			$scope.myLastMoveDest = 'cart'+id;
+			$scope.playerCompleteEvent(0,0);
+		//	$scope.myLastWhatItems1 = selectedCartItems;
+		//	$scope.myLastFromWhere1 = 'cart'+prevId;
+		//	$scope.myLastMoveDest = 'cart'+id;
+
 		}
 		//move cart items to cart
 		move($scope.myId, actionCost, selectedCartItems, 'cart'+prevId, 'cart'+id)
@@ -954,15 +956,15 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	}
 
 	$scope.moveItemsBetweenCartsEvent = function(id) {
-		if(!$scope.oneFreeMove) {
-			alert('Only one free move during the parade!');
-			return;
-		}
+		//if(!$scope.oneFreeMove) {
+		//	alert('Only one free move during the parade!');
+		//	return;
+		//}
 		var actionCost = 0;
 		var success = $scope.moveItemsToCart(id, actionCost );
-		if (success) {
-			$scope.oneFreeMove = false;
-		}
+		//if (success) {
+		//	$scope.oneFreeMove = false;
+		//}
 		
 	}
 
@@ -1000,7 +1002,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		var cart3CardCountSel = getSelectedCardcount(player.carts[3].cards, true);
 		var totalCardsSelected = playerCardCountSel+cart0CardCountSel +cart1CardCountSel +cart2CardCountSel +cart3CardCountSel ;
 		$scope.playerPaidWithItems=totalCardsSelected;	
-		//resetCartCardsSelected(player, cartId);
+		if($scope.displayMode === "eventVikingParade") {
+			resetCartCardsSelected(player, cartId);
+		}
 		play("button");
 	}
 	
@@ -1285,8 +1289,13 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					break;
 				case 'eventVikingParade':
 					eventId = 17;
+					if(id != "X") {
+						where1 = "cart" +$scope.prevActiveCartId;
+						dest1 = "cart" + $scope.activeCartId;
+						what1 = $scope.selectedCartItems;
+					}
 					//reset it if there are more than one viking parade in deck
-					$scope.oneFreeMove = true;
+					//$scope.oneFreeMove = true;
 					break;
 				default:
 					resetDisplayModeName('game');
@@ -1439,7 +1448,23 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 //		card.setCardSize("orig");
 		var cardGold = game.itemMarketHolders.playingCards[11];
 		var card = null;
-//		player.lastEvent.images.push("../images/1_gold.jpg");
+		var adverb = [];
+		adverb[0] = "dope";
+		adverb[1] = "shaky";
+		adverb[2] = "stirdy";
+		adverb[3] = "wobly";
+		adverb[4] = "well-built";
+		adverb[5] = "vigorous";
+		adverb[6] = "bulky";
+		adverb[7] = "hulking";
+		adverb[8] = "rugged";
+		adverb[9] = "powerhouse";
+		adverb[10] = "secure";
+		var w = Math.floor(Math.random()*10+1);
+		var x = Math.floor(Math.random()*10+1);
+		var y = Math.floor(Math.random()*10+1);
+		var z = Math.floor(Math.random()*10+1);
+
 	/**events.push(new Event(6,"BarbarianAttack"));
 	events.push(new Event(7,"BrokenItems"));
 	events.push(new Event(8,"CastleTaxation"));
@@ -1463,7 +1488,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				if (event.prepWhatItems1.length > 0) {
 					parr1 = parseToArray(event.prepWhatItems1);
 					for (var c = 0; c < parr1.length; ++c) {
-						prep1 += "item " + getCardName(parr1[c]) + " from their " + event.prepFromWhere1;
+						prep1 += getCardName(parr1[c]) + " from their " + adverb[x] + " " + event.prepFromWhere1;
 						card = game.itemMarketHolders.playingCards[parr1[c]-1];
 						player.lastEvent.images.addCardc(card);						
 						if(c+1 < event.prepWhatItems1.length) {
@@ -1477,7 +1502,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				if (event.whatItems1.length > 0) {
 					arr1 = parseToArray(event.whatItems1);
 					for (var c = 0; c < arr1.length; ++c) {
-						text1 += "item " + getCardName(arr1[c]) + " from their shaky " + event.fromWhere1;
+						text1 += getCardName(arr1[c]) + " from their " + adverb[y] + " " + event.fromWhere1;
 						card = game.itemMarketHolders.playingCards[arr1[c]-1];
 						player.lastEvent.images.addCardc(card);						
 						if(c+1 < event.whatItems1.length) {
@@ -1489,7 +1514,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				if (event.whatItems2.length > 0) {
 					arr2 = parseToArray(event.whatItems2);
 					for (var c = 0; c < arr2.length; ++c) {
-						text2 += "item " + getCardName(arr2[c]) + " from their dope " + event.fromWhere2;
+						text2 += getCardName(arr2[c]) + " from their " + adverb[z] + " " +  event.fromWhere2;
 						card = game.itemMarketHolders.playingCards[arr2[c]-1];
 						player.lastEvent.images.addCardc(card);						
 						if(c+1 < event.whatItems2.length) {
@@ -1577,7 +1602,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 						eventCompletedText = player.name + " defeated the Orcs!";
 					}
 					else {
-						eventCompletedText = "Orcs have destroyed " + player.name + "'s wheelbarrow.  ";
+						eventCompletedText = "Orcs have destroyed " + player.name +  "'s " + adverb[w] + " wheelbarrow.  ";
 						if(event.prepWhatItems1.length > 0) {
 							eventCompletedText += player.name + " received " + parseFromArrayIntoNames(parr1) + " from their destroyed cart!  ";
 						}
@@ -1607,17 +1632,12 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 					player.lastEvent.images.addCardc(card);
 					break;
 				case 17:
-					//$scope.myLastWhatItems1 = null;
-					//$scope.myLastFromWhere1 = null;
-					//$scope.myLastMoveDest = null;
-					if ($scope.myLastWhatItems1 === null) {
-						return;
-					}
-					if ($scope.myLastWhatItems1.length > 0) {
-						arr1 = parseToArray($scope.myLastWhatItems1);
+
+					if (event.whatItems1.length > 0) {
+						arr1 = parseToArray(event.whatItems1.length);
 						for (var c = 0; c < arr1.length; ++c) {
-							move1 += " " + getCardName(arr1[c]) + " from their " + convertToName($scope.myLastFromWhere1);
-							if(c+1 < $scope.myLastWhatItems1.length) {
+							move1 += " " + getCardName(arr1[c]) + " from their " + event.fromWhere1;
+							if(c+1 < event.whatItems.length) {
 								move1 += " and ";
 							}
 						}
@@ -1631,7 +1651,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 								eventCompletedText += " and ";
 							}
 						}
-						eventCompletedText += " to their " + convertToName($scope.myLastMoveDest) + ".";
+						eventCompletedText += " to their " + adverb[w] + " " + event.moveDest + ".";
 					}
 					break;
 				case 18:
