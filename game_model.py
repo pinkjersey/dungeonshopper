@@ -15,14 +15,16 @@ class QuestCard(ndb.Model):
 
 class Event(ndb.Model):    
     eventId = ndb.IntegerProperty(required=True, default=0)
-    whatitems1 = ndb.StringProperty(required=False, default="")
+    whatItems1 = ndb.StringProperty(required=False, default="")
     fromWhere1 = ndb.StringProperty(required=False, default="")
-    whatitems2 = ndb.StringProperty(required=False, default="")
+    whatItems2 = ndb.StringProperty(required=False, default="")
     fromWhere2 = ndb.StringProperty(required=False, default="")
-    cartToDestroy = ndb.StringProperty(required=False, default="cart0")
     gold = ndb.IntegerProperty(required=False, default=0)
     itemsCount = ndb.IntegerProperty(required=False, default=0)
     moveDest = ndb.StringProperty(required=False, default="")
+    prepWhatItems1 = ndb.StringProperty(required=False, default="")
+    prepFromWhere1 = ndb.StringProperty(required=False, default="")
+    prepMoveDest = ndb.StringProperty(required=False, default="")
 
 class Cart(ndb.Model):
     purchased = ndb.BooleanProperty(required=True, default=False)
@@ -42,6 +44,7 @@ class Player(ndb.Model):
     maxHand = ndb.IntegerProperty(required=True, default=5)
     turns = ndb.IntegerProperty(required=True, default=0)
     questsCompleted = ndb.LocalStructuredProperty(QuestCard, repeated=True)
+    curEventStatus = ndb.StringProperty(required=False, default="completed")
     curEvent = ndb.LocalStructuredProperty(Event, repeated=True)
 
 class PlayerLog(ndb.Model):
@@ -51,7 +54,6 @@ class PlayerLog(ndb.Model):
 
 class Game(ndb.Model):
     gameMode = ndb.StringProperty(required=True, default="game") 
-    pendingMode = ndb.StringProperty(required=True, default="game") 
     curPlayer = ndb.IntegerProperty(default=0)
     actionsRemaining = ndb.IntegerProperty(default=2)        
     numPlayers = ndb.IntegerProperty(required=True)
@@ -63,6 +65,7 @@ class Game(ndb.Model):
     questsInPlay = ndb.LocalStructuredProperty(QuestCard, repeated=True)
     playerLog = ndb.LocalStructuredProperty(PlayerLog, repeated=True)
     eventCompletedCount = ndb.IntegerProperty(default=0)
+    eventPendingCompletedCount = ndb.IntegerProperty(default=0)
 
 
 

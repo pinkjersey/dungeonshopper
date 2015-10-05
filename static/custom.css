@@ -2,7 +2,10 @@
 
 .body         { padding-top:50px; }
 
-
+.splashImg {
+	width: 300px;
+	height: auto;
+}
 
 .label {
     display: block;
@@ -41,14 +44,19 @@
 	padding: 10px;
 }
 .right{
- width:700px;
+ width:850px;
  height:150px;
  float:right;
+ position: relative;
  background:white;
+ 
 }
 .left{
  height:150px;
+ width:850px;
  background:white;
+ float:left;
+ position: relative;
  overflow:hidden;
 }
 

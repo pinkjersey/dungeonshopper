@@ -6,6 +6,17 @@ var Event = function (type, name, eventText ) {
 	this.eventText = eventText;
 	this.displayMode = 'event' + name;
 	this.image = eventImageBase + name + '.jpg';
+    this.whatItems1 = null;
+    this.fromWhere1 = null;
+    this.whatItems2 = null;
+    this.fromWhere2 = null;
+    this.gold = null;
+	this.images = new cardSet();
+    this.itemsCount = null;
+    this.moveDest = null;
+    this.prepWhatItems1 = null;
+    this.prepFromWhere1 = null;
+    this.prepMoveDest = null;
 }
 
 var QuestReady = function (items, questCard, cartId, questIndex) {
@@ -40,7 +51,7 @@ var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased,
 	this.imageNotPurchased = imageNotPurchased;
 	this.goldCost = goldCost;
 	this.itemCost = itemCost;
-	this.cards = new cardSet;
+	this.cards = new cardSet();
 	this.borderColorNotBoughtInit = "#5c3e3c"
 	this.borderColorInit = "#9c280b"
 	this.borderColor = this.borderColorInit;
@@ -81,6 +92,7 @@ var Game = function(blankMarketImageBase, questImageBase, cartImageBase) {
 	this.autoSelectCart=false;
 	this.autoSelectHand=false;
 	this.activeEvent = null;
+	this.activeEventCard = null;
 	//event id, event type, event name
 	
 
@@ -112,6 +124,7 @@ var Player = function (game, id, name) {
 	this.nextCartId = 0;
 	this.nextCartName = 'Hand Cart';
 	this.winner=false;
+	this.lastEvent = null;
     this.carts = [new Cart(0, 3, true, 0, 5,'Wheelbarrow', game.cartImageBase + '0.jpg', game.cartImageBase + '0_not_purchased.jpg'), 
 				  new Cart(1, 3, false, 1, 10, 'Hand Cart', game.cartImageBase + '1.jpg', game.cartImageBase + '1_not_purchased.jpg'), 
 				  new Cart(2, 4, false, 2, 15, 'Horse Wagon', game.cartImageBase + '2.jpg', game.cartImageBase + '2_not_purchased.jpg'), 

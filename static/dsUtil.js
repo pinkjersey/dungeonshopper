@@ -348,8 +348,8 @@ dealQuestCard = function(game, items, level, type) {
 		}
 		
 		if(level === 4) {
-			game.activeEvent = card.name;
-			prepareEventForPlayer(game, card);
+			game.activeEventCard = card;
+			//prepareEventForPlayer(game, card);
 		}
 	}
 }
@@ -409,8 +409,8 @@ getSelectedCards = function(deck, selectedCardsOnly){
 
 }
 
-logSelectedCards = function(items) {
-	var s = "";
+parseToArray = function(items) {
+	var s = [];
 	var num = "";
 	for (var i = 0; i < items.length; i++) {
 		if (items.charAt(i) === '0') {
@@ -419,6 +419,22 @@ logSelectedCards = function(items) {
 		else {
 			num = items.charAt(i);
 		}
+		s[i] = num;
+	}
+	return s;
+}
+
+
+parseFromArray = function(items) {
+	var s = "";
+	var num = "";
+	for (var i = 0; i < items.length; i++) {
+		if (items[i] === '0') {
+			num = '10'
+		}
+		else {
+			num = items[i];
+		}
 		s += num;
 		if(i+1 < items.length) {
 			s+=", ";
@@ -426,6 +442,25 @@ logSelectedCards = function(items) {
 }
 	return s;
 }
+
+parseFromArrayIntoNames = function(items) {
+	var s = "";
+	var num = "";
+	for (var i = 0; i < items.length; i++) {
+		if (items[1] === '0') {
+			num = '10'
+		}
+		else {
+			num = items[i];
+		}
+		s += getCardName(num);
+		if(i+1 < items.length) {
+			s+=", ";
+		}
+}
+	return s;
+}
+
 
 //returns number of cards selected for deck
 getSelectedCardcount = function(deck, selectedCardsOnly){
@@ -496,7 +531,7 @@ setMarketCounts = function(game) {
 var convertToName = function(params) {
 	switch(params) {
 		case "hand":
-			return "player's hand";
+			return "hand";
 			break;
 		case "cart0":
 			return "wheelbarrow";

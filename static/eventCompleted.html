@@ -1,0 +1,56 @@
+﻿<div class="container">
+	<div class="row" >
+			<div  style="float:right; padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 5px;">
+				<button class="btn btn-warning" ng-click="playerRefresh()" >Refresh</button>    
+				<button ng-disabled="loadingData===true" class="btn btn-danger" ng-click="endGame()">Quit</button>
+			</div>
+	</div>
+</div>
+
+<div>
+	<button ng-show = "!clickedCompleteEvent" class="btn btn-danger" ng-click="playerCompletedEvent()">Back to Game?</button>
+	<label ng-show = "clickedCompleteEvent" ">Waiting on other players</label>
+
+<div class="panel panel-primary">
+		<br></br>
+		<div class="container-fluid">
+			<div class="row">
+				<span ng-repeat="eventcard in game.questsInPlay.playingCards track by $index">
+					<eventcardorig ng-show="eventcard.level===4" info="eventcard"></eventcardorig>
+				</span>	
+			</div>
+		</div>
+</div>
+
+
+	<p></p>
+</div>
+
+<div class="row" ng-repeat="player in game.players" >
+	<div class="panel panel-primary">  
+		<div class="panel-heading">  
+			<div class="panel-body">
+					<table class="table table-condensed">
+							<tr>
+								<th><big>{{player.name}}</big></th>
+								<th><big>VP: {{player.vp}}</big></th>
+								<th><big>Bonus: {{player.bonus}}</big></th>
+								<th><big>Gold: {{player.gold}}</big></th>								
+								<th><big>Total: {{player.gold + player.vp + player.bonus}}</big></th>								
+								<th><big>Turns: {{player.turns}}</big></th>
+							</tr>
+					</table>
+ 
+			<div class="row">
+				<div ng-show="player.curEvent != eventCompleted">{{player.name}} has not completed event {{player.lastEvent.eventText}}!</div>
+				<div ng-show="player.curEvent === eventCompleted">{{player.name}} has completed event {{player.lastEvent.eventText}}!</div>
+				<p></p>
+
+				<label>{{player.lastEvent.eventCompletedText}}</label>
+				<span ng-repeat = "card in player.lastEvent.images.playingCards track by $index">
+					<img ng-src="{{card.image}}"/>
+				</span>
+			</div>
+		</div>
+	</div>	
+</div>

@@ -1,6 +1,6 @@
 ﻿<div class="panel-body">
 			<span class="panel-title pull-right"><button class="btn btn-primary" ng-click="noGame()">Reset</button></span>
-			<img  ng-src="{{splashImage}}" width = "auto" height = "400" ></img>
+			<img  class = "splashImg" ng-src="{{splashImage}}"></img><big ng-show="displayMode != 'nogame'"> {{displayModeName}}</big>
 			<br></br>
 			<br></br>
 			<p>Player ID: <input type="text" ng-model="playerId" ng-Init="0"></input></p>
