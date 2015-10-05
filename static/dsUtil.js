@@ -24,6 +24,78 @@ var prepEvents = function() {
 }
 
 
+getCardName = function (number) {
+	switch (parseInt(number)) {
+	   case 0:
+		   name = "Ballista";
+		   break;
+		case 1: 
+		   name = "Club";
+			break;
+	   case 2:
+		   name = "Shield";
+			break;
+	   case 3:
+		   name = "Mace";
+		   break;
+	   case 4:
+		   name = "Flail";
+		   break;
+	   case 5:
+		   name = "Sword";
+		   break;
+	   case 6:
+		   name = "Axe";
+		   break;
+	   case 7:
+		   name = "Crossbow";
+		   break;
+	   case 8:
+		   name = "Armor";
+		   break;
+	   case 9:
+		   name = "Trebuchet";
+		   break;
+	   case 10:
+		   name = "Ballista";
+		   break;
+	   default:
+		   name = "Unknown";
+		   break;
+   }
+	return name;
+}
+
+getAdj = function(i) {
+	var adj = [];
+	adj[0] = "dope";
+	adj[1] = "shaky";
+	adj[2] = "stirdy";
+	adj[3] = "wobly";
+	adj[4] = "well-built";
+	adj[5] = "vigorous";
+	adj[6] = "bulky";
+	adj[7] = "hulking";
+	adj[8] = "rugged";
+	adj[9] = "powerhouse";
+	adj[10] = "secure";
+	return adj[i];
+}
+
+playCartSound = function(cartId) {
+		if(cartId===0) {
+			play("choppingWood");
+		}		
+		if(cartId===1) {
+			play("buyCart");
+		}
+		if(cartId===2) {
+			play("horseNeigh");
+		}
+		if(cartId===3) {
+			play("anvil");
+		}
+}
 
 playerCardChecked = function(card) {
 	if(card.selected) {
@@ -710,17 +782,3 @@ logPlayerAction = function(isActive, playersLog, playerName, logItem) {
 	}
 }
 
-playCartSound = function(cartId) {
-		if(cartId===0) {
-			play("choppingWood");
-		}		
-		if(cartId===1) {
-			play("buyCart");
-		}
-		if(cartId===2) {
-			play("horseNeigh");
-		}
-		if(cartId===3) {
-			play("anvil");
-		}
-}
