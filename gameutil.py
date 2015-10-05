@@ -2,6 +2,7 @@ import random
 import json
 import logging
 from game_model import *
+from array import *
 
 def createOtherPlayer(player):
     dict = player.to_dict()
@@ -11,6 +12,22 @@ def createOtherPlayer(player):
         hand[i] = -1
     dict["hand"] = hand
     return player
+
+def calculateBonus(player):    
+    numThreeSet = 0
+    numFiveSet = 0
+    # creates an array of five unsigned bytes (0 .. 255)
+    types = array('B', [0,0,0,0,0])
+    for quest in player.questsCompleted:
+        types[quest.type] += 1
+        
+    numFiveSet = min(types)
+    for num in types:
+        ct = num / 3
+        numThreeSet += ct
+
+    return (numThreeSet + numFiveSet) * 3
+
 
 def playerState(game, playerId):
     #game.players[playerId].playerId = playerId
@@ -25,6 +42,8 @@ def playerState(game, playerId):
     thedict["market"] = game.market
     thedict["playerId"] = playerId
     thedict["gameMode"] = game.gameMode
+    thedict["bonus"] = calculateBonus(player)
+
     eventList = []
     for e in player.curEvent:
         eventList.append(e.to_dict())	
