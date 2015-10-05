@@ -42,7 +42,6 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.autoPass = true;
 	$scope.hideImagesBool = false;
 
-	setRandomText();
 	//gui variable to control cart buttons
 	$scope.prevActiveCartId = -1;
 	$scope.activeCartId = -1;
