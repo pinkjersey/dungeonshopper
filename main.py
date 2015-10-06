@@ -7,7 +7,10 @@ This is the back end for dungeon shopper
 import webapp2
 import json
 import logging
+import string
+import random
 
+from google.appengine.api import memcache
 from google.appengine.ext import ndb
 from gameutil import *
 from game_model import *
@@ -27,7 +30,12 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        game = createNewGame(numPlayers, name)       
+        # Temporary: delete theGame from the data store
+        # later, perhaps stale games will be deleted here
+        game_k = ndb.Key('Game', 'theGame')
+        game_k.delete()
+
+        game = createNewGame("theGame", numPlayers, name)       
         retstr = playerState(game, 0)        
         #jsonstr = json.dumps([game.to_dict()])
                 
@@ -574,6 +582,79 @@ class GameHandler(webapp2.RequestHandler):
         game.playerLog.append(el)
         game.put()
 
+    def id_generator(self, size=6, chars=string.ascii_uppercase + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
+
+    def createGame(self, numPlayers):
+        gameKey = "game{0}".format(numPlayers)
+        randomStr = self.id_generator(6, gameKey)
+        gameKey += "_" + randomStr
+        gameInfo = GameInfo(gameKey=gameKey, numPlayers=numPlayers, spaceAvailable=numPlayers)
+        gameInfo.put()
+
+        # if the game exists in the datastore ... delete it
+        game_k = ndb.Key('Game', gameKey)
+        game_k.delete()
+
+        theGame = createNewGame(gameKey, numPlayers, "defaultPlayer0")
+
+        # add game to cache
+        memcache.add(key=gameKey, value=theGame)
+
+
+    def listGames(self):
+        """
+        This function returns a list of games available to play
+        
+        It will manage the games: delete old ones and create new ones as needed
+        The game state will mainly be saved in the memcache often and the db store
+        rarely.
+
+        Functionality Provided:
+        - Creating games when # of available games less than 4
+        - Synchronizing cache with games in db when those games are not in the cache
+          but yet not complete
+        - Deleting games from cache, game entity (db) and game info entity (db) when the
+          games are complete or stale
+        """
+        ct = 1
+        gamesNeeded = array('B', [1,1,1,1])         
+
+        # get all games from game info datastore
+        gameInfos = []
+        games = GameInfo.query()
+        for gi in games:
+            keyStr = gi.gameKey
+            game = memcache.get(keyStr)            
+            if (game == None):
+                logging.error("Key not in cache: {0}".format(keyStr))
+
+            if (gi.spaceAvailable > 0):
+                gamesNeeded[gi.numPlayers-1] = 0
+                gameInfos.append(gi.to_dict())
+
+        #ct = 1
+        #for 
+
+        gameCreated = 0
+        ct = 1
+        for gn in gamesNeeded:
+            if gn == 1:
+                # create game
+                self.createGame(ct)
+                gameCreated = 1
+            ct += 1
+
+        if (gameCreated == 1):
+            return self.listGames()
+        
+        thedict = {}
+        thedict["gamesAvailable"] = gameInfos
+        jsonstr = json.dumps(thedict)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(jsonstr)      
+
     def get(self):
         """Switchboard for game actions"""
 
@@ -624,6 +705,9 @@ class GameHandler(webapp2.RequestHandler):
 
             if action == "refresh":
                 return self.refresh()
+
+            if action == "listGames":
+                return self.listGames()
 
         except ValueError as e:
             logging.error("Exception ({0}): {1}".format(e.errno, e.strerror))
