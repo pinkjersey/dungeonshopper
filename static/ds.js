@@ -294,7 +294,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		var len = game.marketDeckInTrade.playingCards.length - 1;
 		game.marketDeckInTrade.playingCards[len].selected = true;
 		updateMarketItemPoints(card.number);
-		play($scope.sounds[19].name);
+		play($scope.sounds[9].name);
 
 	}
 
@@ -311,7 +311,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		game.marketDeckInTrade.playingCards[i] = null;
 		game.marketDeckInTrade.truncate();
 		updateMarketItemPoints(-card.number);
-		play($scope.sounds[19].name);
+		play($scope.sounds[9].name);
 
 	}
 
@@ -338,7 +338,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				card.setCardSize("orig");
 			}
 		}
-		play($scope.sounds[19].name);
+		play($scope.sounds[9].name);
 
 	}
 
@@ -433,7 +433,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		resetCartCardsSelected(player, id);
 		
 		cart.cardSumSelected = getSelectedCardSum(cart.cards, true);
-		play($scope.sounds[19].name);
+		play($scope.sounds[9].name);
 
 	}
 
@@ -448,7 +448,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		player.cardSumSelected = getSelectedCardSum(player.cards, true);
 		$scope.selectedItemsCount = getSelectedCardcount(player.cards, true);
 		updatePurchaseText(player.cardSumSelected);
-		play($scope.sounds[19].name);
+		play($scope.sounds[9].name);
 
 	}
 
@@ -1027,7 +1027,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		if($scope.displayMode === "eventVikingParade") {
 			resetCartCardsSelected(player, cartId);
 		}
-		play($scope.sounds[19].name);
+		play($scope.sounds[9].name);
 	}
 	
 	$scope.userClickedItemImageEvent = function (cardIndex) {
@@ -1046,7 +1046,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		var totalCardsSelected = playerCardCountSel+cart0CardCountSel +cart1CardCountSel +cart2CardCountSel +cart3CardCountSel ;
 		//$scope.playerPaidWithItems=totalCardsSelected;	
 
-		play($scope.sounds[19].name);
+		play($scope.sounds[9].name);
 	}
 	
 	$scope.playerCompletedEvent = function() {
