@@ -112,13 +112,13 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		//$scope.numberOfPlayers =1;
 		//$scope.playerId = 0;
 		$scope.game=null;
-		hideImages();
+		hideImages($scope);
 		listGames();
 	}	
 
 	$scope.joinGame = function(gameKey, numPlayers, playerName ) {
 		//$scope.myId = playerId;
-		hideImages();
+		hideImages($scope);
 		$scope.game = new Game($scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		joinGame(gameKey, playerName);
 		$scope.events = prepEvents();
@@ -135,7 +135,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.newGame = function (numberOfPlayers, playerName) {
 		$scope.numberOfPlayers = Number(numberOfPlayers);
 		$scope.myId = 0;
-		hideImages();
+		hideImages($scope);
 		$scope.game = new Game($scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		newGame(numberOfPlayers, playerName);
 		$scope.events = prepEvents();
@@ -163,28 +163,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 
 
-	hideImages = function() {
-		if($scope.hideImagesBool) {
-			$scope.questImageBase = "../images/questxxx";
-			$scope.blankMarketImageBase = "../images/xxx";
-			$scope.cartImageBase = "../images/cart_xxx";
-			$scope.splashImage = "../images/boxtopxxx.jpg";
-			$scope.itemCardBack = "../images/shoppingCardBack.jpgxxx";
-			$scope.vendorCardBack = "../images/vendorback.jpgxxx";
-			$scope.knight = "";
-			$scope.titleImg = "../images/title_smallxxx.jpg";
-		}
-		else {
-			$scope.questImageBase = "../images/quest";
-			$scope.blankMarketImageBase = "../images/";
-			$scope.cartImageBase = "../images/cart";
-			$scope.splashImage = "../images/boxtop.jpg";
-			$scope.itemCardBack = "../images/shoppingCardBack.jpg";
-			$scope.vendorCardBack = "../images/vendorback.jpg";
-			$scope.knight = "../images/knight.gif";
-			$scope.titleImg = "../images/title_small.jpg";
-		}
-	}	
+
 
 		//plays audio files
 	play = function (soundId) {
@@ -211,46 +190,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 	}
 
-	var getSound = function(action) {
-		var name = "";
-		switch (action) {
-			case "discard":
-				name = $scope.sounds[1].name;
-				break;
-			case "completeEventeventId":
-				break;
-			case "fish":
-				break;
-			case "completeQuest":
-				break;
-			case "move":
-				break;
-			case "marketTrade":
-				break;
-			case "buyCart":
-				break;
-			case "pass":
-				break;
-			default:
-				name = "";
-		}
-	return name;
-	}
-	
-	playCartSound = function(cartId) {
-			if(cartId===0) {
-				play($scope.sounds[0].name);
-			}		
-			if(cartId===1) {
-				play($scope.sounds[13].name);
-			}
-			if(cartId===2) {
-				play($scope.sounds[6].name);
-			}
-			if(cartId===3) {
-				play($scope.sounds[4].name);
-			}
-	}
+
 
 	$scope.showOtherPlayerDataClick = function () {
 		$scope.showOtherPlayerData = !$scope.showOtherPlayerData;
@@ -407,7 +347,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			alert(cart.name + " does not contain the necessary items for this quest!")
 			return;
 		}
-		play($scope.sounds[17].name);
+		play($scope.sounds[7].name);
 
 	}
 
@@ -540,7 +480,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			
 		cart.cards.setCardSize("small");
 		resetAllSelectedCards(player);
-		play($scope.sounds[15].name);
+		play($scope.sounds[5].name);
 
 		return true;
 	}
@@ -610,7 +550,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			}
 
 			resetCartCardsSelected(player,-1);
-			play($scope.sounds[18].name);
+			play($scope.sounds[8].name);
 
 			return true;
 		}
@@ -644,7 +584,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 
 		resetAllSelectedCards(player);
-		play($scope.sounds[18].name);
+		play($scope.sounds[8].name);
 
 		return true;
 	}
@@ -769,7 +709,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}			
 
 		resetAllSelectedCards(player);
-		playCartSound(cartId);
+		playCartSound(cartId, $scope);
 	}
 		
 	$scope.playerBuyAction = function() {
@@ -1814,7 +1754,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		log.reverse();
 		for (var i = 0; i < log.length - $scope.logItemCount; ++i) {   
 		//0 is always the active player
-			logPlayerAction($scope.isActive, game.playersLog, getPlayerName(game, data.playerLog[i].playerId), data.playerLog[i].event);
+			logPlayerAction($scope.isActive, game.playersLog, getPlayerName(game, data.playerLog[i].playerId), data.playerLog[i].event, $scope);
 		}
 
 		$scope.logItemCount = data.playerLog.length;
