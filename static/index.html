@@ -2,18 +2,18 @@
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" ng-app="dsApp">
 <head>
-<meta name="viewport" content="width=480">
     <meta charset="utf-8" />
 
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.js"></script>
 	<script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css"/>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.3/angular-animate.js"></script>
     <link rel="stylesheet" href="http://cdn.jsdelivr.net/animatecss/2.1.0/animate.min.css"/>
     <script type="text/javascript" src="//cdn.rawgit.com/cornflourblue/angu-fixed-header-table/master/angu-fixed-header-table.js"></script>
-	<link rel="stylesheet" href="custom.css">
+	<link rel="stylesheet" href="custom.css"/>
+	
     <script type="text/javascript" src="dsApp.js" ></script>
     <script type="text/javascript" src="factory.js" ></script>
     <script type="text/javascript" src="items.js"></script>
@@ -22,9 +22,12 @@
     <script type="text/javascript" src="dsUtil.js" ></script>
     <script type="text/javascript" src="ds.js" ></script>
 
+	
+	
 </head>
 
 <body ng-controller="dsCtrl">
+
 <audio id="choppingWood">
 	<source src="../sounds/choppingWood.mp3"></source>
 </audio>
@@ -71,7 +74,7 @@
 
     <div class="panel panel-info">
 		<div class="panel-heading">
-			<img ng-show="displayMode != 'nogame'" ng-src="{{titleImg}}" </img><big> {{displayModeName}}</big>
+			<img ng-show="displayMode != 'nogame'" ng-src="{{titleImg}}"></img><big> {{displayModeName}}</big>
 			<span class="panel-title pull-right"><button class="btn btn-primary" ng-show="displayMode === 'game'" ng-click="noGame()">Reset</button></span>
 			<ng-include src="'nogame.html'" ng-show="displayMode === 'nogame'"></ng-include>
 			<ng-include src="'game.html'" ng-show="displayMode === 'game'"></ng-include>
