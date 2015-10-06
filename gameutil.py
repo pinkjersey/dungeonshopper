@@ -990,15 +990,11 @@ def buyAction(game, aPlayerId):
 
     return True
 
-def createNewGame(numPlayers, name):
-    # Temporary: delete theGame from the data store
-    # later, perhaps stale games will be deleted here
-    game_k = ndb.Key('Game', 'theGame')
-    game_k.delete()
+def createNewGame(gameKey, numPlayers, name):
 
     # create new game entity with id "theGame"
     # later each existing game will have their own IDs
-    game = Game(numPlayers=int(numPlayers), id='theGame')
+    game = Game(numPlayers=int(numPlayers), id=gameKey)
 
     # create decks
     game.questDeck = newQuestDeck(numPlayers)

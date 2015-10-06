@@ -6,6 +6,11 @@ from google.appengine.ext import ndb
 
 import webapp2
 
+class GameInfo(ndb.Model):
+    gameKey = ndb.StringProperty(required=True)
+    numPlayers = ndb.IntegerProperty(required=True)
+    spaceAvailable = ndb.IntegerProperty(required=True)
+
 class QuestCard(ndb.Model):
     level = ndb.IntegerProperty(required=True)
     coin = ndb.BooleanProperty(required=True, default=True)
@@ -65,6 +70,7 @@ class Game(ndb.Model):
     questsInPlay = ndb.LocalStructuredProperty(QuestCard, repeated=True)
     playerLog = ndb.LocalStructuredProperty(PlayerLog, repeated=True)
     eventCompletedCount = ndb.IntegerProperty(default=0)
+
 
 
 
