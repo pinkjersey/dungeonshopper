@@ -25,10 +25,18 @@ angular.module('dsApp')
                    }).success(callback)
                      .error(errorcallback);
                },
-               joinGame: function (playerId, playerName, callback, errorcallback) {
+               joinGame: function (gameKey, playerName, callback, errorcallback) {
                    $http({
                        method: 'GET',
-                       url: '/game?action=join&playerId=' + playerId  + '&name=' + playerName,
+                       url: '/game?action=join&gameKey=' + gameKey  + '&name=' + playerName,
+                       cache: false
+                   }).success(callback)
+                     .error(errorcallback);
+               },
+               listGames: function (callback, errorcallback) {
+                   $http({
+                       method: 'GET',
+                       url: '/game?action=listGames',
                        cache: false
                    }).success(callback)
                      .error(errorcallback);

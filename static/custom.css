@@ -23,6 +23,19 @@
     top: -1px;
 }
 
+.inputText {
+	background-color: lightyellow;
+	border-style: solid;
+	border-color: lightyellow;
+	border: 0px 4px 0px 4px;
+	padding: 1px 6px 1px 6px;
+
+	:focus
+
+	border-style: solid;
+	border-color: black;
+}
+
 .tab40 { margin-left: 40px; }
 
 .tab30 { margin-left: 30px; }

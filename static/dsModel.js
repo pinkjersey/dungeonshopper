@@ -18,6 +18,11 @@ var Event = function (type, name, eventText ) {
     this.prepMoveDest = null;
 }
 
+var GameAvailable = function (gameKey, numPlayers, playerId) {
+	this.gameKey =gameKey;
+	this.numPlayers = numPlayers;
+	this.playerId =playerId;
+}
 var Sound = function (id, name) {
 	this.id = id;
 	var soundBase = "../sounds/";

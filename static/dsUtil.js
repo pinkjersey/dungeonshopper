@@ -25,20 +25,20 @@ var prepEvents = function() {
 
 var prepSounds = function() {
 	var sounds = [];
-	sounds.push(new Sound(0,"choppingWood");
-	sounds.push(new Sound(1,"trash");
-	sounds.push(new Sound(2,"ambiance");
-	sounds.push(new Sound(3,"card");
-	sounds.push(new Sound(4,"anvil");
-	sounds.push(new Sound(5,"swords");
-	sounds.push(new Sound(6,"horseNeigh");
-	sounds.push(new Sound(7,"questComplete");
-	sounds.push(new Sound(8,"fish");
-	sounds.push(new Sound(9,"button");
-	sounds.push(new Sound(10,"cards");
-	sounds.push(new Sound(11,"pass");
-	sounds.push(new Sound(12,"market");
-	sounds.push(new Sound(13,"buyCart");
+	sounds.push(new Sound(0,"choppingWood"));
+	sounds.push(new Sound(1,"trash"));
+	sounds.push(new Sound(2,"ambiance"));
+	sounds.push(new Sound(3,"card"));
+	sounds.push(new Sound(4,"anvil"));
+	sounds.push(new Sound(5,"swords"));
+	sounds.push(new Sound(6,"horseNeigh"));
+	sounds.push(new Sound(7,"questComplete"));
+	sounds.push(new Sound(8,"fish"));
+	sounds.push(new Sound(9,"button"));
+	sounds.push(new Sound(10,"cards"));
+	sounds.push(new Sound(11,"pass"));
+	sounds.push(new Sound(12,"market"));
+	sounds.push(new Sound(13,"buyCart"));
 	return sounds;
 }
 
