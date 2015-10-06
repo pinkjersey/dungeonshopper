@@ -14,6 +14,7 @@ def createOtherPlayer(player):
     return player
 
 def calculateBonus(player):    
+    return 0
     numThreeSet = 0
     numFiveSet = 0
     # creates an array of five unsigned bytes (0 .. 255)

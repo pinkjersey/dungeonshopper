@@ -990,8 +990,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	}
 	
 	$scope.playerCompletedEvent = function() {
-		var eventCompletedText = getEventCompletedText(game, player, player.lastEvent);
-		playersLog.push(new PlayersLog(playersLog.length, player.name, eventCompletedText));
+		var eventCompletedText = getEventCompletedText($scope.game, $scope.activePlayer, $scope.activePlayer.lastEvent);
+		$scope.game.playersLog.push(new PlayersLog($scope.game.playersLog.length, $scope.activePlayer.name, eventCompletedText));
 		completeEventDealQuest($scope.activeEventId, $scope.myId);
 		$scope.clickedCompleteEvent = true;
 		//playerRefresh($scope.myId)
