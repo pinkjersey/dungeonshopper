@@ -23,6 +23,26 @@ var prepEvents = function() {
 	return events;
 }
 
+var prepSounds = function() {
+	var sounds = [];
+	sounds.push(new Sound(0,"choppingWood");
+	sounds.push(new Sound(1,"trash");
+	sounds.push(new Sound(2,"ambiance");
+	sounds.push(new Sound(3,"card");
+	sounds.push(new Sound(4,"anvil");
+	sounds.push(new Sound(5,"swords");
+	sounds.push(new Sound(6,"horseNeigh");
+	sounds.push(new Sound(7,"questComplete");
+	sounds.push(new Sound(8,"fish");
+	sounds.push(new Sound(9,"button");
+	sounds.push(new Sound(10,"cards");
+	sounds.push(new Sound(11,"pass");
+	sounds.push(new Sound(12,"market");
+	sounds.push(new Sound(13,"buyCart");
+	return sounds;
+}
+
+
 
 getCardName = function (number) {
 	switch (parseInt(number)) {
@@ -82,21 +102,6 @@ getAdj = function(i) {
 	return adj[i];
 }
 
-playCartSound = function(cartId) {
-		if(cartId===0) {
-			play("choppingWood");
-		}		
-		if(cartId===1) {
-			play("buyCart");
-		}
-		if(cartId===2) {
-			play("horseNeigh");
-		}
-		if(cartId===3) {
-			play("anvil");
-		}
-}
-
 playerCardChecked = function(card) {
 	if(card.selected) {
 		card.image = card.imageChecked;
@@ -115,28 +120,7 @@ cartCardChecked = function(card) {
 	}
 }	
 	
-hideImages = function(scope) {
-	if(scope.hideImagesBool) {
-		scope.questImageBase = "../images/questxxx";
-		scope.blankMarketImageBase = "../images/xxx"
-		scope.cartImageBase = "../images/cart_xxx";
-		scope.splashImage = "../images/boxtopxxx.jpg";
-		scope.itemCardBack = "../images/shoppingCardBack.jpgxxx";
-		scope.vendorCardBack = "../images/vendorback.jpgxxx";
-		scope.knight = "";
-		scope.titleImg = "../images/title_smallxxx.jpg"
-	}
-	else {
-		scope.questImageBase = "../images/quest";
-		scope.blankMarketImageBase = "../images/"
-		scope.cartImageBase = "../images/cart";
-		scope.splashImage = "../images/boxtop.jpg";
-		scope.itemCardBack = "../images/shoppingCardBack.jpg";
-		scope.vendorCardBack = "../images/vendorback.jpg";
-		scope.knight = "../images/knight.gif";
-		scope.titleImg = "../images/title_small.jpg"
-	}
-}
+
 	
 showHide = function(showOtherPlayerData) {
 	if(showOtherPlayerData)	{
@@ -679,34 +663,34 @@ logPlayerAction = function(isActive, playersLog, playerName, logItem) {
 							break;
 						case "discard":
 							logEntry+=" discarded";
-							sound = "trash";
+							sound = getSound(logActions[j]);
 							break;
 						case "completeEventeventId":
 							logEntry+=" completed event " + logActions[j]
 							break;
 						case "fish":
 							logEntry+=" fished " ;
-							sound = "fish";
+							sound = getSound(logActions[j]);
 							break;
 						case "completeQuest":
 							logEntry+= " completed a quest ";
-							sound = "questComplete";
+							sound = getSound(logActions[j]);
 							break;
 						case "move":
 							logEntry+=" moved " ;
-							sound = "swords";
+							sound = getSound(logActions[j]);
 							break;
 						case "marketTrade":
 							logEntry+= " did a market trade from ";
-							sound = "market";
+							sound = getSound(logActions[j]);
 							break;
 						case "buyCart":
 							logEntry+= "bought ";
-							playCartSound(logActions[j+1]);
+							sound = getSound(logActions[j+1]);
 							break;
 						case "pass":
 							logEntry+=" passed ";
-							sound = "swords";
+							sound = getSound(logActions[j]);
 							break;
 						case "what":
 							logEntry+=" item(s) " ;
@@ -737,7 +721,7 @@ logPlayerAction = function(isActive, playersLog, playerName, logItem) {
 							break;
 						case "cart2":
 							logEntry+=convertToName("cart2");
-							sound="horseNeigh";
+							sound = getSound("horseNeigh");
 							break;
 						case "cart3":
 							logEntry+=convertToName("cart3");

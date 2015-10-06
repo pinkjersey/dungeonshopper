@@ -33,6 +33,7 @@ def playerState(game, playerId):
     #game.players[playerId].playerId = playerId
     player = game.players[playerId]
     player.playerId = playerId
+    player.bonus = calculateBonus(player)
     thedict = player.to_dict()
 
     thedict["numPlayers"] = game.numPlayers
@@ -42,11 +43,11 @@ def playerState(game, playerId):
     thedict["market"] = game.market
     thedict["playerId"] = playerId
     thedict["gameMode"] = game.gameMode
-    thedict["bonus"] = calculateBonus(player)
+    #thedict["bonus"] = calculateBonus(player)
 
     eventList = []
     for e in player.curEvent:
-        eventList.append(e.to_dict())	
+        eventList.append(e.to_dict())
     thedict["curEvent"] = eventList
 
     if game.curPlayer == playerId:
@@ -62,12 +63,13 @@ def playerState(game, playerId):
     otherPlayers = []
     for p in game.players:
         if (p != player):
-            #dict = p.to_dict()
-            #hand = dict["hand"]
-            #sz = len(hand)
-            #for i in range(sz):
-                #hand[i] = -1
-                #dict["hand"] = hand
+            dict = p.to_dict()
+            hand = dict["hand"]
+            sz = len(hand)
+            for i in range(sz):
+                hand[i] = -1
+                dict["hand"] = hand
+            p.bonus = calculateBonus(p.playerId)
             otherPlayers.append(p.to_dict())
     thedict["otherPlayers"] = otherPlayers
 

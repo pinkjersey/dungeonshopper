@@ -1,11 +1,10 @@
-
 var Event = function (type, name, eventText ) {
-	var eventImageBase="../images/event";
+	var eventImageBase = "../images/event";
 	this.id = type;
 	this.name = name;
 	this.eventText = eventText;
-	this.displayMode = 'event' + name;
-	this.image = eventImageBase + name + '.jpg';
+	this.displayMode = "event" + name;
+	this.image = eventImageBase + name + ".jpg";
     this.whatItems1 = null;
     this.fromWhere1 = null;
     this.whatItems2 = null;
@@ -19,13 +18,19 @@ var Event = function (type, name, eventText ) {
     this.prepMoveDest = null;
 }
 
+var Sound = function (id, name) {
+	this.id = id;
+	var soundBase = "../sounds/";
+	this.soundFile = soundBase + name + ".mp3";
+	this.name = name;
+}
+
 var QuestReady = function (items, questCard, cartId, questIndex) {
 	this.items = items;
 	this.questCard = questCard;
 	this.cartId = cartId;
 	this.questIndex = questIndex;
 }
-
 
 var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased, imageNotPurchased) {
     this.id = id;
@@ -68,7 +73,6 @@ var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased,
    }
 }
  
-
 var Game = function(blankMarketImageBase, questImageBase, cartImageBase) {
 
 	//all the starter empty playingCards holders	
@@ -103,10 +107,6 @@ var PlayersLog = function (id, name, logItem) {
 	this.name = name;
 	this.logItem = logItem;
 }
-
-
-
-
 
 var Player = function (game, id, name) {
     this.id = id;
