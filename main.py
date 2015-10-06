@@ -119,7 +119,7 @@ class GameHandler(webapp2.RequestHandler):
         if (result == False):
             self.error(500)
             return
-        self.appendToLog(game)
+        self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
@@ -164,7 +164,7 @@ class GameHandler(webapp2.RequestHandler):
         if (result == False):
             self.error(500)
             return
-        self.appendToLog(game)
+        self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
@@ -218,7 +218,7 @@ class GameHandler(webapp2.RequestHandler):
         if (result == False):
             self.error(500)
             return
-        self.appendToLog(game)
+        self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
@@ -272,7 +272,7 @@ class GameHandler(webapp2.RequestHandler):
         if (result == False):
             self.error(500)
             return
-        self.appendToLog(game)
+        self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
@@ -303,7 +303,7 @@ class GameHandler(webapp2.RequestHandler):
         if (result == False):
             self.error(500)
             return
-        self.appendToLog(game)
+        self.appendToLog(game, iPlayerId)
         retstr = playerState(game, iPlayerId)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
@@ -351,7 +351,7 @@ class GameHandler(webapp2.RequestHandler):
         if (result == False):
             self.error(500)
             return
-        self.appendToLog(game)
+        self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
@@ -397,7 +397,7 @@ class GameHandler(webapp2.RequestHandler):
 
         logging.info("Compelete quest: done")
 
-        self.appendToLog(game)
+        self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
@@ -532,7 +532,7 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        self.appendToLog(game)
+        self.appendToLog(game, iPlayerId)
 
         try:
             priorPlayer = passPlayer(game, iPlayerId, items)
@@ -569,7 +569,7 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)        
 
-    def appendToLog(self, game):        
+    def appendToLog(self, game, iPlayerId):        
         el = PlayerLog(playerId=iPlayerId, event=self.request.url)
         game.playerLog.append(el)
         game.put()
