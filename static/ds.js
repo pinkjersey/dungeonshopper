@@ -109,20 +109,28 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	setupNoGame = function() {
 		$scope.displayMode = "nogame";
 		$scope.playerName="Player";
-		$scope.numberOfPlayers =1;
-		$scope.playerId = 0;
+		//$scope.numberOfPlayers =1;
+		//$scope.playerId = 0;
 		$scope.game=null;
 		hideImages();
+		listGames();
 	}	
 
-	$scope.joinGame = function(playerName, playerId) {
-		$scope.myId = playerId;
+	$scope.joinGame = function(gameKey, numPlayers, playerName ) {
+		//$scope.myId = playerId;
 		hideImages();
 		$scope.game = new Game($scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
-		joinGame(playerId, playerName);
+		joinGame(gameKey, playerName);
 		$scope.events = prepEvents();
 		$scope.sounds = prepSounds();
-	}
+	    startInterval(2000);
+    }
+		
+	
+	$(document).ready(function() {
+        setupNoGame();
+	});
+
 	
 	$scope.newGame = function (numberOfPlayers, playerName) {
 		$scope.numberOfPlayers = Number(numberOfPlayers);
@@ -205,7 +213,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 	var getSound = function(action) {
 		var name = "";
-		switch action {
+		switch (action) {
 			case "discard":
 				name = $scope.sounds[1].name;
 				break;
@@ -1398,6 +1406,15 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.loadingData=true;
 		alert("Error Occurred: " + returnVal);
 	};
+
+	var processListGamesCallback = function (data) {
+		getListGamesResults(data);
+	};
+
+	var processListGamesErrorCallback = function (returnVal) {
+		alert("Error Occurred: " + returnVal);
+	};
+
 	
 	getEventCompletedText = function(game, player, event){
 		var eventCompletedText = null;
@@ -1635,6 +1652,22 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 		return eventCompletedText;
 	}
+
+	function getListGamesResults(data) {
+		
+			$scope.gamesAvailable = [];
+			$scope.gamesAvailable = data.gamesAvailable;
+			//var pattern = "game";
+			
+			//for (var i = 0; i < data.gamesAvailable.length; ++i) {   
+			//	var gameKey = str.substr(index + 2, str.length - index + 2);
+			//	var numPlayers = str.substr(index, 1);
+			//	var playerId = parseToInt(str.substr(index, 1)) - 1;
+			//	$scope.gamesAvailable.push(new GameAvailable(gameKey, numPlayers, playerId));
+			//}
+
+
+	}
 	
 	function getObjectResults(data) {
 		var text = "";
@@ -1859,9 +1892,14 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		gameFactory.refresh(playerId, processGameStateCallback, processGameStateErrorCallback);
 	}
 
-	function joinGame(playerId, playerName) {
+	function joinGame(gameKey, playerName) {
 		$scope.loadingData=true;
-		gameFactory.joinGame(playerId, playerName, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.joinGame(gameKey, playerName, processGameStateCallback, processGameStateErrorCallback);
+	}
+
+	function listGames() {
+		$scope.loadingData=true;
+		gameFactory.listGames(processListGamesCallback, processListGamesErrorCallback);
 	}
 
 	function completeEventDealQuest(eventId, playerId) {
@@ -1914,11 +1952,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		gameFactory.completeQuest(playerId, cartItems, cart, processGameStateCallback, processGameStateErrorCallback);
 	}
 	
-	//this is the initial load spectator refresh 
-    $(document).ready(); {
-        startInterval(2000);
-		setupNoGame();
-    }
+
 	
 
 }]).directive('questcard', function () {
