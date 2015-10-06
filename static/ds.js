@@ -1611,6 +1611,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		player.gold = data.gold;
 		player.turns = data.turns;
 		player.vp = data.points;
+		player.bonus = data.bonus;
 		player.maxHand = data.maxHand;
 
 		
@@ -1660,6 +1661,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			game.players[len].cards = new cardSet();
 			game.players[len].questsCompleted =  new cardSet();
 			game.players[len].gold = data.otherPlayers[z].gold;
+			game.players[len].bonus = data.otherPlayers[z].bonus;
 			game.players[len].turns = data.otherPlayers[z].turns;
 			game.players[len].vp = data.otherPlayers[z].points;
 			game.players[len].maxHand = data.otherPlayers[z].maxHand;
