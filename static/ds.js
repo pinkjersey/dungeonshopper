@@ -1596,6 +1596,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		
 			$scope.gamesAvailable = [];
 			$scope.gamesAvailable = data.gamesAvailable;
+
 			//var pattern = "game";
 			
 			//for (var i = 0; i < data.gamesAvailable.length; ++i) {   
@@ -1835,7 +1836,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 	function joinGame(gameKey, playerName) {
 		$scope.loadingData=true;
-		gameFactory.joinGame($scope.gameKey, playerName, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.joinGame(gameKey, playerName, processGameStateCallback, processGameStateErrorCallback);
 	}
 
 	function listGames() {
