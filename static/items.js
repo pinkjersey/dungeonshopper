@@ -1,14 +1,6 @@
-/****************************************************************************************
-                  Script to provide an API for managing card games
-                  Written by Mark Wilton-Jones, 20/12/2005-8/1/2006
-*****************************************************************************************
+/************************************************************************************
 
-Please see http://www.howtocreate.co.uk/jslibs/ for details and a demo of this script
-Please see http://www.howtocreate.co.uk/tutorials/jsexamples/solitaire.html for a demonstration
-Please see http://www.howtocreate.co.uk/jslibs/termsOfUse.html for terms of use
-_____________________________________________________________________________________________________
-
-Card game core API documentation:
+core API documentation:
 
 public class cardSet()
 	Class representing a deck of cards.
@@ -16,16 +8,8 @@ cardSet.playingCards
 	Array of all cards in the deck.
 cardSet.addCard(string: suit,integer: cardnumber,mixed: color)
 	Adds the specified card into the deck.
-	Suit should normally be one of 'spades', 'hearts', 'clubs', 'diamonds'.
-	Cardnumber should be in the range 1-13 (unless you wish to create a joker - you may want to create this as
-	card 14 in a new suit - remember to use changeCardNames as appropriate [add an extra card name on the end]).
-	Color is an arbitrary value and is for your own use only.
 cardSet.setCardSize(string: width,string: height)
 	Sets the width and height styles of all card images. Cards will redraw if needed.
-cardSet.shuffleCards(optional integer: times)
-	Sorts the cards in a random order within the cardSet.playingCards array. No redrawing is performed. If
-	you pass an integer to it, it will sort that many times (in case the browser has a bad random number
-	generator). Default is 3 times.
 
 public class playingCard(string: suit,integer: cardnumber,mixed: color,object: cardSet)
 	Class representing a card in the deck. It is generally best to use cardSet.create52Cards,
@@ -103,20 +87,7 @@ cardSet.prototype.setCardSize = function (size) {
 	}
 };
 
-/*
-cardSet.prototype.create75Cards = function () {
-	// Create 75 cards
-	var oImage = "";
-	for( a = 1; a <= 10; a = a + 1) {
-	   for( b = 12; b >= a; b = b - 1)	   
-	   {
-		   oImage="../images/"+a+"_card.jpg";
-			this.addCard(a,oImage,1,this);
-		}
 
-	}
-}
-*/
 cardSet.prototype.createBlankMarket = function(imageBase) {
 	// Create 10 cards
 	var oImage = "";
@@ -216,7 +187,7 @@ function playingCard(oNumber,oName, oImage,oImageSmall,oImageLarge,oImageSmallCh
 
 playingCard.prototype.setCountImage = function (oCount) {
 	
-	this.countImg = "../images/" + oCount +  "_count_card.jpg";
+	this.countImg = "./images/" + oCount +  "_count_card.jpg";
 }
 
 playingCard.prototype.setCardSize = function (size) {

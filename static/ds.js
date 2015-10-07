@@ -1,5 +1,6 @@
 app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory) {
-
+	$scope.imagePath = "./images/"
+	
 	$scope.activePlayer = null;
 	$scope.activeEvent = null;
 	$scope.isActive = false;
@@ -41,6 +42,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.autoSelectQuest = true;
 	$scope.autoPass = true;
 	$scope.hideImagesBool = false;
+	$scope.showOptions = false;
 
 	//gui variable to control cart buttons
 	$scope.prevActiveCartId = -1;
@@ -87,6 +89,10 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	
 	$scope.autoSelectCartCheck = function () {
 		$scope.autoSelectCart = !$scope.autoSelectCart;
+	}	
+
+	$scope.showOptionsClick = function () {
+		$scope.showOptions = !$scope.showOptions;
 	}	
 	
 	$scope.autoSelectHandCheck = function () {

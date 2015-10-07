@@ -44,24 +44,24 @@ var prepSounds = function() {
 
 hideImages = function(scope) {
 	if(scope.hideImagesBool) {
-		scope.questImageBase = "../images/questxxx";
-		scope.blankMarketImageBase = "../images/xxx";
-		scope.cartImageBase = "../images/cart_xxx";
-		scope.splashImage = "../images/boxtopxxx.jpg";
-		scope.itemCardBack = "../images/shoppingCardBack.jpgxxx";
-		scope.vendorCardBack = "../images/vendorback.jpgxxx";
+		scope.questImageBase = scope.imagePath + "xxx";
+		scope.blankMarketImageBase = scope.imagePath + "xxx";
+		scope.cartImageBase = scope.imagePath + "xxx";
+		scope.splashImage = scope.imagePath + "xxx";
+		scope.itemCardBack = scope.imagePath + "xxx";
+		scope.vendorCardBack = scope.imagePath + "xxx";
 		scope.knight = "";
-		scope.titleImg = "../images/title_smallxxx.jpg";
+		scope.titleImg = scope.imagePath + "xxx";
 	}
 	else {
-		scope.questImageBase = "../images/quest";
-		scope.blankMarketImageBase = "../images/";
-		scope.cartImageBase = "../images/cart";
-		scope.splashImage = "../images/boxtop.jpg";
-		scope.itemCardBack = "../images/shoppingCardBack.jpg";
-		scope.vendorCardBack = "../images/vendorback.jpg";
-		scope.knight = "../images/knight.gif";
-		scope.titleImg = "../images/title_small.jpg";
+		scope.questImageBase = scope.imagePath + "quest";
+		scope.blankMarketImageBase = scope.imagePath;
+		scope.cartImageBase = scope.imagePath + "cart";
+		scope.splashImage = scope.imagePath + "title_small.jpg";
+		scope.itemCardBack = scope.imagePath + "shoppingCardBack.jpg";
+		scope.vendorCardBack = scope.imagePath + "vendorback.jpg";
+		scope.knight = scope.imagePath + "knight.gif";
+		scope.titleImg = scope.imagePath + "title_small.jpg";
 	}
 }	
 

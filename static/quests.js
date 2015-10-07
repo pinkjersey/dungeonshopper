@@ -1,17 +1,5 @@
-
-
-
-/****************************************************************************************
-                  Script to provide an API for managing card games
-                  Written by Mark Wilton-Jones, 20/12/2005-8/1/2006
-*****************************************************************************************
-
-Please see http://www.howtocreate.co.uk/jslibs/ for details and a demo of this script
-Please see http://www.howtocreate.co.uk/tutorials/jsexamples/solitaire.html for a demonstration
-Please see http://www.howtocreate.co.uk/jslibs/termsOfUse.html for terms of use
-_____________________________________________________________________________________________________
-
-Card game core API documentation:
+/*************************************************************************************
+core API documentation:
 
 public class cardSet()
 	Class representing a deck of cards.
@@ -19,17 +7,12 @@ cardSet.playingCards
 	Array of all cards in the deck.
 cardSet.addCard(string: suit,integer: cardnumber,mixed: color)
 	Adds the specified card into the deck.
-	Suit should normally be one of 'spades', 'hearts', 'clubs', 'diamonds'.
-	Cardnumber should be in the range 1-13 (unless you wish to create a joker - you may want to create this as
-	card 14 in a new suit - remember to use changeCardNames as appropriate [add an extra card name on the end]).
-	Color is an arbitrary value and is for your own use only.
 cardSet.setCardSize(string: width,string: height)
 	Sets the width and height styles of all card images. Cards will redraw if needed.
 cardSet.shuffleCards(optional integer: times)
 	Sorts the cards in a random order within the cardSet.playingCards array. No redrawing is performed. If
 	you pass an integer to it, it will sort that many times (in case the browser has a bad random number
 	generator). Default is 3 times.
-
 public class playingCard(string: suit,integer: cardnumber,mixed: color,object: cardSet)
 	Class representing a card in the deck. It is generally best to use cardSet.create52Cards,
 	cardSet.addCard, or playingCard.changeCard instead of creating instances manually - if you do,
@@ -50,9 +33,6 @@ function questSet() {
 	this.playingCards = [];
 }
 
-//questSet.prototype.defaultCardNames = ['1','2','3','4','5','6','7','8','9','10'];
-//questSet.prototype.defaultCardWord = 'Quest';
-//questSet.prototype.toString = function () { return '[object questSet]'; };
 
 questSet.prototype.addCard = function (level,gold,item1,item2,item3,item4,item5,vp,name,nameId,oImage,oImageSmall,oImageLarge) {
 	// Add a Quest to the deck
@@ -74,7 +54,6 @@ questSet.prototype.addCard = function (level,gold,item1,item2,item3,item4,item5,
 		default:
 		
 	}
-
 	
 	var oImageOrig = oImage + '.jpg'
 	var oImageSmall = oImage + '_sm.jpg'
@@ -140,20 +119,6 @@ questSet.prototype.setCardSize = function (size) {
 	}
 };
 
-//questSet.prototype.redrawCards = function () {
-//	// Redraws all cards (resets their images and alt text to the correct values)
-//	for( var i = 0; i < this.playingCards.length; i++ ) {
-//		this.playingCards[i].redrawCardImage();
-//	}
-//};
-
-
-//questSet.prototype.forcePageRedraw = function () {
-//	// Force full document redraw
-//	document.body.className = document.body.className ? ( document.body.className + '' ) : '';
-//};
-
-
 questSet.prototype.createQuestDeck = function (questImageBase) {
 	// Create quest deck
 	
@@ -188,80 +153,6 @@ questSet.prototype.createQuestDeck = function (questImageBase) {
 	
 
 }
-
-
-/*  hotseat create quest deck
-questSet.prototype.createQuestDeck = function (numOfOpponents, ) {
-	// Create quest deck
-	
-	var level1 = new questSet();
-	var level2 = new questSet();
-	var level3 = new questSet();
-	var events = new questSet();
-	
-	level1.createQuestDecks(1);
-	level2.createQuestDecks(2);
-	level3.createQuestDecks(3);
-	events.createQuestDecks('4');
-
-	level1.shuffleCards(10);
-	level2.shuffleCards(10);
-	level3.shuffleCards(10);
-	events.shuffleCards(10);
-	
-	var top = new questSet();
-	var middle = new questSet();
-	var bottom = new questSet();
-
-
-	if(numOfOpponents === 1)
-	{
-		createQuests(top, middle, bottom, level1, level2, level3, events, 5,1,2,1,1,2,1,1);
-		//createQuests(top, middle, bottom, level1, level2, level3, events, 4,0,0,0,0,0,5,0);
-	}
-	if(numOfOpponents === 2)
-	{
-		//createQuests(top, middle, bottom, level1, level2, level3, events,7,1,4,1,2,4,2,2);
-		createQuests(top, middle, bottom, level1, level2, level3, events,4,1,4,1,2,4,4,4);
-	}
-	if(numOfOpponents === 3)
-	{
-		createQuests(top, middle, bottom, level1, level2, level3, events,10,3,7,2,3,5,2,2);
-	}
-	if(numOfOpponents === 4)
-	{
-		createQuests(top, middle, bottom, level1, level2, level3, events,12,4,10,2,4,6,3,3);
-	}
-
-	//shuffle this deck
-	top.shuffleCards(10);
-	//shuffle this deck
-	middle.shuffleCards(10);
-	//shuffle this deck
-	bottom.shuffleCards(10);
-
-	//create and add all quests to the quests deck
-
-		for( var i = 0; i < top.playingCards.length; i++ ) {
-            var cardt = top.playingCards[0];
-			this.addCardc(cardt);
-			top.playingCards.shift();
-        }
-		for( var i = 0; i < middle.playingCards.length; i++ ) {
-            var cardm = middle.playingCards[0];
-			this.addCardc(cardm);
-			middle.playingCards.shift();
-        }
-		for( var i = 0; i < bottom.playingCards.length; i++ ) {
-            var cardb = bottom.playingCards[0];
-			this.addCardc(cardb);
-			bottom.playingCards.shift();
-			
-        }
-	
-
-}
-*/
 
 
 
@@ -410,7 +301,7 @@ if(level===3){
 }
 
 if(level===4){
-	var image="../images/event";
+	var image="./images/event";
 	this.addCard(level,0,0,0,0,0,0,0,'eventBarbarianAttack',6,image+"barbarianattack",this);
 	this.addCard(level,0,0,0,0,0,0,0,'eventBrokenItems',7,image+"brokenitems",this);
 	this.addCard(level,0,0,0,0,0,0,0,'eventCastleTaxation',8,image+"castletaxation",this);
@@ -468,8 +359,6 @@ function questCard( level,gold,item1,item2,item3,item4,item5,vp, name, nameId,im
 	this.cardImage.style.display = 'block';
 
 }
-
-//questCard.prototype.toString = function () { return '[object questCard: '+this.number+']'; };
 
 
 questCard.prototype.setCardSize = function (size) {
