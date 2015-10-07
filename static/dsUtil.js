@@ -71,19 +71,35 @@ hideImages = function(scope) {
 			case "discard":
 				name = scope.sounds[1].name;
 				break;
-			case "completeEventeventId":
-				break;
 			case "fish":
+				name = scope.sounds[8].name;
 				break;
 			case "completeQuest":
+				name = scope.sounds[7].name;
 				break;
 			case "move":
+				name = scope.sounds[5].name;
 				break;
 			case "marketTrade":
+				name = scope.sounds[12].name;
 				break;
 			case "buyCart":
+				name = scope.sounds[13].name;
+				break;
+			case "cart0":
+				name = scope.sounds[0].name;
+				break;
+			case "cart1":
+				name = scope.sounds[13].name;
+				break;
+			case "cart2":
+				name = scope.sounds[6].name;
+				break;
+			case "cart3":
+				name = scope.sounds[4].name;
 				break;
 			case "pass":
+				name = scope.sounds[11].name;
 				break;
 			default:
 				name = "";
@@ -472,7 +488,7 @@ dealQuestCard = function(game, items, level, type) {
 	}
 }
 		
-		//sort player cart cards
+//sort player cart cards
 sortPlayerCartCards = function(cart) {
 	cart.cards.playingCards.sort(function (a,b) {return a.number-b.number});
 }
