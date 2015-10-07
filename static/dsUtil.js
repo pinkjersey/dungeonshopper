@@ -198,8 +198,6 @@ cartCardChecked = function(card) {
 	}
 }	
 	
-
-	
 showHide = function(showOtherPlayerData) {
 	if(showOtherPlayerData)	{
 			return "Hide";
