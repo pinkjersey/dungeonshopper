@@ -58,6 +58,7 @@ class PlayerLog(ndb.Model):
     event = ndb.StringProperty(required=True)
 
 class Game(ndb.Model):
+    gameKey = ndb.StringProperty(required=True, default="game") 
     gameMode = ndb.StringProperty(required=True, default="game") 
     curPlayer = ndb.IntegerProperty(default=0)
     actionsRemaining = ndb.IntegerProperty(default=2)        
