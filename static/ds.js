@@ -59,6 +59,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.myLastWhatItems1 = null;
 	$scope.myLastFromWhere1 = null;
 	$scope.myLastMoveDest = null;
+	$scope.gameKey = null;
 
 	//sets randome number for cart fun text
 	setRandomText = function() {
@@ -116,8 +117,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		listGames();
 	}	
 
-	$scope.joinGame = function(gameKey, numPlayers, playerName ) {
-		//$scope.myId = playerId;
+	$scope.joinGame = function(gameKey, playerName) {
 		hideImages($scope);
 		$scope.game = new Game($scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		joinGame(gameKey, playerName);
@@ -145,7 +145,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 	//refresh data from backend if anything is stuck
 	$scope.playerRefresh = function() {
-		playerRefresh($scope.myId);
+		playerRefresh();
 		$scope.loadingData=false;
 	}
 
@@ -154,7 +154,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
         $scope.timerId = setInterval(function () { 
 			//if($scope.isActive===false) {
 				if($scope.refresh === true) {
-					playerRefresh($scope.myId);
+					playerRefresh();
 				}
 			//}
 
@@ -335,7 +335,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			if(r===true) {
 				//check if player completed quest and move it to their completed quests
 				game.questsInPlay.setCardSize("orig");
-				completeQuest($scope.myId, selectedCards, 'cart' + cart.id);
+				completeQuest(selectedCards, 'cart' + cart.id);
 				questClicked.selected = false;
 				resetAllSelectedCards(player);
 			}
@@ -476,7 +476,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 		
 		//when moved from player to cart
-		move($scope.myId, actionCost, selectedCards, 'hand','cart'+id)
+		move(actionCost, selectedCards, 'hand','cart'+id)
 			
 		cart.cards.setCardSize("small");
 		resetAllSelectedCards(player);
@@ -512,7 +512,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		}
 		
 		//move cart items to cart
-		move($scope.myId, actionCost, selectedCartItems, 'cart'+prevId, 'cart'+id)
+		move(actionCost, selectedCartItems, 'cart'+prevId, 'cart'+id)
 		
 		cart.cards.setCardSize("small");
 		resetAllSelectedCards(player);
@@ -543,7 +543,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			
 			var r =  confirm("Discard the " + card.name + "? Fish for a new card?");
 			if(r===true) {
-				fish($scope.myId, actionCost, card.number, 'cart' + cart.id);
+				fish(actionCost, card.number, 'cart' + cart.id);
 			}
 			else {
 				return false;
@@ -577,7 +577,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 		var r =  confirm("Discard the " + card.name + "? Fish for a new card?");
 		if(r===true) {
-			fish($scope.myId, actionCost, card.number, 'hand');
+			fish(actionCost, card.number, 'hand');
 		}
 		else {
 			return false;
@@ -611,7 +611,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 
 			var r =  confirm("Are you sure you want discard?");
 			if(r===true) {
-				discard($scope.myId, actionCost, selectedCards, 'cart'+id)
+				discard(actionCost, selectedCards, 'cart'+id)
 			}
 			else {
 				return false;
@@ -646,7 +646,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		
 		var r =  confirm("Are you sure you want discard?");
 		if(r===true) {
-			discard($scope.myId, actionCost, selectedCards, 'hand');
+			discard(actionCost, selectedCards, 'hand');
 		}
 		else {
 			return;
@@ -687,7 +687,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		if(total >= cart.itemCost) {
 			var r = confirm("Confirm purchase with items!");
 				if (r === true) {
-					buyCart($scope.myId, actionCost, 'cart'+cartId, 0, selectedCards);
+					buyCart(actionCost, 'cart'+cartId, 0, selectedCards);
 				}
 				else {
 					return;
@@ -699,7 +699,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			if(player.gold >= player.carts[cartId].goldCost) {
 			var r = confirm("Confirm purchase with gold!");
 				if (r == true) {
-					buyCart($scope.myId, actionCost, 'cart'+cartId, 1, "");
+					buyCart(actionCost, 'cart'+cartId, 1, "");
 				}
 				else {
 					return;
@@ -718,7 +718,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		if(player.gold >= 2) {
 			var r =  confirm("This will cost you 2 gold!  Confirm?");
 			if(r===true) {
-				buyAction($scope.myId);
+				buyAction();
 			}
 			else {
 				return;
@@ -772,7 +772,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 				discardSelectedCards = "";
 			}
 		
-		pass($scope.myId, discardSelectedCards);
+		pass(discardSelectedCards);
 
 		$scope.selectedMarketTradeCount = 0;
 		$scope.sumMarketValueSelected = 0;
@@ -830,7 +830,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		
 			var r =  confirm(text + "?");
 			if(r===true) {
-				marketTrade($scope.myId, actionCost, selectedItemCards, selectedMarketCards);
+				marketTrade(actionCost, selectedItemCards, selectedMarketCards);
 			}
 			else {
 				return;
@@ -992,9 +992,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	$scope.playerCompletedEvent = function() {
 		var eventCompletedText = getEventCompletedText($scope.game, $scope.activePlayer, $scope.activePlayer.lastEvent);
 		$scope.game.playersLog.push(new PlayersLog($scope.game.playersLog.length, $scope.activePlayer.name, eventCompletedText));
-		completeEventDealQuest($scope.activeEventId, $scope.myId);
+		completeEventDealQuest($scope.activeEventId);
 		$scope.clickedCompleteEvent = true;
-		//playerRefresh($scope.myId)
 	}
 
 	
@@ -1270,7 +1269,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 			if(dest1===undefined) {dest1="";}
 			if(gold===undefined) {gold=0;}
 			if(items===undefined) {items=0;}
-			completeEvent(eventId, $scope.myId, gold, items, what1, where1, what2, where2, dest1);
+			completeEvent(eventId, gold, items, what1, where1, what2, where2, dest1);
 			resetPlayerCardsSelected(player);
 		
 		}
@@ -1597,6 +1596,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		
 			$scope.gamesAvailable = [];
 			$scope.gamesAvailable = data.gamesAvailable;
+
 			//var pattern = "game";
 			
 			//for (var i = 0; i < data.gamesAvailable.length; ++i) {   
@@ -1612,6 +1612,8 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	function getObjectResults(data) {
 		var text = "";
 		var game = $scope.game;
+		$scope.myId = data.playerId;
+		$scope.gameKey = data.gameKey;
 		var events = prepEvents();
 				
 		// players = game.players;
@@ -1827,9 +1829,9 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		gameFactory.newGame(numPlayers, playerName,  processGameStateCallback, processGameStateErrorCallback);
 	}
 
-	function playerRefresh(playerId) {
+	function playerRefresh() {
 		$scope.loadingData=true;
-		gameFactory.refresh(playerId, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.refresh($scope.gameKey, $scope.myId, processGameStateCallback, processGameStateErrorCallback);
 	}
 
 	function joinGame(gameKey, playerName) {
@@ -1842,54 +1844,54 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		gameFactory.listGames(processListGamesCallback, processListGamesErrorCallback);
 	}
 
-	function completeEventDealQuest(eventId, playerId) {
+	function completeEventDealQuest(eventId) {
 		$scope.loadingData=true;
-		gameFactory.completeEventDealQuest(eventId, playerId, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.completeEventDealQuest($scope.gameKey, $scope.myId, eventId, processGameStateCallback, processGameStateErrorCallback);
 	}
 
 	function completeEvent(eventId, playerId, gold, items, what1, where1, what2, where2, dest1) {
 		$scope.loadingData=true;
-		gameFactory.completeEvent(eventId, playerId, gold, items, what1, where1, what2, where2, dest1, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.completeEvent($scope.gameKey, $scope.myId, eventId, gold, items, what1, where1, what2, where2, dest1, processGameStateCallback, processGameStateErrorCallback);
 	}
 
-	function pass(playerId, discard) {
+	function pass(discard) {
 		$scope.loadingData=true;
-		gameFactory.pass(playerId, discard, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.pass($scope.gameKey, $scope.myId, discard, processGameStateCallback, processGameStateErrorCallback);
 	}
 
-	function move(playerId, actionCost, what, src, dst) {
+	function move(actionCost, what, src, dst) {
 		$scope.loadingData=true;
-		gameFactory.move(playerId, actionCost, what, src, dst, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.move($scope.gameKey, $scope.myId, actionCost, what, src, dst, processGameStateCallback, processGameStateErrorCallback);
 	}
 
-	function fish(playerId, actionCost, what, where) {
+	function fish(actionCost, what, where) {
 		$scope.loadingData=true;
-		gameFactory.fish(playerId, actionCost, what, where, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.fish($scope.gameKey, $scope.myId,  actionCost, what, where, processGameStateCallback, processGameStateErrorCallback);
 	}
 
-	function discard(playerId, actionCost, what, where) {
+	function discard(actionCost, what, where) {
 		$scope.loadingData=true;
-		gameFactory.discard(playerId, actionCost, what, where, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.discard($scope.gameKey, $scope.myId, actionCost, what, where, processGameStateCallback, processGameStateErrorCallback);
 	}
 
-	function buyCart(playerId, actionCost, cart, goldFlag, items) {
+	function buyCart(actionCost, cart, goldFlag, items) {
 		$scope.loadingData=true;
-		gameFactory.buyCart(playerId, actionCost, cart, goldFlag, items, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.buyCart($scope.gameKey, $scope.myId, actionCost, cart, goldFlag, items, processGameStateCallback, processGameStateErrorCallback);
 	}
 
-	function buyAction(playerId) {
+	function buyAction() {
 		$scope.loadingData=true;
-		gameFactory.buyAction(playerId, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.buyAction($scope.gameKey, $scope.myId, processGameStateCallback, processGameStateErrorCallback);
 	}
 
-	function marketTrade(playerId, actionCost, handItems, marketItems) {
+	function marketTrade(actionCost, handItems, marketItems) {
 		$scope.loadingData=true;
-		gameFactory.marketTrade(playerId, actionCost, handItems, marketItems, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.marketTrade($scope.gameKey, $scope.myId, actionCost, handItems, marketItems, processGameStateCallback, processGameStateErrorCallback);
 	}
 
-	function completeQuest(playerId, cartItems, cart) {
+	function completeQuest(cartItems, cart) {
 		$scope.loadingData=true;
-		gameFactory.completeQuest(playerId, cartItems, cart, processGameStateCallback, processGameStateErrorCallback);
+		gameFactory.completeQuest($scope.gameKey, $scope.myId, cartItems, cart, processGameStateCallback, processGameStateErrorCallback);
 	}
 	
 
