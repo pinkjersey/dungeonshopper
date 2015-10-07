@@ -74,8 +74,16 @@
 
     <div class="panel panel-info">
 		<div class="panel-heading">
+			<span class="panel-title pull-right">
+				<button class="btn btn-info" ng-click="showOptionsClick()">Options</button>
+				<button class="btn btn-primary" ng-click="noGame()">Reset</button>
+			</span>
+			<span class="panel-title pull-right">
+				<ng-include src="'options.html'" ng-show="showOptions"></ng-include>
+			</span>
+
 			<img ng-show="displayMode != 'nogame'" ng-src="{{titleImg}}"></img><big> {{displayModeName}}</big>
-			<span class="panel-title pull-right"><button class="btn btn-primary" ng-show="displayMode === 'game'" ng-click="noGame()">Reset</button></span>
+
 			<ng-include src="'nogame.html'" ng-show="displayMode === 'nogame'"></ng-include>
 			<ng-include src="'game.html'" ng-show="displayMode === 'game'"></ng-include>
 			<ng-include src="'gameSpectator.html'" ng-show="displayMode === 'gameSpectator'"></ng-include>
