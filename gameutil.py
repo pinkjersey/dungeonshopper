@@ -978,10 +978,13 @@ def createNewGame(gameKey, numPlayers, name):
 
     # create new game entity with id "theGame"
     # later each existing game will have their own IDs
-    game = Game(numPlayers=int(numPlayers), id=gameKey, gameKey=gameKey)
+    game = Game(numPlayers=numPlayers, id=gameKey, gameKey=gameKey)
 
     # create decks
     game.questDeck = newQuestDeck(numPlayers)
+    if (len(game.questDeck) == 0):
+        raise ValueError("blank quest deck. Cannot continue")
+
 
     game.itemDeck = newItemDeck()
     for i in range (0, game.numPlayers):
@@ -1059,49 +1062,53 @@ def createQuestCard(level, coin, items, vp, type):
     return card
 
 def createQuestStacks(tippytop, top, middle, bottom, level1, level2, level3, level4, l0t, l1t, l1m, l2m, l1b, l2b, l3b, et, em, eb):
+    etotal = et + em + eb
+    if (etotal > len(level4)):
+        raise ValueError("Total number of events too big!")
+
     # tippytop
     for i in range(l0t):
-        tippytop.append(level1[i])
-        del level1[i]
+        tippytop.append(level1[0])
+        del level1[0]
 
     # top
     for i in range(l1t):
-        top.append(level1[i])
-        del level1[i]
+        top.append(level1[0])
+        del level1[0]
 
     for i in range(et):
-        top.append(level4[i])
-        del level4[i]
+        top.append(level4[0])
+        del level4[0]
 
     # middle
     for i in range(l1m):
-        middle.append(level1[i])
-        del level1[i]
+        middle.append(level1[0])
+        del level1[0]
 
     for i in range(l2m):
-        middle.append(level2[i])
-        del level2[i]
+        middle.append(level2[0])
+        del level2[0]
 
     for i in range(em):
-        middle.append(level4[i])
-        del level4[i]
+        middle.append(level4[0])
+        del level4[0]
 
     #bottom
     for i in range(l1b):
-        bottom.append(level1[i])
-        del level1[i]
+        bottom.append(level1[0])
+        del level1[0]
 
     for i in range(l2b):
-        bottom.append(level2[i])
-        del level2[i]
+        bottom.append(level2[0])
+        del level2[0]
 
     for i in range(l3b):
-        bottom.append(level3[i])
-        del level3[i]
+        bottom.append(level3[0])
+        del level3[0]
 
     for i in range(eb):
-        bottom.append(level4[i])
-        del level4[i]
+        bottom.append(level4[0])
+        del level4[0]
 
 def newItemDeck():
     cards = []
@@ -1151,7 +1158,7 @@ def getFirstItemCard(game):
 def dealItemCard(playerIndex, game):
     card = getFirstItemCard(game)   
     logging.info("dealing card to player! {0}".format(playerIndex))  
-	
+
     game.players[playerIndex].hand.append(card)
     game.players[playerIndex].hand.sort()
 
@@ -1176,6 +1183,8 @@ def dealQuest(game):
 
 
 def newQuestDeck(numPlayers):
+    logging.error("Creating quest deck for {0} players".format(numPlayers))
+
     level1Cards = []
     level2Cards = []
     level3Cards = []
@@ -1284,20 +1293,23 @@ def newQuestDeck(numPlayers):
     level4Cards = shuffle(level4Cards)
 
     #def createQuestStacks(tippytop, top, middle, bottom, level1, level2, level3, level4, l0t, l1t, l1m, l2m, l1b, l2b, l3b, et, em, eb):
-    if numPlayers == "1":
+    if numPlayers == 1:
         #createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards, 4,  4,1,2,1,1,2,   1,1,1)
         createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,     3,3,3)
-    elif numPlayers == "2":
+    elif numPlayers == 2:
         createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  6,1,4,1,2,4,   2,2,2)
         #createQuestStacks(tippytop,top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,   3,3,3)
-    elif numPlayers == "3":
+    elif numPlayers == 3:
         createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  7,3,7,2,3,5,   3,3,3)
-    elif numPlayers == "4":
+    elif numPlayers == 4:
         createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  10,4,10,2,4,6, 4,4,4)
+    else:
+        raise ValueError("Invalid number of players")
 
     tippytop = shuffle(tippytop)
     top = shuffle(top)
     middle = shuffle(middle)
-    bottom = shuffle(bottom)        
+    bottom = shuffle(bottom)
+    logging.error("card lists sizes {0} {1} {2} {3}".format(len(tippytop), len(top), len(middle), len(bottom)))        
 
     return tippytop + top + middle + bottom
