@@ -14,6 +14,7 @@ def createOtherPlayer(player):
     return player
 
 def calculateBonus(player):    
+    return 0
     numThreeSet = 0
     numFiveSet = 0
     # creates an array of five unsigned bytes (0 .. 255)
@@ -69,7 +70,7 @@ def playerState(game, playerId):
             for i in range(sz):
                 hand[i] = -1
                 dict["hand"] = hand
-            p.bonus = calculateBonus(p.playerId)
+            p.bonus = calculateBonus(p)
             otherPlayers.append(p.to_dict())
     thedict["otherPlayers"] = otherPlayers
 
@@ -280,8 +281,7 @@ def move(game, aPlayerId, what, src, dst, actionCost):
         return False
 
     game.actionsRemaining = game.actionsRemaining - actionCost
-
-    game.put()
+    
 
     return True
 
@@ -344,9 +344,7 @@ def buyCart(game, aPlayerId, cartidstr, withGold, items, actionCost):
     elif cartid == 3:
         player.maxHand += 1
 
-    game.actionsRemaining = game.actionsRemaining - actionCost
-		
-    game.put()    
+    game.actionsRemaining = game.actionsRemaining - actionCost		      
 
     return True
 
@@ -413,9 +411,7 @@ def marketTrade(game, aPlayerId, handItems, marketItems, actionCost):
     player.hand.extend(addToHand)
     player.hand.sort()
     
-    game.actionsRemaining = game.actionsRemaining - actionCost
-
-    game.put()
+    game.actionsRemaining = game.actionsRemaining - actionCost    
 
     return True                
 
@@ -452,9 +448,7 @@ def discard(game, aPlayerId, what, where, actionCost):
         # couldn't find 'what'
         return False
 
-    game.actionsRemaining = game.actionsRemaining - actionCost
-
-    game.put()
+    game.actionsRemaining = game.actionsRemaining - actionCost    
 
     return True
 
@@ -816,8 +810,7 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
         return False  
 
     game.players[playerId].curEventStatus = "eventCompleted"
-
-    game.put()
+    
     return True	
 
 def completeEventDealQuest(game, playerId, eventId):
@@ -832,12 +825,9 @@ def completeEventDealQuest(game, playerId, eventId):
     if game.eventCompletedCount==game.numPlayers:
         game.gameMode = "game"		
         game.eventCompletedCount = 0	
+        logging.info("game mode reset: {0}".format(game.gameMode))
         decklen = len(game.questsInPlay)
-        if(decklen == 0):
-            return True
-        else:
-            del game.questsInPlay[decklen-1]
-
+        del game.questsInPlay[decklen-1]
         dealQuest(game)
 
 def completeQuest(game, aPlayerId, what, where):
@@ -886,8 +876,7 @@ def completeQuest(game, aPlayerId, what, where):
     except ValueError as e:
         logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
         return False
-
-    game.put()
+    
 
     return True
 
@@ -933,10 +922,7 @@ def passPlayer(game, aPlayerId, items):
     if game.curPlayer == game.numPlayers:
         game.curPlayer = 0
 
-    player.turns += 1	
-
-    # save game to data store
-    game.put()
+    player.turns += 1	    
 
     return priorPlayer
 
@@ -969,7 +955,6 @@ def fish(game, aPlayerId, what, where, actionCost):
 
     game.actionsRemaining = game.actionsRemaining - actionCost
 
-    game.put()
 
     return True
 
@@ -984,9 +969,7 @@ def buyAction(game, aPlayerId):
         return False
 
     player.gold = player.gold - buyCost
-    game.actionsRemaining = game.actionsRemaining + 1
-
-    game.put()
+    game.actionsRemaining = game.actionsRemaining + 1    
 
     return True
 
@@ -1278,13 +1261,13 @@ def newQuestDeck(numPlayers):
     level3Cards.append(createQuestCard(3,False,[3,4,7,8,9],6,5))
     
 
-    level4Cards.append(createQuestCard(4,False,[],0,6))
-    level4Cards.append(createQuestCard(4,False,[],0,7))
-    level4Cards.append(createQuestCard(4,False,[],0,8))
-    level4Cards.append(createQuestCard(4,False,[],0,9))
-    level4Cards.append(createQuestCard(4,False,[],0,10))
-    level4Cards.append(createQuestCard(4,False,[],0,11))
-    level4Cards.append(createQuestCard(4,False,[],0,12))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
+    level4Cards.append(createQuestCard(4,False,[],0,13))
     level4Cards.append(createQuestCard(4,False,[],0,13))
     level4Cards.append(createQuestCard(4,False,[],0,14))
     level4Cards.append(createQuestCard(4,False,[],0,15))
@@ -1299,13 +1282,13 @@ def newQuestDeck(numPlayers):
     level3Cards = shuffle(level3Cards)
     level4Cards = shuffle(level4Cards)
 
-	#def createQuestStacks(tippytop, top, middle, bottom, level1, level2, level3, level4, l0t, l1t, l1m, l2m, l1b, l2b, l3b, et, em, eb):
+    #def createQuestStacks(tippytop, top, middle, bottom, level1, level2, level3, level4, l0t, l1t, l1m, l2m, l1b, l2b, l3b, et, em, eb):
     if numPlayers == "1":
-        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards, 4,  4,1,2,1,1,2,   1,1,1)
-        #createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,     3,3,3)
+        #createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards, 4,  4,1,2,1,1,2,   1,1,1)
+        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,     3,3,3)
     elif numPlayers == "2":
         createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  6,1,4,1,2,4,   2,2,2)
-		#createQuestStacks(tippytop,top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,   3,3,3)
+        #createQuestStacks(tippytop,top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,   3,3,3)
     elif numPlayers == "3":
         createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  7,3,7,2,3,5,   3,3,3)
     elif numPlayers == "4":

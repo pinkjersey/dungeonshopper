@@ -17,35 +17,37 @@ from game_model import *
 from google.appengine.api.logservice import logservice
 
 class GameHandler(webapp2.RequestHandler):
-    def newGame(self):
-        """Creates new game object"""
-        # Confirm inputs
-        numPlayers = self.request.get('numPlayers')
-        if (numPlayers == None or numPlayers == ""):
-            self.error(500)
-            return
+    def reserveID(self, gameKey):
+        ret = memcache.incr(gameKey+"_counter")
+        if (ret == None):
+            return -1
+        return ret-1    
 
-        name = self.request.get("name")
-        if (name == None or name == ""):
-            self.error(500)
-            return
+    def saveGame(self, game, gameKey, alsoDatastore):
+        memcache.set(key=gameKey, value=game)
+        if (alsoDatastore):
+            game.put()
 
-        # Temporary: delete theGame from the data store
-        # later, perhaps stale games will be deleted here
-        game_k = ndb.Key('Game', 'theGame')
-        game_k.delete()
 
-        game = createNewGame("theGame", numPlayers, name)       
-        retstr = playerState(game, 0)        
-        #jsonstr = json.dumps([game.to_dict()])
-                
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)
+    def getGame(self, gameKey):
+        game = memcache.get(gameKey)
+        saveInCache = 0            
+        if (game == None):
+            logging.error("Key not in cache: {0}".format(gameKey))
+            game_k = ndb.Key('Game', gameKey)
+            game = game_k.get()
+            saveInCache = 1
+
+        if (game == None):
+            raise ValueError("Game doesn't exist")
+
+        if (saveInCache):
+            memcache.add(key=gameKey, value=game)
+
+        return game
+
     
-    def info(self):
-        game_k = ndb.Key('Game', 'theGame')
-        game = game_k.get()
+    def info(self, game):                
         if (game == None):
             self.response.headers.add_header('Access-Control-Allow-Origin', "*")
             self.response.headers["Content-Type"] = "application/json"
@@ -59,43 +61,57 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(jsonstr)    
 
-    def join(self):
-        game_k = ndb.Key('Game', 'theGame')
-        game = game_k.get()
-
+    def join(self, game, gameKey):
+        playerId = self.reserveID(gameKey)
+        if (playerId == -1):
+            logging.error("Failed to reserve player ID: -1")
+            self.error(500)
+            return
+        
         name = self.request.get("name")
         if (name == None or name == ""):
+            logging.error("name not set")
             self.error(500)
             return
 
-        playerId = self.request.get("playerId")
-        if (playerId == None or playerId == ""):
+        gameInfoQuery = GameInfo.query(GameInfo.gameKey==gameKey)
+        giList = gameInfoQuery.fetch()
+        if (len(giList) != 1):
+            logging.error("unexpected number of game info items returned")
             self.error(500)
             return
 
-        iPlayerId = int(playerId)
-        if (iPlayerId < 1 or iPlayerId > 3):
+        gi = giList[0]
+        if (gi.spaceAvailable < 1):
+            logging.error("space unavailable")
             self.error(500)
             return
 
-        game.players[iPlayerId].name = name
-        
-        game.put()
-        retstr = playerState(game, iPlayerId)        
+        minAllowed = gi.numPlayers - gi.spaceAvailable
+        gi.spaceAvailable -= 1
+        gi.put()        
+
+        logging.error("player ID: {0} {1}".format(playerId, minAllowed))
+        if (playerId > 3 or playerId != minAllowed):
+            logging.error("Invalid player ID: {0}".format(playerId))
+            self.error(500)
+            return
+
+        game.players[playerId].name = name
+                
+        retstr = playerState(game, playerId)        
                 
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
-    def fish(self):
+    def fish(self, game):
         """
         USAGE: /game?action=fish&what=<singlecard>&where=<hand,cart0,cart1,etc>
         example: /game?action=fish&what=2&where=cart1
         checks to make sure 2 is in cart1 before doing the action
         returns error 500 when there is an error
-        """
-        game_k = ndb.Key('Game', 'theGame')
-        game = game_k.get()
+        """        
 
         where = self.request.get('where')
         if (where == None or where == ""):
@@ -134,15 +150,13 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(retstr)
 
 
-    def discard(self):
+    def discard(self, game):
         """
         USAGE: /game?action=discard&what=<item list>&where=<hand,cart0,cart1,etc>
         example: /game?action=discard&what=234&where=hand
         discards the given list of items from location given. Each item must exist, otherwise 500 is returned
         returns error 500 when there is an error
-        """
-        game_k = ndb.Key('Game', 'theGame')
-        game = game_k.get()
+        """        
 
         where = self.request.get('where')
         if (where == None or where == ""):
@@ -179,17 +193,14 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(retstr)
 
 
-    def move(self):
+    def move(self, game):
         """
         USAGE: /game?action=cartCards&what=<item list>&src=<hand,cart0,cart1,etc>&dst=<cart0,cart1,etc>
         example: /game?action=cartCards&what=23&src=hand&dst=cart0
         Moves cards from hand to cart or cart to cart. Destination cart must be purchased and 
         there must be enough space. Otherwise an error is returned
         returns error 500 when there is an error
-        """
-        logging.info("move")        
-        game_k = ndb.Key('Game', 'theGame')
-        game = game_k.get()
+        """        
 
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
@@ -233,15 +244,13 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(retstr)
 
 
-    def buyCart(self):
+    def buyCart(self, game):
         """
         USAGE: /game?action=buyCart&withGold=<1or0>&items=<blank or itemlist>&cart=<cart0,cart1,etc>
         example: /game?action=buyCart&withGold=0&items=37&cart=cart1
         confirms the cart isn't purchased already and the item cost is greater or equal to the cart cost
         returns error 500 when there is an error
-        """
-        game_k = ndb.Key('Game', 'theGame')
-        game = game_k.get()
+        """        
 
         withGold = self.request.get('withGold')
         if (withGold == None or withGold == ""):
@@ -287,15 +296,13 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(retstr)
 
 
-    def buyAction(self):
+    def buyAction(self, game):
         """
         USAGE: /game?action=buyAction
         example: /game?action=buyAction
         confirms the player has enough gold, if so the number of actions is increased
         returns error 500 when there is an error
-        """
-        game_k = ndb.Key('Game', 'theGame')
-        game = game_k.get()
+        """        
 
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
@@ -318,7 +325,7 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(retstr)
 
 
-    def marketTrade(self):
+    def marketTrade(self, game):
         """
         USAGE: /game?action=marketTrade&handItems=<1 or more items>&marketItems=<1 or more items>
         example: /game?action=marketTrade&handItems=23&marketItems=5
@@ -326,9 +333,7 @@ class GameHandler(webapp2.RequestHandler):
         Trades with the market. The length of one of the list must be zero. Sum of the lists must be equal.
         The cards must exist in the hand and in the market. Error 500 is returned if any of these conditions
         aren't met
-        """
-        game_k = ndb.Key('Game', 'theGame')
-        game = game_k.get()
+        """        
 
  
         playerId = self.request.get("playerId")
@@ -366,15 +371,12 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(retstr)
 
 
-    def completeQuest(self):
+    def completeQuest(self, game):
         """
         USAGE: /game?action=completeQuest&what=<itemList>where=<cartID>
         Uses the items in the cart to complete a quest. If a quest with the cards in the cart doesn't exist, it returns an error
         """
-        logging.info("Compelete quest: begin")
-        game_k = ndb.Key('Game', 'theGame')
-        game = game_k.get()
-
+        logging.info("Compelete quest: begin")        
         logging.info("Compelete quest: loaded quest")
 
         playerId = self.request.get("playerId")
@@ -412,14 +414,11 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(retstr)
 
 
-    def completeEventDealQuest(self):
+    def completeEventDealQuest(self, game):
         """
         USAGE: /game?action=completeEventDealQuest&eventId=<eventId>playerId=<playerId>
         """
-        logging.info("Players Compeleting Event Deal Quest: begin")
-        game_k = ndb.Key('Game', 'theGame')
-        game = game_k.get()
-
+        logging.info("Players Compeleting Event Deal Quest: begin")        
         logging.info("Players Compeleting event: loaded event")
 
         eventId = self.request.get('eventId')
@@ -452,15 +451,12 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
-    def completeEvent(self):
+    def completeEvent(self, game):
         """
         USAGE: /game?action=completeEvent&eventId=<eventId>&cart=<cart0>&gold=<0>&items=<0>&what1=<>&where1=<>&what2=<>&where2=<>&dest1=<>
         Complete an event. 
         """
-        logging.info("Compelete Event: begin")
-        game_k = ndb.Key('Game', 'theGame')
-        game = game_k.get()
-
+        logging.info("Compelete Event: begin")        
         logging.info("Compelete event: loaded event")
 
         eventId = self.request.get('eventId')
@@ -509,7 +505,7 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
-    def passPlayer(self):
+    def passPlayer(self, game):
         """
         USAGE: /game?action=passPlayer&items=<items to discard>
         example: /game?action=passPlayer&items=2
@@ -521,9 +517,7 @@ class GameHandler(webapp2.RequestHandler):
         Once the player hand is handled, the market is dealt one card. The current player is changed.
         
         returns error 500 when there is an error
-        """
-        game_k = ndb.Key('Game', 'theGame')
-        game = game_k.get()
+        """        
 
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
@@ -554,9 +548,7 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)        
 
-    def refresh(self):
-        game_k = ndb.Key('Game', 'theGame')
-        game = game_k.get()
+    def refresh(self, game):        
         if (game == None):
             self.response.headers.add_header('Access-Control-Allow-Origin', "*")
             self.response.headers["Content-Type"] = "application/json"
@@ -600,6 +592,7 @@ class GameHandler(webapp2.RequestHandler):
 
         # add game to cache
         memcache.add(key=gameKey, value=theGame)
+        memcache.add(key=gameKey+"_counter", value=0)
 
 
     def listGames(self):
@@ -663,54 +656,74 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
+        gameKey = self.request.get('gameKey')
+        if gameKey == None or gameKey == "":
+            if action == "listGames":                
+                return self.listGames()
+            else:
+                logging.error("Invalid action")
+                self.error(500)
+                return
+        
         try:
-            if action == "new":
-                return self.newGame()
+            retval = False
+            alsoDatastore = False
+            game = self.getGame(gameKey)
+
+            #if action == "new":
+            #    return self.newGame()
 
             if action == "join":
-                return self.join()
-
-            if action == "info":
-                return self.info()
+                retval = self.join(game, gameKey)
 
             if action == "fish":
-                return self.fish()
+                retval = self.fish(game)
 
             if action == "discard":
-                return self.discard()
+                retval = self.discard(game)
 
             if action == "move":
-                return self.move()
+                retval = self.move(game)
 
             if action == "buyCart":
-                return self.buyCart()
+                retval = self.buyCart(game)
 
             if action == "buyAction":
-                return self.buyAction()
+                retval = self.buyAction(game)
 
             if action == "pass":
-                return self.passPlayer()
+                retval = self.passPlayer(game)
+                if (retval == True and game.curPlayer == 0):
+                    alsoDatastore = True
 
             if action == "marketTrade":
-                return self.marketTrade()
+                retval = self.marketTrade(game)
 
             if action == "completeQuest":
-                return self.completeQuest()
+                retval = self.completeQuest(game)
 
             if action == "completeEvent":
-                return self.completeEvent()
+                retval = self.completeEvent(game)
 
             if action == "completeEventDealQuest":
-                return self.completeEventDealQuest()
+                retval = self.completeEventDealQuest(game)
 
             if action == "refresh":
-                return self.refresh()
+                retval = self.refresh(game)
 
-            if action == "listGames":
-                return self.listGames()
+            if action == "info":
+                retval = self.info(game)
+
+            if (retval == False):
+                logging.error("Worker function returned an error")
+                self.error(500)
+                return
+            
+            self.saveGame(game, gameKey, alsoDatastore)
+            return
 
         except ValueError as e:
-            logging.error("Exception ({0}): {1}".format(e.errno, e.strerror))
+            logging.error("Exception: {0}".format(e))
             self.error(500)
             return
 

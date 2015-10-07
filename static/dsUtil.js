@@ -42,8 +42,70 @@ var prepSounds = function() {
 	return sounds;
 }
 
+hideImages = function(scope) {
+	if(scope.hideImagesBool) {
+		scope.questImageBase = "../images/questxxx";
+		scope.blankMarketImageBase = "../images/xxx";
+		scope.cartImageBase = "../images/cart_xxx";
+		scope.splashImage = "../images/boxtopxxx.jpg";
+		scope.itemCardBack = "../images/shoppingCardBack.jpgxxx";
+		scope.vendorCardBack = "../images/vendorback.jpgxxx";
+		scope.knight = "";
+		scope.titleImg = "../images/title_smallxxx.jpg";
+	}
+	else {
+		scope.questImageBase = "../images/quest";
+		scope.blankMarketImageBase = "../images/";
+		scope.cartImageBase = "../images/cart";
+		scope.splashImage = "../images/boxtop.jpg";
+		scope.itemCardBack = "../images/shoppingCardBack.jpg";
+		scope.vendorCardBack = "../images/vendorback.jpg";
+		scope.knight = "../images/knight.gif";
+		scope.titleImg = "../images/title_small.jpg";
+	}
+}	
 
-
+	var getSound = function(action, scope) {
+		var name = "";
+		switch (action) {
+			case "discard":
+				name = scope.sounds[1].name;
+				break;
+			case "completeEventeventId":
+				break;
+			case "fish":
+				break;
+			case "completeQuest":
+				break;
+			case "move":
+				break;
+			case "marketTrade":
+				break;
+			case "buyCart":
+				break;
+			case "pass":
+				break;
+			default:
+				name = "";
+		}
+	return name;
+	}
+	
+	playCartSound = function(cartId, scope) {
+			if(cartId===0) {
+				play(scope.sounds[0].name);
+			}		
+			if(cartId===1) {
+				play(scope.sounds[13].name);
+			}
+			if(cartId===2) {
+				play(scope.sounds[6].name);
+			}
+			if(cartId===3) {
+				play(scope.sounds[4].name);
+			}
+	}
+	
 getCardName = function (number) {
 	switch (parseInt(number)) {
 	   case 0:
@@ -584,6 +646,7 @@ setMarketCounts = function(game) {
 }
 
 
+
 var convertToName = function(params) {
 	switch(params) {
 		case "hand":
@@ -640,7 +703,7 @@ action=move&what=45&src=hand&dst=cart2
 
 //completeEventeventId16 the wheelbarrowgold1what1where1what2where2dest1.
 
-logPlayerAction = function(isActive, playersLog, playerName, logItem) {
+logPlayerAction = function(isActive, playersLog, playerName, logItem, scope) {
 	if(logItem!="") {
 		var pattern = "/game?";
 		var index = logItem.indexOf(pattern) + pattern.length;
@@ -663,34 +726,34 @@ logPlayerAction = function(isActive, playersLog, playerName, logItem) {
 							break;
 						case "discard":
 							logEntry+=" discarded";
-							sound = getSound(logActions[j]);
+							sound = getSound(logActions[j], scope);
 							break;
 						case "completeEventeventId":
 							logEntry+=" completed event " + logActions[j]
 							break;
 						case "fish":
 							logEntry+=" fished " ;
-							sound = getSound(logActions[j]);
+							sound = getSound(logActions[j], scope);
 							break;
 						case "completeQuest":
 							logEntry+= " completed a quest ";
-							sound = getSound(logActions[j]);
+							sound = getSound(logActions[j], scope);
 							break;
 						case "move":
 							logEntry+=" moved " ;
-							sound = getSound(logActions[j]);
+							sound = getSound(logActions[j], scope);
 							break;
 						case "marketTrade":
 							logEntry+= " did a market trade from ";
-							sound = getSound(logActions[j]);
+							sound = getSound(logActions[j], scope);
 							break;
 						case "buyCart":
 							logEntry+= "bought ";
-							sound = getSound(logActions[j+1]);
+							sound = getSound(logActions[j+1], scope);
 							break;
 						case "pass":
 							logEntry+=" passed ";
-							sound = getSound(logActions[j]);
+							sound = getSound(logActions[j], scope);
 							break;
 						case "what":
 							logEntry+=" item(s) " ;
@@ -721,7 +784,7 @@ logPlayerAction = function(isActive, playersLog, playerName, logItem) {
 							break;
 						case "cart2":
 							logEntry+=convertToName("cart2");
-							sound = getSound("horseNeigh");
+							sound = getSound("horseNeigh", scope);
 							break;
 						case "cart3":
 							logEntry+=convertToName("cart3");
