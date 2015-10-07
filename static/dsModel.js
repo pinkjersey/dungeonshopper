@@ -1,5 +1,5 @@
 var Event = function (type, name, eventText ) {
-	var eventImageBase = "../images/event";
+	var eventImageBase = "./images/event";
 	this.id = type;
 	this.name = name;
 	this.eventText = eventText;
@@ -25,7 +25,7 @@ var GameAvailable = function (gameKey, numPlayers, playerId) {
 }
 var Sound = function (id, name) {
 	this.id = id;
-	var soundBase = "../sounds/";
+	var soundBase = "./sounds/";
 	this.soundFile = soundBase + name + ".mp3";
 	this.name = name;
 }

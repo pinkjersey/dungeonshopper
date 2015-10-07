@@ -1,5 +1,6 @@
 app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory) {
-
+	$scope.imagePath = "./images/"
+	
 	$scope.activePlayer = null;
 	$scope.activeEvent = null;
 	$scope.isActive = false;
