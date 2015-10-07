@@ -44,6 +44,7 @@ def playerState(game, playerId):
     thedict["market"] = game.market
     thedict["playerId"] = playerId
     thedict["gameMode"] = game.gameMode
+    thedict["gameKey"] = game.gameKey
     #thedict["bonus"] = calculateBonus(player)
 
     eventList = []
@@ -977,7 +978,7 @@ def createNewGame(gameKey, numPlayers, name):
 
     # create new game entity with id "theGame"
     # later each existing game will have their own IDs
-    game = Game(numPlayers=int(numPlayers), id=gameKey)
+    game = Game(numPlayers=int(numPlayers), id=gameKey, gameKey=gameKey)
 
     # create decks
     game.questDeck = newQuestDeck(numPlayers)
