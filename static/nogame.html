@@ -1,18 +1,20 @@
 ﻿<div class="panel-body">
-			<img  class = "splashImg" ng-src="{{splashImage}}"></img><big ng-show="displayMode != 'nogame'"></big>
+			<img  ng-src="{{splashImage}}"></img>
 			<br></br>
 			<br></br>
-				
+			<br></br>			
+			<br></br>			
+			<br></br>				
 	<p>Enter your name: <input type="text" class="inputText" ng-model="playerName" ng-Init="Player"></input></p>
 
-	<div class="panel panel-primary" style="width=200px;" ng-repeat="game in gamesAvailable | orderBy : 'numPlayers'">  
+	<div class="panel panel-primary" ng-repeat="game in gamesAvailable | orderBy : 'numPlayers'">  
 
 		<div class="panel-heading" >  
 			<big><b>{{game.numPlayers}} player game? &nbsp;&nbsp;&nbsp; There 
 				<span ng-switch on="game.numPlayers">
 					<span ng-switch-when="1">is</span>
 					<span ng-switch-default>are</span>
-				<span>
+				</span>
 				{{game.spaceAvailable}} open 
 				<span ng-switch on="game.numPlayers">
 					<span ng-switch-when="1">seat.</span>

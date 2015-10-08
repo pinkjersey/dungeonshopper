@@ -81,7 +81,8 @@
 			<span class="panel-title pull-right">
 				<ng-include src="'./static/options.html'" ng-show="showOptions"></ng-include>
 			</span>
-
+		</div>			
+		<div class="panel-heading">
 			<img ng-show="displayMode != 'nogame'" ng-src="{{titleImg}}"></img><big> {{displayModeName}}</big>
 
 			<ng-include src="'./static/nogame.html'" ng-show="displayMode === 'nogame'"></ng-include>
