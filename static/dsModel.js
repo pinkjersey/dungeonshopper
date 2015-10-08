@@ -37,7 +37,7 @@ var QuestReady = function (items, questCard, cartId, questIndex) {
 	this.questIndex = questIndex;
 }
 
-var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased, imageNotPurchased) {
+var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased) {
     this.id = id;
 	this.size = size;
     this.active = active;
@@ -47,18 +47,16 @@ var Cart = function (id, size, active, goldCost, itemCost, name, imagePurchased,
 	this.name = name;
 	this.destroyed = false;
 	this.purchaseWith = 'items';
-	this.image = imageNotPurchased;
 
 	//set initial state of carts
 	if(active===true) {
 		this.image = imagePurchased;
 	}
 	else {
-		this.image = imageNotPurchased;
+		this.image = "";
 	}
 		
 	this.imagePurchased = imagePurchased;
-	this.imageNotPurchased = imageNotPurchased;
 	this.goldCost = goldCost;
 	this.itemCost = itemCost;
 	this.cards = new cardSet();
@@ -130,9 +128,9 @@ var Player = function (game, id, name) {
 	this.nextCartName = 'Hand Cart';
 	this.winner=false;
 	this.lastEvent = null;
-    this.carts = [new Cart(0, 3, true, 0, 5,'Wheelbarrow', game.cartImageBase + '0.jpg', game.cartImageBase + '0_not_purchased.jpg'), 
-				  new Cart(1, 3, false, 1, 10, 'Hand Cart', game.cartImageBase + '1.jpg', game.cartImageBase + '1_not_purchased.jpg'), 
-				  new Cart(2, 4, false, 2, 15, 'Horse Wagon', game.cartImageBase + '2.jpg', game.cartImageBase + '2_not_purchased.jpg'), 
-			      new Cart(3, 5, false, 3, 20, 'War Wagon', game.cartImageBase + '3.jpg', game.cartImageBase + '3_not_purchased.jpg')]
+    this.carts = [new Cart(0, 3, true, 0, 5,'Wheelbarrow', game.cartImageBase + '0.jpg'), 
+				  new Cart(1, 3, false, 1, 10, 'Hand Cart', game.cartImageBase + '1.jpg'), 
+				  new Cart(2, 4, false, 2, 15, 'Horse Wagon', game.cartImageBase + '2.jpg'), 
+			      new Cart(3, 5, false, 3, 20, 'War Wagon', game.cartImageBase + '3.jpg')]
 				  ;
 }

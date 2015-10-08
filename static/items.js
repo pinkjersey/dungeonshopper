@@ -140,13 +140,13 @@ cardSet.prototype.createBlankMarket = function(imageBase) {
         this.addCard(-1,"CardBack",oImage,oImage,oImage,oImage, oImage, 0);
         oImage=imageBase+"1_gold.jpg";
 		this.addCard(49,"Gold",oImage,oImage,oImage,oImage, oImage, 0);
-        oImage=imageBase+"cart0_sm";
+        oImage=imageBase+"cart0_sm.jpg";
 		this.addCard(50,"Wheelbarrow",oImage,oImage,oImage,oImage, oImage, 0);
-        oImage=imageBase+"cart1_sm";		
+        oImage=imageBase+"cart1_sm.jpg";		
 		this.addCard(51,"Hand Cart",oImage,oImage,oImage,oImage, oImage, 0);
-        oImage=imageBase+"cart2_sm";
+        oImage=imageBase+"cart2_sm.jpg";
 		this.addCard(52,"Horse Wagon",oImage,oImage,oImage,oImage, oImage, 0);
-        oImage=imageBase+"cart3_sm";
+        oImage=imageBase+"cart3_sm.jpg";
 		this.addCard(53,"War Wagon",oImage,oImage,oImage,oImage, oImage, 0);
 
 	}

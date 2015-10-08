@@ -116,11 +116,13 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 	setupNoGame = function() {
 		$scope.displayMode = "nogame";
 		$scope.playerName="Player";
+		$scope.sounds = prepSounds();
 		//$scope.numberOfPlayers =1;
 		//$scope.playerId = 0;
 		$scope.game=null;
 		hideImages($scope);
 		listGames();
+		play($scope.sounds[2].name);
 	}	
 
 	$scope.joinGame = function(gameKey, playerName) {
@@ -128,7 +130,7 @@ app.controller('dsCtrl', ['$scope', 'gameFactory', function ($scope, gameFactory
 		$scope.game = new Game($scope.blankMarketImageBase, $scope.questImageBase,$scope.cartImageBase);
 		joinGame(gameKey, playerName);
 		$scope.events = prepEvents();
-		$scope.sounds = prepSounds();
+
 	    startInterval(2000);
     }
 		
