@@ -5,16 +5,15 @@ from game_model import *
 from array import *
 
 def createOtherPlayer(player):
-    dict = player.to_dict()
+    dict = copy.deepcopy(p.to_dict())
     hand = dict["hand"]
     sz = len(hand)
     for i in range(sz):
         hand[i] = -1
-    dict["hand"] = hand
-    return player
+        dict["hand"] = hand
+    return dict    
 
 def calculateBonus(player):    
-    return 0
     numThreeSet = 0
     numFiveSet = 0
     # creates an array of five unsigned bytes (0 .. 255)
@@ -45,7 +44,7 @@ def playerState(game, playerId):
     thedict["playerId"] = playerId
     thedict["gameMode"] = game.gameMode
     thedict["gameKey"] = game.gameKey
-    #thedict["bonus"] = calculateBonus(player)
+    thedict["bonus"] = calculateBonus(player)
 
     eventList = []
     for e in player.curEvent:
@@ -65,14 +64,9 @@ def playerState(game, playerId):
     otherPlayers = []
     for p in game.players:
         if (p != player):
-            dict = p.to_dict()
-            hand = dict["hand"]
-            sz = len(hand)
-            for i in range(sz):
-                hand[i] = -1
-                dict["hand"] = hand
             p.bonus = calculateBonus(p)
-            otherPlayers.append(p.to_dict())
+            otherPlayers.append(createOtherPlayer(p))
+
     thedict["otherPlayers"] = otherPlayers
 
     thedict["actionsRemaining"] = game.actionsRemaining
@@ -1269,15 +1263,14 @@ def newQuestDeck(numPlayers):
     level3Cards.append(createQuestCard(3,False,[1,2,2,4,4],5,5))
     level3Cards.append(createQuestCard(3,True,[1,3,5,6,9],5,5))
     level3Cards.append(createQuestCard(3,False,[3,4,7,8,9],6,5))
-    
-
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,13))
+        
+    level4Cards.append(createQuestCard(4,False,[],0,6))
+    level4Cards.append(createQuestCard(4,False,[],0,7))
+    level4Cards.append(createQuestCard(4,False,[],0,8))
+    level4Cards.append(createQuestCard(4,False,[],0,9))
+    level4Cards.append(createQuestCard(4,False,[],0,10))
+    level4Cards.append(createQuestCard(4,False,[],0,11))
+    level4Cards.append(createQuestCard(4,False,[],0,12))
     level4Cards.append(createQuestCard(4,False,[],0,13))
     level4Cards.append(createQuestCard(4,False,[],0,14))
     level4Cards.append(createQuestCard(4,False,[],0,15))
@@ -1294,8 +1287,8 @@ def newQuestDeck(numPlayers):
 
     #def createQuestStacks(tippytop, top, middle, bottom, level1, level2, level3, level4, l0t, l1t, l1m, l2m, l1b, l2b, l3b, et, em, eb):
     if numPlayers == 1:
-        #createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards, 4,  4,1,2,1,1,2,   1,1,1)
-        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,     3,3,3)
+        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards, 4,  4,1,2,1,1,2,   1,1,1)
+        #createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,     3,3,3)
     elif numPlayers == 2:
         createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  6,1,4,1,2,4,   2,2,2)
         #createQuestStacks(tippytop,top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,   3,3,3)

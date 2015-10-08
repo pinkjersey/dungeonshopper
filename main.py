@@ -17,10 +17,24 @@ from game_model import *
 from google.appengine.api.logservice import logservice
 
 class GameHandler(webapp2.RequestHandler):
+    def getGameInfo(self, gameKey):
+        gameInfoQuery = GameInfo.query(GameInfo.gameKey==gameKey)
+        giList = gameInfoQuery.fetch()
+        if (len(giList) != 1):
+            logging.error("unexpected number of game info items returned")
+            self.error(500)
+            return
+
+        return giList[0]
+        
+
     def reserveID(self, gameKey):
         ret = memcache.incr(gameKey+"_counter")
         if (ret == None):
-            return -1
+            gi = self.getGameInfo(gameKey)
+            ret = gi.numPlayers - gi.spaceAvailable
+            memcache.add(key=gameKey+"_counter", value=ret+1)
+            return ret
         return ret-1    
 
     def saveGame(self, game, gameKey, alsoDatastore):
@@ -74,14 +88,7 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        gameInfoQuery = GameInfo.query(GameInfo.gameKey==gameKey)
-        giList = gameInfoQuery.fetch()
-        if (len(giList) != 1):
-            logging.error("unexpected number of game info items returned")
-            self.error(500)
-            return
-
-        gi = giList[0]
+        gi = self.getGameInfo(gameKey)
         if (gi.spaceAvailable < 1):
             logging.error("space unavailable")
             self.error(500)
@@ -211,7 +218,7 @@ class GameHandler(webapp2.RequestHandler):
         if (iPlayerId < 0 or iPlayerId > 3):
             self.error(500)
             return
-			
+
         src = self.request.get('src')
         if (src == None or src == ""):
             self.error(500)
