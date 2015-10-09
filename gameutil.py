@@ -3,9 +3,10 @@ import json
 import logging
 from game_model import *
 from array import *
+from copy import deepcopy
 
 def createOtherPlayer(player):
-    dict = copy.deepcopy(p.to_dict())
+    dict = deepcopy(player.to_dict())
     hand = dict["hand"]
     sz = len(hand)
     for i in range(sz):
