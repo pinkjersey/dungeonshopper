@@ -20,7 +20,10 @@ def calculateBonus(player):
     # creates an array of five unsigned bytes (0 .. 255)
     types = array('B', [0,0,0,0,0])
     for quest in player.questsCompleted:
-        types[quest.type] += 1
+        if quest.type < 1 or quest.type > 5:
+            pass
+
+        types[quest.type-1] += 1
         
     numFiveSet = min(types)
     for num in types:
@@ -96,8 +99,19 @@ def playerState(game, playerId):
     jsonstr = json.dumps(thedict)
     return jsonstr   
 
+def representsInt(s):
+    try: 
+        int(s)
+        return True
+    except ValueError:
+        return False
+
 def whatToArray(what):
     ret = []
+    if not representsInt(what):
+        logging.info("invalid what, cannot convert to array: {0}".format(what))
+        return ret
+
     for c in what:
         ci = int(c)
         if (ci == 0):
