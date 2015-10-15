@@ -102,7 +102,7 @@ class GameHandler(webapp2.RequestHandler):
         gi.spaceAvailable -= 1
         gi.put()        
 
-        logging.error("player ID: {0} {1}".format(playerId, minAllowed))
+        logging.info("player ID: {0} {1}".format(playerId, minAllowed))
         if (playerId > 3 or playerId != minAllowed):
             logging.error("Invalid player ID: {0}".format(playerId))
             self.error(500)

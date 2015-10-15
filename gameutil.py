@@ -109,7 +109,7 @@ def representsInt(s):
 def whatToArray(what):
     ret = []
     if not representsInt(what):
-        logging.info("invalid what, cannot convert to array: {0}".format(what))
+        logging.error("invalid what, cannot convert to array: {0}".format(what))
         return ret
 
     for c in what:
@@ -1196,7 +1196,7 @@ def dealQuest(game):
 
 
 def newQuestDeck(numPlayers):
-    logging.error("Creating quest deck for {0} players".format(numPlayers))
+    logging.info("Creating quest deck for {0} players".format(numPlayers))
 
     level1Cards = []
     level2Cards = []
@@ -1322,6 +1322,6 @@ def newQuestDeck(numPlayers):
     top = shuffle(top)
     middle = shuffle(middle)
     bottom = shuffle(bottom)
-    logging.error("card lists sizes {0} {1} {2} {3}".format(len(tippytop), len(top), len(middle), len(bottom)))        
+    logging.info("card lists sizes {0} {1} {2} {3}".format(len(tippytop), len(top), len(middle), len(bottom)))        
 
     return tippytop + top + middle + bottom
