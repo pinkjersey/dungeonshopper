@@ -463,8 +463,8 @@ class GameHandler(webapp2.RequestHandler):
         USAGE: /game?action=completeEvent&eventId=<eventId>&cart=<cart0>&gold=<0>&items=<0>&what1=<>&where1=<>&what2=<>&where2=<>&dest1=<>
         Complete an event. 
         """
-        logging.info("Compelete Event: begin")        
-        logging.info("Compelete event: loaded event")
+        logging.info("Complete Event: begin")        
+        logging.info("Complete event: loaded event")
 
         eventId = self.request.get('eventId')
         if (eventId == None or eventId == ""):
@@ -485,7 +485,9 @@ class GameHandler(webapp2.RequestHandler):
         gold = self.request.get('gold')
         igold = int(gold)
         items = self.request.get('items')
-        iitemsCount = int(items)
+        iitemsCount = 0
+        if (items != None and items != ""):
+            iitemsCount = int(items)
         what1 = self.request.get('what1')
         where1 = self.request.get('where1')
         what2 = self.request.get('what2')
@@ -505,7 +507,7 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        logging.info("Compelete event: done")
+        logging.info("Complete event: done")
 
         retstr = playerState(game, iPlayerId)
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
@@ -631,7 +633,10 @@ class GameHandler(webapp2.RequestHandler):
 
             if (gi.spaceAvailable > 0):
                 gamesNeeded[gi.numPlayers-1] = 0
-                gameInfos.append(gi.to_dict())
+                gameDict = gi.to_dict()
+                del gameDict["createDate"]
+                del gameDict["updateDate"]
+                gameInfos.append(gameDict)
 
         #ct = 1
         #for 

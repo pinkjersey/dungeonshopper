@@ -10,6 +10,8 @@ class GameInfo(ndb.Model):
     gameKey = ndb.StringProperty(required=True)
     numPlayers = ndb.IntegerProperty(required=True)
     spaceAvailable = ndb.IntegerProperty(required=True)
+    createDate = ndb.DateTimeProperty(required=True, auto_now_add=True)
+    updateDate = ndb.DateTimeProperty(required=True, auto_now=True)
 
 class QuestCard(ndb.Model):
     level = ndb.IntegerProperty(required=True)

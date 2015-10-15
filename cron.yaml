@@ -1,0 +1,5 @@
+cron:
+- description: game cleanup
+  url: /cleanup
+  schedule: every 15 mins
+  
