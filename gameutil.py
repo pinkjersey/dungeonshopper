@@ -167,7 +167,11 @@ def discardItem(game, aPlayerId, whati, where):
     if ("cart" in where):
         #logging.info("cart section: {0}".format(where)) 	
         # string "cart1" becomes int(1)
-        cartid = int(where[4:])
+        cartIdStr = where[4:]
+        if not representsInt(cartIdStr):
+            raise ValueError('Invalid cart ID: {0}'.format(cartIdStr))
+
+        cartid = int(cartIdStr)
         #logging.info("cartid section: {0}".format(cartid)) 
         if (cartid >=0 and cartid <4):
             cart = player.carts[cartid]
@@ -182,9 +186,9 @@ def discardItem(game, aPlayerId, whati, where):
                     del cart.inCart[i]
                     found = True
                     break
-    #else:
+    else:
         # invalid where
-        #raise ValueError('Where value is invalid')
+        raise ValueError('Where value is invalid: {0}'.format(where))
 
     logging.info("exiting discard section: {0}".format(found)) 
     return found
