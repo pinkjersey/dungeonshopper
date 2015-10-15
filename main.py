@@ -17,6 +17,10 @@ from game_model import *
 from google.appengine.api.logservice import logservice
 
 class GameHandler(webapp2.RequestHandler):
+    def updateGameInfo(self, gameKey):
+        gi = self.getGameInfo(gameKey)
+        gi.put()
+
     def getGameInfo(self, gameKey):
         gameInfoQuery = GameInfo.query(GameInfo.gameKey==gameKey)
         giList = gameInfoQuery.fetch()
@@ -732,6 +736,9 @@ class GameHandler(webapp2.RequestHandler):
                 return
             
             self.saveGame(game, gameKey, alsoDatastore)
+            if (alsoDatastore):
+                updateGameInfo(gameKey)
+
             return
 
         except ValueError as e:
