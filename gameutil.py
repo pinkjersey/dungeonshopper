@@ -900,8 +900,11 @@ def passPlayer(game, aPlayerId, items):
     else:
         player = game.players[aPlayerId]
 
-    whats = whatToArray(items)
-    numItems = len(whats)    
+    whats = []
+    numItems = 0
+    if (items != ''):
+        whats = whatToArray(items)
+        numItems = len(whats)    
 
     priorPlayer = player.playerId
     player = game.players[player.playerId]
