@@ -154,7 +154,7 @@ def discardItem(game, aPlayerId, whati, where):
                 found = True
                 break
 
-    if (where == "market"):
+    elif (where == "market"):
         logging.info("market section: {0}".format(where))
         m = len(game.market)
         for mi in range(m):
@@ -164,7 +164,7 @@ def discardItem(game, aPlayerId, whati, where):
                 found = True
                 break
 
-    if ("cart" in where):
+    elif ("cart" in where):
         #logging.info("cart section: {0}".format(where)) 	
         # string "cart1" becomes int(1)
         cartIdStr = where[4:]
