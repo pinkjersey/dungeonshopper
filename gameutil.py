@@ -305,7 +305,7 @@ def buyCart(game, aPlayerId, cartidstr, withGold, items, actionCost):
         player = game.players[game.curPlayer]
     else:
         player = game.players[aPlayerId]
-	
+
     if game.actionsRemaining == 0:
         # no actions remaining
         logging.error("No actions remaining")        
@@ -372,7 +372,7 @@ def marketTrade(game, aPlayerId, handItems, marketItems, actionCost):
         player = game.players[game.curPlayer]
     else:
         player = game.players[aPlayerId]
-	
+
     whath = whatToArray(handItems)
     whatm = whatToArray(marketItems)
     if (len(whath) > 1 and len(whatm) > 1):
@@ -430,6 +430,15 @@ def marketTrade(game, aPlayerId, handItems, marketItems, actionCost):
     return True                
 
 def discard(game, aPlayerId, what, where, actionCost):
+    """Discards a card from the given location
+    
+    game: game object
+    aPlayerId: necessary when discarding for events
+    what: a list of items to discard
+    where: from which location, hand, market or cart
+    actionCost: 1 or 0
+
+    """
     if (game.actionsRemaining == 0 and actionCost > 0):
         # no actions remaining
         logging.error("No actions remaining")  
@@ -500,6 +509,12 @@ def getIntersection(list1, list2):
 
 
 def prepEvents(game, eventId):
+    """This function is called after an event card is drawn. Does all work necessary before asking
+        The player for input
+
+        game: game object
+        eventId: event id of the even drawn
+    """
     if game.gameMode != "eventStarted":
         return False
     game.gameMode = "eventPending"
@@ -548,9 +563,9 @@ def prepEvents(game, eventId):
                 card = "0"
             #logging.info("card dealt:  {0}".format(card))
             #get the number on the card, go through the market, discard all that match
-            mlen = len(game.market)
+            
             currentEvent=Event(eventId = eventId, prepWhatItems1 = str(card), fromWhere1 = "market")
-            for itemi in range(mlen):
+            for itemi in game.market:
                 if itemi == card:
                     discard(game,0,card,"market",0)
 
