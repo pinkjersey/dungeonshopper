@@ -1175,6 +1175,9 @@ def resetMarket(game):
 
 
 def getFirstItemCard(game):
+    """Pops the first time from the itemDeck and returns it
+    if the itemDeck is empty, the market is destroyed and the itemDeck is regenerated
+    """
     decklen = len(game.itemDeck)
     if (decklen == 0):
         resetMarket(game)
@@ -1187,13 +1190,16 @@ def getFirstItemCard(game):
         return card
 
 def dealItemCard(playerIndex, game):
+    """deals a card to the given player
+    playerIndex: player id
+    game: game object
+    """
     card = getFirstItemCard(game)   
-    logging.info("dealing card to player! {0}".format(playerIndex))  
-
     game.players[playerIndex].hand.append(card)
     game.players[playerIndex].hand.sort()
 
 def dealItemCardToMarket(game):
+    """deals a card to the market"""
     card = getFirstItemCard(game)
     game.market.append(card)
     return card
