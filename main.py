@@ -51,7 +51,7 @@ class GameHandler(webapp2.RequestHandler):
         game = memcache.get(gameKey)
         saveInCache = 0            
         if (game == None):
-            logging.error("Key not in cache: {0}".format(gameKey))
+            logging.warning("Key not in cache: {0}".format(gameKey))
             game_k = ndb.Key('Game', gameKey)
             game = game_k.get()
             saveInCache = 1
@@ -387,8 +387,8 @@ class GameHandler(webapp2.RequestHandler):
         USAGE: /game?action=completeQuest&what=<itemList>where=<cartID>
         Uses the items in the cart to complete a quest. If a quest with the cards in the cart doesn't exist, it returns an error
         """
-        logging.info("Compelete quest: begin")        
-        logging.info("Compelete quest: loaded quest")
+        logging.info("Complete quest: begin")        
+        logging.info("Complete quest: loaded quest")
 
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
@@ -410,13 +410,13 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        logging.info("Compelete quest: running")
+        logging.info("Complete quest: running")
         result = completeQuest(game, iPlayerId, what, where)
         if (result == False):
             self.error(500)
             return
 
-        logging.info("Compelete quest: done")
+        logging.info("Complete quest: done")
 
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
@@ -631,9 +631,11 @@ class GameHandler(webapp2.RequestHandler):
         games = GameInfo.query()
         for gi in games:
             keyStr = gi.gameKey
-            game = memcache.get(keyStr)            
+            game = self.getGame(keyStr)          
             if (game == None):
-                logging.error("Key not in cache: {0}".format(keyStr))
+                logging.error("Couldn't get the game -- deleting game info")
+                gi.key.delete()
+                continue
 
             if (gi.spaceAvailable > 0):
                 gamesNeeded[gi.numPlayers-1] = 0
@@ -642,8 +644,6 @@ class GameHandler(webapp2.RequestHandler):
                 del gameDict["updateDate"]
                 gameInfos.append(gameDict)
 
-        #ct = 1
-        #for 
 
         gameCreated = 0
         ct = 1

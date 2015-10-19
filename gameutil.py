@@ -107,6 +107,13 @@ def representsInt(s):
         return False
 
 def whatToArray(what):
+    """Converts the given string containing integers into a an array of ints
+    Features:
+    1) Confirms that the given string is valid, logs error and returns blank array if not
+       valid
+    2) Converts 0's into 10
+    3) The results are sorted
+    """
     ret = []
     if not representsInt(what):
         logging.error("invalid what, cannot convert to array: {0}".format(what))
@@ -194,7 +201,12 @@ def discardItem(game, aPlayerId, whati, where):
     return found
 
 def removeItems(game, aPlayerId, what, where):
-    """Utility function that removes items from a location"""
+    """Utility function that removes items from a location
+    
+    Exceptions thrown when the following conditions occur:
+    1) whatlen == 0
+    2) a given card is not in the source.
+    """
     if game.gameMode == "game":
         player = game.players[game.curPlayer]
     else:
@@ -213,6 +225,10 @@ def removeItems(game, aPlayerId, what, where):
         cart = player.carts[cartId]
         srclist = cart.inCart
 
+    srclen = len(srclist)
+    if (whatlen > srclen):
+        raise ValueError("removeItems: asked to remove {0} items but source has only {1} item(s)".format(whatlen, srclen))
+
     for whati in whats:
         found = False
         srclen = len(srclist)
@@ -226,7 +242,15 @@ def removeItems(game, aPlayerId, what, where):
                 del srclist[i]
                 break
 
-        if (found == False):
+        if (found == False):            
+            logging.error("removeItems: failed to find {0}".format(whati))
+            srclen = len(srclist)
+            for i in range(srclen):
+                srci = srclist[i]
+                if (srci == 0):
+                    srci = 10                        
+                logging.error("removeItems: src {0}".format(srci))
+
             raise ValueError("Failed to locate {0} in src list".format(whati))
 
     return
@@ -731,8 +755,13 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
     logging.info("Entered Logic for Events")
     logging.info("playerid is: {0}".format(playerId)) 
     cart = game.players[playerId].carts[0]
-    what1arr = whatToArray(what1)
-    what2arr = whatToArray(what2)
+    what1arr = []
+    if (what1 != None and what1 != ''):
+        whatToArray(what1)
+
+    what2arr = []
+    if (what2 != None and what2 != ''):
+        what2arr = whatToArray(what2)
 
     try:
         #Barb Attack destroy market and re-seed if you are the first to get here        
@@ -815,9 +844,8 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
             logging.info("Starting Event Id:  {0}".format(eventId))
         #VikingParade
         if eventId == 17:
-            logging.info("Viking Parade start Event Id:  {0}".format(eventId))
-            whats = whatToArray(what1)
-            whatlen = len(whats)
+            logging.info("Viking Parade start Event Id:  {0}".format(eventId))            
+            whatlen = len(what1arr)
             if (whatlen == 0):
                 logging.info("Nothing to move")  
             else:
@@ -835,7 +863,7 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
                     dealItemCard(playerId, game)
 
     except ValueError as e:
-        logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
+        logging.error("Exception: {0}".format(e))
         return False  
 
     game.players[playerId].curEventStatus = "eventCompleted"
@@ -903,7 +931,7 @@ def completeQuest(game, aPlayerId, what, where):
             return False
 
     except ValueError as e:
-        logging.error("Exception ({0}): {1}".format(e.errno, e.strerror)) 
+        logging.error("Exception: {0}".format(e))
         return False
     
 
