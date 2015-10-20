@@ -1019,7 +1019,7 @@ def fish(game, aPlayerId, what, where, actionCost):
         player = game.players[game.curPlayer]
     else:
         player = game.players[aPlayerId]
-		
+
     whati = int(what)
     if (whati < 1 or whati > 10):
         # invalid what
@@ -1259,6 +1259,7 @@ def dealItemCardToMarket(game):
 def dealQuest(game):
     decklen = len(game.questDeck)
     if(decklen == 0):
+        logging.error("Quest deck empty, can't deal quest")
         return
     else:
         quest = game.questDeck[0]
