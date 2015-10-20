@@ -138,31 +138,29 @@ def getCartId(where):
         raise ValueError("where isn't a cartid")
 
 def discardItem(game, aPlayerId, whati, where):
-    """Utility discard function"""
+    """Utility discard function
+    game: the game object
+    aPlayerId: player ID. Only used when game not in game mode
+    whati: what to remove
+    where: hand, market or cart
+
+    """
     if game.gameMode == "game":
         player = game.players[game.curPlayer]
     else:
         player = game.players[aPlayerId]
-    #logging.info("whati {0}".format(whati))  
-    #logging.info("where {0}".format(where))  
+    
     found = False
     if (where == "hand"):
-        #logging.info("hand section: {0}".format(where))
-        l = len(player.hand)
-        #logging.info("player hand length section: {0}".format(l))
-        for i in range(l):
-            #logging.info("player hand card [i] section: {0}".format(i))
-            #logging.info("whati: {0}".format(whati))
-            if player.hand[i] == whati:
-                #logging.info("match found: {0}".format(whati))
-                game.discardPile.append(player.hand[i])
-                #logging.info("discarded : {0}".format(player.hand[i]))
+        l = len(player.hand)        
+        for i in range(l):            
+            if player.hand[i] == whati:                
+                game.discardPile.append(player.hand[i])                
                 del player.hand[i]
                 found = True
                 break
 
-    elif (where == "market"):
-        logging.info("market section: {0}".format(where))
+    elif (where == "market"):        
         m = len(game.market)
         for mi in range(m):
             if game.market[mi] == whati:
@@ -171,15 +169,12 @@ def discardItem(game, aPlayerId, whati, where):
                 found = True
                 break
 
-    elif ("cart" in where):
-        #logging.info("cart section: {0}".format(where)) 	
-        # string "cart1" becomes int(1)
+    elif ("cart" in where):        
         cartIdStr = where[4:]
         if not representsInt(cartIdStr):
             raise ValueError('Invalid cart ID: {0}'.format(cartIdStr))
 
-        cartid = int(cartIdStr)
-        #logging.info("cartid section: {0}".format(cartid)) 
+        cartid = int(cartIdStr)         
         if (cartid >=0 and cartid <4):
             cart = player.carts[cartid]
             if (cart.purchased == False):
@@ -196,13 +191,17 @@ def discardItem(game, aPlayerId, whati, where):
     else:
         # invalid where
         raise ValueError('Where value is invalid: {0}'.format(where))
-
-    logging.info("exiting discard section: {0}".format(found)) 
+     
     return found
 
 def removeItems(game, aPlayerId, what, where):
     """Utility function that removes items from a location
     
+    game: the game object
+    aPlayerId: the player ID to operate on, only valid when the game is in the event mode
+    what: a number representing the card to remove (1->10)
+    where: hand or cart
+
     Exceptions thrown when the following conditions occur:
     1) whatlen == 0
     2) a given card is not in the source.
@@ -220,10 +219,14 @@ def removeItems(game, aPlayerId, what, where):
 
     if (where == "hand"):
         srclist = player.hand
-    else:
+    elif ("cart" in where):
         cartId = getCartId(where)
         cart = player.carts[cartId]
         srclist = cart.inCart
+    else:
+        logging.error("removeItems: invalid where {0}".format(where))
+        raise ValueError("removeItems: invalid where {0}".format(where))
+
 
     srclen = len(srclist)
     if (whatlen > srclen):
@@ -257,25 +260,24 @@ def removeItems(game, aPlayerId, what, where):
             
 
 def move(game, aPlayerId, what, src, dst, actionCost):
-    """Moves cards from src to dst"""
-    """There is the pending event logic that moves items back to hand before the event starts"""
-    """This is for the orcs attack.  """
-    logging.info("move start")
+    """Moves cards from src to dst
+    There is the pending event logic that moves items back to hand before the event starts
+    This is for the orcs attack.  
+    """    
     if game.gameMode == "game":
         player = game.players[game.curPlayer]
     else:
         player = game.players[aPlayerId]
 
-    #logging.info("what = ".format(what))
-    #logging.info("src = ".format(src))
-    #logging.info("dst = ".format(dst))
-    #logging.info("actionCost = ".format(actionCost))
     if (game.actionsRemaining == 0 and actionCost > 0):
         # no actions remaining
         logging.error("No actions remaining")        
         return False
 
-    logging.info("starting move, getting array of what")
+    if (src == dst):
+        logging.error("move: src and dst the same")
+        return False
+
     # convert input to array
     whats = whatToArray(what)
     whatlen = len(whats)
