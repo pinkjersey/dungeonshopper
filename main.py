@@ -424,44 +424,6 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
-
-    def completeEventDealQuest(self, game):
-        """
-        USAGE: /game?action=completeEventDealQuest&eventId=<eventId>playerId=<playerId>
-        """
-        logging.info("Players Compeleting Event Deal Quest: begin")        
-        logging.info("Players Compeleting event: loaded event")
-
-        eventId = self.request.get('eventId')
-        if (eventId == None or eventId == ""):
-            self.error(500)
-            return
-        ieventId = int(eventId)
-
-
-        playerId = self.request.get("playerId")
-        if (playerId == None or playerId == ""):
-            self.error(500)
-            return
-
-        iPlayerId = int(playerId)
-        if (iPlayerId < 0 or iPlayerId > 3):
-            self.error(500)
-            return
-
-        logging.info("EventId found:  {0}".format(eventId))
-        result = completeEventDealQuest(game, iPlayerId, ieventId)
-        if (result == False):
-            self.error(500)
-            return
-
-        logging.info("Player {0}'s compeleting event".format(iPlayerId))
-
-        retstr = playerState(game, iPlayerId)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)
-
     def completeEvent(self, game):
         """
         USAGE: /game?action=completeEvent&eventId=<eventId>&cart=<cart0>&gold=<0>&items=<0>&what1=<>&where1=<>&what2=<>&where2=<>&dest1=<>
@@ -720,9 +682,6 @@ class GameHandler(webapp2.RequestHandler):
 
             if action == "completeEvent":
                 retval = self.completeEvent(game)
-
-            if action == "completeEventDealQuest":
-                retval = self.completeEventDealQuest(game)
 
             if action == "refresh":
                 retval = self.refresh(game)
