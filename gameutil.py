@@ -539,7 +539,9 @@ def prepEvents(game, eventId):
         game: game object
         eventId: event id of the even drawn
     """
+    logging.info("In prepEvents")
     if game.gameMode != "eventStarted":
+        logging.info("Wrong game state, leaving prepEvents")
         return False
     game.gameMode = "eventPending"
     logging.info("GameMode pending: {0}".format(game.gameMode))
@@ -581,16 +583,21 @@ def prepEvents(game, eventId):
 
         #MarketShortage	
         if eventId == 11:
-            logging.info("MarketShortage start Event Id:  {0}".format(eventId))
+            logging.info("MarketShortage start Event Id: {0}".format(eventId))
             card = str(dealItemCardToMarket(game))
             if card == "10":
                 card = "0"
-            #logging.info("card dealt:  {0}".format(card))
+            logging.info("Market shortage card dealt: {0}".format(card))
             #get the number on the card, go through the market, discard all that match
             
             currentEvent=Event(eventId = eventId, prepWhatItems1 = str(card), fromWhere1 = "market")
+            logging.info("Market contents:")
+            for itemi in game.market:
+                logging.info("   {0}".format(itemi))
+
             for itemi in game.market:
                 if itemi == card:
+                    logging.info("{0} matches card, discarding".format(itemi))
                     discard(game,0,card,"market",0)
 
         #MarketSurplus
@@ -806,7 +813,7 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
             logging.info("KingsFeast start Event Id:  {0}".format(eventId))
         #MarketShortage	
         if eventId == 11:
-            logging.info("MarketShortage start Event Id:  {0}".format(eventId))
+            logging.info("Complete Event MarketShortage nothing to do")
         #MarketSurplus
         if eventId == 12:
             logging.info("MarketSurplus start Event Id:  {0}".format(eventId))
@@ -866,26 +873,30 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
         logging.error("Exception: {0}".format(e))
         return False  
 
+    logging.info("Player {0} event completed".format(playerId))
     game.players[playerId].curEventStatus = "eventCompleted"
     
+    ct = 0
+    for player in game.players:
+        if player.curEventStatus == "eventCompleted":
+            ct += 1
+
+    if (ct == game.numPlayers):
+        game.gameMode = "game"
+        deleteEventFromQuestList()
+        dealQuest(game)
+
+
     return True	
 
-def completeEventDealQuest(game, playerId, eventId):
-    logging.info("playerId event status to eventInProgress: {0}".format(game.players[playerId].curEventStatus))
-    if game.players[playerId].curEventStatus == "eventCompleted":
-        game.eventCompletedCount += 1
-        logging.info("eventCompletedCount: {0}".format(game.eventCompletedCount))
-        logging.info("game.numPlayers: {0}".format(game.numPlayers))
-    else:
-        return True
+def deleteEventFromQuestList():
+    ct = 0
+    for quest in game.questsInPlay:
+        if (quest.type > 5):
+            del game.questsInPlay[ct]
+            break
 
-    if game.eventCompletedCount==game.numPlayers:
-        game.gameMode = "game"		
-        game.eventCompletedCount = 0	
-        logging.info("game mode reset: {0}".format(game.gameMode))
-        decklen = len(game.questsInPlay)
-        del game.questsInPlay[decklen-1]
-        dealQuest(game)
+        ct += 1
 
 def completeQuest(game, aPlayerId, what, where):
     # completing quests require no actions
