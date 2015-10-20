@@ -6,6 +6,11 @@ from array import *
 from copy import deepcopy
 
 def createOtherPlayer(player):
+    """Utility function that copies the given player into a dictionary and sets the
+    hand cards to -1. This creates a view of player X of player Y.
+
+    player: the player to create a copy of
+    """
     dict = deepcopy(player.to_dict())
     hand = dict["hand"]
     sz = len(hand)
@@ -14,7 +19,8 @@ def createOtherPlayer(player):
         dict["hand"] = hand
     return dict    
 
-def calculateBonus(player):    
+def calculateBonus(player):
+    """Calculates the bonus points a player earned"""
     numThreeSet = 0
     numFiveSet = 0
     # creates an array of five unsigned bytes (0 .. 255)
@@ -885,13 +891,18 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
 
     if (ct == game.numPlayers):
         game.gameMode = "game"
-        deleteEventFromQuestList()
+        deleteEventFromQuestList(game)
         dealQuest(game)
 
 
     return True	
 
-def deleteEventFromQuestList():
+def deleteEventFromQuestList(game):
+    """Searches for an event in the questsInPlay list and deletes it
+    This code assumes there is only one event in  the quest list
+
+    game: the game object
+    """
     ct = 0
     for quest in game.questsInPlay:
         if (quest.type > 5):
