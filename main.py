@@ -51,7 +51,7 @@ class GameHandler(webapp2.RequestHandler):
         game = memcache.get(gameKey)
         saveInCache = 0            
         if (game == None):
-            logging.warning("Key not in cache: {0}".format(gameKey))
+            logging.error("getGame: Key {0} not in cache possible loss of game data".format(gameKey))
             game_k = ndb.Key('Game', gameKey)
             game = game_k.get()
             saveInCache = 1
@@ -69,7 +69,8 @@ class GameHandler(webapp2.RequestHandler):
         if (game == None):
             self.response.headers.add_header('Access-Control-Allow-Origin', "*")
             self.response.headers["Content-Type"] = "application/json"
-            self.response.write("")    
+            self.response.write("")
+            return    
 
         jsonstr = json.dumps([game.to_dict()])
         if jsonstr == None or jsonstr == "":
@@ -525,17 +526,20 @@ class GameHandler(webapp2.RequestHandler):
 
     def refresh(self, game):        
         if (game == None):
+            logging.warning("refresh called with null game object")
             self.response.headers.add_header('Access-Control-Allow-Origin', "*")
             self.response.headers["Content-Type"] = "application/json"
             self.response.write("") 
 
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
+            logging.error("refresh called with bad playerId")
             self.error(500)
             return
 
         iPlayerId = int(playerId)
         if (iPlayerId < 0 or iPlayerId > 3):
+            logging.error("refresh called with invalid playerId")
             self.error(500)
             return
 
@@ -697,6 +701,16 @@ class GameHandler(webapp2.RequestHandler):
             self.saveGame(game, gameKey, alsoDatastore)
             if (alsoDatastore):
                 updateGameInfo(gameKey)
+
+            if (self.response.has_error()):
+                if (game != None):
+                    jsonstr = json.dumps([game.to_dict()])
+                    if jsonstr == None or jsonstr == "":
+                        jsonstr = "no game in current session"
+                    logging.error("game state {0}".format(state))
+                else:
+                    logging.error("Can't display game state as the game object is invalid")
+
 
             return
 

@@ -595,6 +595,8 @@ def prepEvents(game, eventId):
             card = str(dealItemCardToMarket(game))
             if card == "10":
                 card = "0"
+
+            cardInt = int(card)
             logging.info("Market shortage card dealt: {0}".format(card))
             #get the number on the card, go through the market, discard all that match
             
@@ -604,7 +606,7 @@ def prepEvents(game, eventId):
                 logging.info("   {0}".format(itemi))
 
             for itemi in game.market:
-                if itemi == card:
+                if itemi == cardInt:
                     logging.info("{0} matches card, discarding".format(itemi))
                     discard(game,0,card,"market",0)
 
