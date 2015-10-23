@@ -1362,6 +1362,7 @@ def newQuestDeck(numPlayers):
     level3Cards.append(createQuestCard(3,True,[1,3,5,6,9],5,5))
     level3Cards.append(createQuestCard(3,False,[3,4,7,8,9],6,5))
         
+    # events to include in all games
     level4Cards.append(createQuestCard(4,False,[],0,6))
     level4Cards.append(createQuestCard(4,False,[],0,7))
     level4Cards.append(createQuestCard(4,False,[],0,8))
@@ -1370,13 +1371,15 @@ def newQuestDeck(numPlayers):
     level4Cards.append(createQuestCard(4,False,[],0,11))
     level4Cards.append(createQuestCard(4,False,[],0,12))
     level4Cards.append(createQuestCard(4,False,[],0,13))
-    level4Cards.append(createQuestCard(4,False,[],0,14))
     level4Cards.append(createQuestCard(4,False,[],0,15))
     level4Cards.append(createQuestCard(4,False,[],0,16))
-    level4Cards.append(createQuestCard(4,False,[],0,17))
-    level4Cards.append(createQuestCard(4,False,[],0,18))
+    level4Cards.append(createQuestCard(4,False,[],0,17))    
     level4Cards.append(createQuestCard(4,False,[],0,19))
 
+    # events to include when the game isn't a 1 player game
+    if (numPlayers != 1):
+        level4Cards.append(createQuestCard(4,False,[],0,14))
+        level4Cards.append(createQuestCard(4,False,[],0,18))
 
     level1Cards = shuffle(level1Cards)
     level2Cards = shuffle(level2Cards)
