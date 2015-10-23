@@ -112,6 +112,9 @@ def whatToArray(what):
        valid
     2) Converts 0's into 10
     3) The results are sorted
+
+    what: a string representing a list of numbers, '22' becomes [2, 2]
+    returns: list of cards
     """
     ret = []
     if not representsInt(what):
@@ -767,11 +770,19 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
     cart = game.players[playerId].carts[0]
     what1arr = []
     if (what1 != None and what1 != ''):
-        whatToArray(what1)
+        what1arr = whatToArray(what1)
+        if (len(what1arr) == 0):
+            raise ValueError("what1arr size cannot be 0 {0}".format(what1))
+    else:
+        logging.info("blank what1")
 
     what2arr = []
     if (what2 != None and what2 != ''):
         what2arr = whatToArray(what2)
+        if (len(what2arr) == 0):
+            raise ValueError("what2arr size cannot be 0 {0}".format(what1))
+    else:
+        logging.info("blank what2")
 
     try:
         #Barb Attack destroy market and re-seed if you are the first to get here        
@@ -781,15 +792,22 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
         if eventId == 7:
             logging.info("BrokenItems start Event Id:  {0}".format(eventId))
             if len(what1arr) > 0:
+                logging.info("Broken items what1 contains {0} items".format(len(what1arr)))
                 for whati in what1arr:
                     #logging.info("whati {0}".format(whati)) 
                     #logging.info("where1 {0}".format(where1)) 
                     fish(game, playerId, whati, where1, 0)
+            else:
+                logging.info("BrokenItems nothing in what1")
+
             if len(what2arr) > 0:
+                logging.info("Broken items what2 contains {0} items".format(len(what2arr)))
                 for whati2 in what2arr:
                     #logging.info("whati2 {0}".format(whati2)) 
                     #logging.info("where2 {0}".format(where2)) 
                     fish(game, playerId, whati2, where2, 0)
+            else:
+                logging.info("BrokenItems nothing in what2")
         #CastleTaxation
         if eventId == 8:
             logging.info("Castle Taxation start Event Id:  {0}".format(eventId))
@@ -1006,6 +1024,15 @@ def passPlayer(game, aPlayerId, items):
     return priorPlayer
 
 def fish(game, aPlayerId, what, where, actionCost):
+    """Discards the given 'what' from 'where' and deals another card to
+    the player's hand
+    
+    game: the game object
+    aPlayerId: the player ID to work on (only used in event mode)
+    what: a string indicating a card (1..10)
+    where: hand or cart
+    actionCost: cost to deduct from the number of actions
+    """
     if (game.actionsRemaining == 0 and actionCost > 0):
         # no actions remaining
         return False
@@ -1024,16 +1051,18 @@ def fish(game, aPlayerId, what, where, actionCost):
     try:
         found = discardItem(game, player.playerId, whati, where)
     except ValueError as e:
+        logging.error("fish: an exception occured during discard item {0}".format(e))
         return False
 
     if (found == False):
         # couldn't find 'what'
+        logging.error("fish: discard failed to find 'what' {0}".format(what))
         return False
 
-    dealItemCard(player.playerId, game)
+    lastDealt = dealItemCard(player.playerId, game)
+    logging.info("fish: player {0} got a {1}".format(player.playerId, lastDealt))
 
-    game.actionsRemaining = game.actionsRemaining - actionCost
-
+    game.actionsRemaining -= actionCost
 
     return True
 
@@ -1189,6 +1218,9 @@ def createQuestStacks(tippytop, top, middle, bottom, level1, level2, level3, lev
         del level4[0]
 
 def newItemDeck():
+    """Creates an array of ints representing the item deck
+    The cards in this deck are 1..10
+    """
     cards = []
     for itemValue in range(1, 11):
         for ct in range(12, itemValue-1, -1):
@@ -1238,12 +1270,16 @@ def getFirstItemCard(game):
 
 def dealItemCard(playerIndex, game):
     """deals a card to the given player
+
     playerIndex: player id
     game: game object
+
+    returns: card just dealt
     """
     card = getFirstItemCard(game)   
     game.players[playerIndex].hand.append(card)
     game.players[playerIndex].hand.sort()
+    return card
 
 def dealItemCardToMarket(game):
     """deals a card to the market"""
@@ -1256,7 +1292,7 @@ def dealQuest(game):
     if(decklen == 0):
         # is the game over?            
         questsInPlayLen = len(game.questsInPlay)	
-        if(questsLeftLen==0 and questsInPlayLen==4):
+        if(questsInPlayLen==4):
             game.gameMode = "gameOver"
             logging.info("Four quests left in the quest list -- game over")
             return
@@ -1363,6 +1399,14 @@ def newQuestDeck(numPlayers):
     level3Cards.append(createQuestCard(3,False,[3,4,7,8,9],6,5))
         
     # events to include in all games
+    # 7 and 13 testing
+    #for i in range(2):
+    #    evt = 7
+    #    if (i == 1):
+    #        evt = 13
+    #    for j in range(7):
+    #        level4Cards.append(createQuestCard(4,False,[],0,evt))
+            
     level4Cards.append(createQuestCard(4,False,[],0,6))
     level4Cards.append(createQuestCard(4,False,[],0,7))
     level4Cards.append(createQuestCard(4,False,[],0,8))
@@ -1380,7 +1424,7 @@ def newQuestDeck(numPlayers):
     if (numPlayers != 1):
         level4Cards.append(createQuestCard(4,False,[],0,14))
         level4Cards.append(createQuestCard(4,False,[],0,18))
-
+            
     level1Cards = shuffle(level1Cards)
     level2Cards = shuffle(level2Cards)
     level3Cards = shuffle(level3Cards)

@@ -657,7 +657,7 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(jsonstr)  
 
 
-    def saveHighscores(self, game):
+    def saveHighScores(self, game):
         """This function saves the score obtained by each player
 
         self: the handler
@@ -696,14 +696,34 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(jsonstr)  
 
 
-    def setGameOver(self, game):        
+    def setGameOver(self, game):                 
+        retstr = ""       
         if (game == None):
-            logging.warning("refresh called with null game object")
+            logging.error("game over called with null game object")
+            self.error(500)
+            return
         else:
             game.gameMode = "gameOver"
-        self.response.write("")
+            playerId = self.request.get("playerId")
+
+            iPlayerId = int(playerId)
+            if (iPlayerId < 0 or iPlayerId > 3):
+                logging.error("game over called with invalid playerId")
+                self.error(500)
+                return
+
+
+            retstr = playerState(game, iPlayerId)
+            if (playerId == None or playerId == ""):
+                logging.error("game over called with bad playerId")
+                self.error(500)
+                return
+
+        
+        
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         self.response.headers["Content-Type"] = "application/json"
+        self.response.write(retstr)
         return True    
 
 
@@ -736,7 +756,7 @@ class GameHandler(webapp2.RequestHandler):
 
             if (game.gameMode == "gameOver" and
                 action != "refresh"):
-                logging.error("Cannot execute {0} after the game is over", action)
+                logging.error("Cannot execute {0} after the game is over".format(action))
                 self.error(500)
                 return
 
@@ -795,7 +815,7 @@ class GameHandler(webapp2.RequestHandler):
 
             self.saveGame(game, gameKey, alsoDatastore)
             if (alsoDatastore):
-                updateGameInfo(gameKey)
+                self.updateGameInfo(gameKey)
 
             if (self.response.has_error()):
                 if (game != None):
