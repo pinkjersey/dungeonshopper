@@ -696,6 +696,18 @@ class GameHandler(webapp2.RequestHandler):
         self.response.write(jsonstr)  
 
 
+    def setGameOver(self, game):        
+        if (game == None):
+            logging.warning("refresh called with null game object")
+        else:
+            game.gameMode = "gameOver"
+        self.response.write("")
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        return True    
+
+
+
     def get(self):
         """Switchboard for game actions"""
 
@@ -751,15 +763,16 @@ class GameHandler(webapp2.RequestHandler):
                 if (retval == True and game.curPlayer == 0):
                     alsoDatastore = True
 
+            if action == "gameOver":
+                retval = self.setGameOver(game)                
+
+
             if action == "marketTrade":
                 retval = self.marketTrade(game)
 
             if action == "completeQuest":
                 retval = self.completeQuest(game)
-                if (game.gameMode == "gameOver"):
-                    #game over, save highscores
-                    self.saveHighScores(game)
-                    alsoDatastore = True
+
 
             if action == "completeEvent":
                 retval = self.completeEvent(game)
@@ -775,6 +788,11 @@ class GameHandler(webapp2.RequestHandler):
                 self.error(500)
                 return
             
+            if (game.gameMode == "gameOver"):
+                #game over, save highscores
+                self.saveHighScores(game)
+                alsoDatastore = True
+
             self.saveGame(game, gameKey, alsoDatastore)
             if (alsoDatastore):
                 updateGameInfo(gameKey)
