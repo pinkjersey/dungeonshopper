@@ -6,6 +6,11 @@ from google.appengine.ext import ndb
 
 import webapp2
 
+class HighScore(ndb.Model):
+    numPlayers = ndb.IntegerProperty(required=True)
+    playerName = ndb.StringProperty(required=True)
+    score = ndb.IntegerProperty(required=True, default=0)
+
 class GameInfo(ndb.Model):
     gameKey = ndb.StringProperty(required=True)
     numPlayers = ndb.IntegerProperty(required=True)

@@ -630,6 +630,72 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(jsonstr)      
 
+    def testHighScores(self):
+        """Utility function that creates some highscores"""
+        names = ["Cordelia", "Aaron", "Dannielle", "Shona", "Yevette",
+                 "Gia", "Rosena", "Micah", "Zoraida", "Kelley", "Quincy",
+                 "Claudette", "Debi", "Porsha", "Ozell", "Nubia", "Joellen",
+                 "Marni", "Edison", "Shayne"]
+
+        logging.error("Adding high scores")
+
+        ct = 0
+        for i in range(4):
+            numPlayers = i + 1
+            for j in range(20):
+                score = j * 2
+                hs = HighScore(numPlayers=numPlayers, playerName=names[j], score=score)
+                hs.put()
+                ct += 1
+
+
+        thedict = {}
+        thedict["highScoresCreated"] = ct
+        jsonstr = json.dumps(thedict)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(jsonstr)  
+
+
+    def saveHighscores(self, game):
+        """This function saves the score obtained by each player
+
+        self: the handler
+        game: the game that just ended
+        """
+        if (game.gameMode != "gameOver"):
+            raise ValueError("save highscores called but game not over {0}".format(game.gameMode))
+                        
+        for player in game.players:
+            score = player.points + player.bonus
+            hs = HighScore(numPlayers=game.numPlayers, playerName=player.name, score=score)
+            hs.put()
+
+    def highScores(self):
+        """This function returns the five highest scores obtained for each of the four
+        game types.
+
+        self: the handler
+        """
+        highScores = []
+        for i in range(4):
+            numPlayers = i + 1
+            query = HighScore.query(HighScore.numPlayers==numPlayers).order(-HighScore.score)
+            scores = query.fetch(5)
+            thisList = []
+            for score in scores:
+                thisList.append(score.to_dict())
+
+            highScores.append(thisList)
+
+        thedict = {}
+        thedict["highScores"] = highScores
+        jsonstr = json.dumps(thedict)
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers["Content-Type"] = "application/json"
+        self.response.write(jsonstr)  
+
+
     def get(self):
         """Switchboard for game actions"""
 
@@ -642,8 +708,12 @@ class GameHandler(webapp2.RequestHandler):
         if gameKey == None or gameKey == "":
             if action == "listGames":                
                 return self.listGames()
+            elif action == "highScores":
+                return self.highScores()
+            elif action == "testHighScores":
+                return self.testHighScores()
             else:
-                logging.error("Invalid action")
+                logging.error("Invalid action {0}".format(action))
                 self.error(500)
                 return
         
@@ -652,8 +722,11 @@ class GameHandler(webapp2.RequestHandler):
             alsoDatastore = False
             game = self.getGame(gameKey)
 
-            #if action == "new":
-            #    return self.newGame()
+            if (game.gameMode == "gameOver" and
+                action != "refresh"):
+                logging.error("Cannot execute {0} after the game is over", action)
+                self.error(500)
+                return
 
             if action == "join":
                 retval = self.join(game, gameKey)
@@ -683,6 +756,10 @@ class GameHandler(webapp2.RequestHandler):
 
             if action == "completeQuest":
                 retval = self.completeQuest(game)
+                if (game.gameMode == "gameOver"):
+                    #game over, save highscores
+                    self.saveHighScores(game)
+                    alsoDatastore = True
 
             if action == "completeEvent":
                 retval = self.completeEvent(game)
@@ -719,7 +796,7 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        logging.error("Invalid action")
+        logging.error("Invalid action {0}".format(action))
         self.error(500)
 
 

@@ -95,13 +95,6 @@ def playerState(game, playerId):
     thedict["playerLog"] = el
     thedict["turns"] = player.turns
 
-    questsLeftLen = len(game.questDeck)
-    questsInPlayLen = len(game.questsInPlay)	
-    if(questsLeftLen==0 and questsInPlayLen==4):
-        thedict["gameOver"] = True
-    else:
-        thedict["gameOver"] = False
-
     jsonstr = json.dumps(thedict)
     return jsonstr   
 
@@ -1261,7 +1254,14 @@ def dealItemCardToMarket(game):
 def dealQuest(game):
     decklen = len(game.questDeck)
     if(decklen == 0):
-        logging.error("Quest deck empty, can't deal quest")
+        # is the game over?            
+        questsInPlayLen = len(game.questsInPlay)	
+        if(questsLeftLen==0 and questsInPlayLen==4):
+            game.gameMode = "gameOver"
+            logging.info("Four quests left in the quest list -- game over")
+            return
+        
+        logging.info("Quest deck empty, can't deal quest")
         return
     else:
         quest = game.questDeck[0]
