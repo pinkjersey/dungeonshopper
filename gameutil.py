@@ -149,7 +149,7 @@ def discardItem(game, aPlayerId, whati, where):
 
     game: the game object
     aPlayerId: player ID. Only used when game not in game mode
-    whati: what to remove
+    whati: what to remove (1..10)
     where: hand, market or cart
     """
     if game.gameMode == "game":
@@ -207,7 +207,7 @@ def removeItems(game, aPlayerId, what, where, addToDiscardPile):
     
     game: the game object
     aPlayerId: the player ID to operate on, only valid when the game is in the event mode
-    what: a number representing the card to remove (1->10)
+    what: a string representing the card to remove (1->10)
     where: hand or cart
     addToDiscardPile: whether or not to add the cards to the discard pile
 
@@ -615,14 +615,25 @@ def prepEvents(game, eventId):
             #get the number on the card, go through the market, discard all that match
             
             currentEvent=Event(eventId = eventId, prepWhatItems1 = str(card), fromWhere1 = "market")
-            logging.info("Market contents:")
+            
+            marketstr = ""
             for itemi in game.market:
-                logging.info("   {0}".format(itemi))
+                itemstr = "   {0}".format(itemi)
+                marketstr += itemstr
+            
+            logging.info("Market contents: {0}".format(marketstr))    
 
-            for itemi in game.market:
-                if itemi == cardInt:
-                    logging.info("{0} matches card, discarding".format(itemi))
-                    discard(game,0,card,"market",0)
+            while (True):
+                found = False
+                for itemi in game.market:
+                    if itemi == cardInt:
+                        logging.info("{0} matches card, discarding".format(itemi))
+                        found = True
+                        discard(game,0,card,"market",0)
+                        break
+
+                if (found == False):
+                    break
 
         #MarketSurplus
         if eventId == 12:
@@ -831,11 +842,11 @@ def completeEvent(game, eventId, playerId, gold, itemsCount, what1, where1, what
             logging.info("Castle Taxation start Event Id:  {0}".format(eventId))
             #discard items first
             if len(what1arr) > 0:
-                for whati in what1arr:        
-                    found = discardItem(game, playerId, whati, where1)
-                    if (found == False):
-                        logging.error("Couldn't find all what1 {0}".format(whati))        
-                        return False
+                removeItems(game,  playerId, what1, where1, True)
+
+            if len(what2arr) > 0:
+                removeItems(game,  playerId, what2, where2, True)
+                                           
             player.gold -= gold
         #GolbinRaid
         if eventId == 9:
@@ -999,11 +1010,29 @@ def completeQuest(game, aPlayerId, what, where):
     return True
 
 def passPlayer(game, aPlayerId, items):
+    """Passes the currnet player
+
+    The player sometimes needs to discard cards to meet the max hand.
+    After discard the # of items in the player hand needs to match the max hand.
+
+    If the number of cards in the players hand is less than max hand, then the player is
+    dealt N number of cards
+
+    Exception cases:
+    1) Discarded too many items
+    2) Discarded too few items
+    3) The item asked to discard doesn't exist in hand
+
+    game: game object
+    aPlayerId: player ID (only used when game in event mode)
+    items: items to discard (what string)
+    """
     if game.gameMode == "game":
         player = game.players[game.curPlayer]
     else:
         player = game.players[aPlayerId]
 
+    # convert what string to array
     whats = []
     numItems = 0
     if (items != ''):
@@ -1013,6 +1042,7 @@ def passPlayer(game, aPlayerId, items):
     priorPlayer = player.playerId
     player = game.players[player.playerId]
 
+    # sanity check
     numItemsInHand = len(player.hand)
     if (numItemsInHand - numItems) > player.maxHand:
         raise ValueError("Need to discard more items")
@@ -1020,13 +1050,11 @@ def passPlayer(game, aPlayerId, items):
     if (numItems > 0 and (numItemsInHand - numItems) < player.maxHand):
         raise ValueError("Discarded too many items")
 
-    # discard cards past max if needed
-    allFound = True
+    # discard cards past max if needed    
     for whati in whats:        
         found = discardItem(game, player.playerId, whati, "hand")
-        if (found == False):
-            allFound = False
-            break
+        if (found == False):            
+            raise ValueError("Pass: Failed to find {0}".format(whati))       
 
     if numItemsInHand < player.maxHand:
         diff = player.maxHand - numItemsInHand
@@ -1432,9 +1460,9 @@ def newQuestDeck(numPlayers):
     # events to include in all games
     # 7 and 13 testing
     #for i in range(2):
-    #    evt = 7
+    #    evt = 11
     #    if (i == 1):
-    #        evt = 13
+    #        evt = 11
     #    for j in range(7):
     #        level4Cards.append(createQuestCard(4,False,[],0,evt))
             

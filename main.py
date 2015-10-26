@@ -536,6 +536,7 @@ class GameHandler(webapp2.RequestHandler):
         try:
             priorPlayer = passPlayer(game, iPlayerId, items)
         except ValueError as e:
+            logging.error("pass player exception {0}".format(e))
             self.error(500)
             return
 
@@ -688,7 +689,7 @@ class GameHandler(webapp2.RequestHandler):
             raise ValueError("save highscores called but game not over {0}".format(game.gameMode))
                         
         for player in game.players:
-            score = player.points + player.bonus
+            score = player.points + player.bonus + player.gold
             hs = HighScore(numPlayers=game.numPlayers, playerName=player.name, score=score)
             hs.put()
 
