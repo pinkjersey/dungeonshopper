@@ -201,7 +201,7 @@ def discardItem(game, aPlayerId, whati, where):
      
     return found
 
-def removeItems(game, aPlayerId, what, where):
+def removeItems(game, aPlayerId, what, where, addToDiscardPile):
     """Utility function that removes items from a location and adds the cards to the
     discard pile
     
@@ -209,6 +209,7 @@ def removeItems(game, aPlayerId, what, where):
     aPlayerId: the player ID to operate on, only valid when the game is in the event mode
     what: a number representing the card to remove (1->10)
     where: hand or cart
+    addToDiscardPile: whether or not to add the cards to the discard pile
 
     Exceptions thrown when the following conditions occur:
     1) whatlen == 0
@@ -271,13 +272,17 @@ def removeItems(game, aPlayerId, what, where):
         else:
             removed.append(whati)
 
-    game.discardPile.extend(removed)
+    if (addToDiscardPile):          
+        game.discardPile.extend(removed)
 
     return
             
 
 def move(game, aPlayerId, what, src, dst, actionCost):
     """Moves cards from src to dst
+
+    Items moved will not end up in the discard pile.
+
     There is the pending event logic that moves items back to hand before the event starts
     This is for the orcs attack.  
     """    
@@ -305,7 +310,7 @@ def move(game, aPlayerId, what, src, dst, actionCost):
     try:        
         # discard items from src
         logging.info("removing items")
-        removeItems(game, aPlayerId, what, src)             
+        removeItems(game, aPlayerId, what, src, False)             
 
         if dst == "hand":
             dstlist = player.hand
@@ -959,7 +964,7 @@ def completeQuest(game, aPlayerId, what, where):
     try:
         # find cart and make sure the cards exist in it
         # delete them if exists
-        removeItems(game, player.playerId, what, where)
+        removeItems(game, player.playerId, what, where, True)
 
         # match quest
         questFound = False

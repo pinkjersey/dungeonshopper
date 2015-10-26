@@ -46,13 +46,20 @@ class GameHandler(webapp2.RequestHandler):
         ct += len(game.market)
         ct += len(game.discardPile)
         ct += len(game.itemDeck)
+        logging.info("Sanity check: mk {0} dp {1} id {2}".format(len(game.market),
+                                                       len(game.discardPile),
+                                                       len(game.itemDeck)))
         for player in game.players:
+            ct += len(player.hand)
+            logging.info("Sanity check: hand {0}".format(len(player.hand)))
             for cart in player.carts:
+                logging.info("Sanity check: cart {0}".format(len(cart.inCart)))
                 ct += len(cart.inCart)
 
         if (ct == 75):
             return True
         else:
+            logging.error("Sanity check: {0}".format(ct))
             return False
 
     def saveGame(self, game, gameKey, alsoDatastore):
