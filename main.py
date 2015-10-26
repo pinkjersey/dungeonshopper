@@ -41,6 +41,20 @@ class GameHandler(webapp2.RequestHandler):
             return ret
         return ret-1    
 
+    def sanityCheck(self, game):
+        ct = 0
+        ct += len(game.market)
+        ct += len(game.discardPile)
+        ct += len(game.itemDeck)
+        for player in game.players:
+            for cart in player.carts:
+                ct += len(cart.inCart)
+
+        if (ct == 75):
+            return True
+        else:
+            return False
+
     def saveGame(self, game, gameKey, alsoDatastore):
         memcache.set(key=gameKey, value=game)
         if (alsoDatastore):
@@ -812,6 +826,9 @@ class GameHandler(webapp2.RequestHandler):
                 #game over, save highscores
                 self.saveHighScores(game)
                 alsoDatastore = True
+
+            if (self.sanityCheck(game) == False):
+                logging.error("Sanity check failed")
 
             self.saveGame(game, gameKey, alsoDatastore)
             if (alsoDatastore):
