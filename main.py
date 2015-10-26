@@ -822,7 +822,7 @@ class GameHandler(webapp2.RequestHandler):
                     jsonstr = json.dumps([game.to_dict()])
                     if jsonstr == None or jsonstr == "":
                         jsonstr = "no game in current session"
-                    logging.error("game state {0}".format(state))
+                    logging.error("game state {0}".format(jsonstr))
                 else:
                     logging.error("Can't display game state as the game object is invalid")
 

@@ -40,6 +40,10 @@ def calculateBonus(player):
 
 
 def playerState(game, playerId):
+    """Generates the player state
+    game: the game object
+    playerId: the playerId of interest
+    """
     #game.players[playerId].playerId = playerId
     player = game.players[playerId]
     player.playerId = playerId
@@ -141,11 +145,12 @@ def getCartId(where):
 
 def discardItem(game, aPlayerId, whati, where):
     """Utility discard function
+    Discards one item from a where and addes it to the discard pile
+
     game: the game object
     aPlayerId: player ID. Only used when game not in game mode
     whati: what to remove
     where: hand, market or cart
-
     """
     if game.gameMode == "game":
         player = game.players[game.curPlayer]
@@ -197,7 +202,8 @@ def discardItem(game, aPlayerId, whati, where):
     return found
 
 def removeItems(game, aPlayerId, what, where):
-    """Utility function that removes items from a location
+    """Utility function that removes items from a location and adds the cards to the
+    discard pile
     
     game: the game object
     aPlayerId: the player ID to operate on, only valid when the game is in the event mode
@@ -213,12 +219,15 @@ def removeItems(game, aPlayerId, what, where):
     else:
         player = game.players[aPlayerId]
 
+    # convert what string to an array
+    # numbers are 1..10
     whats = whatToArray(what)
     whatlen = len(whats)
     if (whatlen == 0):
         logging.error("removeItems: empty what array given")
         raise ValueError("removeItems: empty what array given")
 
+    # get the source list based on the given 'what'
     if (where == "hand"):
         srclist = player.hand
     elif ("cart" in where):
@@ -229,11 +238,13 @@ def removeItems(game, aPlayerId, what, where):
         logging.error("removeItems: invalid where {0}".format(where))
         raise ValueError("removeItems: invalid where {0}".format(where))
 
-
+    # the what should always be less than or equal to the src list
     srclen = len(srclist)
     if (whatlen > srclen):
         raise ValueError("removeItems: asked to remove {0} items but source has only {1} item(s)".format(whatlen, srclen))
 
+    removed = []
+    # for each what, iterate through the src list and remove
     for whati in whats:
         found = False
         srclen = len(srclist)
@@ -257,6 +268,10 @@ def removeItems(game, aPlayerId, what, where):
                 logging.error("removeItems: src {0}".format(srci))
 
             raise ValueError("Failed to locate {0} in src list".format(whati))
+        else:
+            removed.append(whati)
+
+    game.discardPile.extend(removed)
 
     return
             
@@ -334,7 +349,7 @@ def buyCart(game, aPlayerId, cartidstr, withGold, items, actionCost):
     else:
         player = game.players[aPlayerId]
 
-    if game.actionsRemaining == 0:
+    if actionCost > 0 and game.actionsRemaining == 0:
         # no actions remaining
         logging.error("No actions remaining")        
         return False
@@ -354,22 +369,20 @@ def buyCart(game, aPlayerId, cartidstr, withGold, items, actionCost):
 
     if (withGold == "1"):
         if (player.gold < cart.goldCost):
+            logging.error("Player chose to buy cart with gold but the player doesn't have enough")
             return False
 
         player.gold = player.gold - cart.goldCost
         cart.purchased = True
-    else:
-        #logging.info("items {0}".format(items))
+    else:        
         whats = whatToArray(items)
-        sumTotal = sum(whats)
-        #logging.info("sum {0}".format(sumTotal))
-        #logging.info("cart cost {0}".format(cart.cardCost))
+        sumTotal = sum(whats)        
         if sumTotal < cart.cardCost:
+            logging.error("Player chose to buy cart with cards, but card total less than cart cost")
             return False
-        for whati in whats:  
-            #logging.info("discarding {0}".format(whati))		
-            found = discardItem(game, player.playerId, whati, "hand")
-            #logging.info("found {0}".format(found))
+
+        for whati in whats:              
+            found = discardItem(game, player.playerId, whati, "hand")            
             if (found == False):
                 logging.error("Couldn't find all whats {0}".format(whati))        
                 return False
@@ -925,6 +938,12 @@ def deleteEventFromQuestList(game):
         ct += 1
 
 def completeQuest(game, aPlayerId, what, where):
+    """Utility function that completes a quest
+    game: game object
+    aPlayerId: player ID to operate on (only valid when the game is handling events)
+    what: which cards to use
+    where: from where
+    """
     # completing quests require no actions
     if game.gameMode == "game":
         player = game.players[game.curPlayer]
@@ -1231,6 +1250,13 @@ def newItemDeck():
 
 
 def resetMarket(game):
+    """Utility function that 
+
+    1) Extends the discard pile with the content of the market, the market is cleared
+    2) The item deck is extended with the contents of the discard pile, the discount pile is cleared
+    3) The item deck is shuffled
+    4) 4 cards are dealt to the market
+    """
     logging.info("Reseting Market")
     # move market to discard
     game.discardPile.extend(game.market)
