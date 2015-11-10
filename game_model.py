@@ -77,7 +77,7 @@ class Game(ndb.Model):
     market = ndb.IntegerProperty(repeated=True)
     questsInPlay = ndb.LocalStructuredProperty(QuestCard, repeated=True)
     playerLog = ndb.LocalStructuredProperty(PlayerLog, repeated=True)
-    #eventCompletedCount = ndb.IntegerProperty(default=0)
+    highScoresSaved = ndb.BooleanProperty(required=True, default=False)
 
 
 

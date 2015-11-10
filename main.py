@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 """
 This is the back end for dungeon shopper
 """
@@ -63,32 +63,38 @@ class GameHandler(webapp2.RequestHandler):
             return False
 
     def saveGame(self, game, gameKey, alsoDatastore):
-        memcache.set(key=gameKey, value=game)
-        if (alsoDatastore):
-            game.put()
+        """Responsible for saving the game"""
+        #memcache.set(key=gameKey, value=game)
+        #if (alsoDatastore):
+        #    game.put()
+        game.put()
 
 
     def getGame(self, gameKey):
-        game = memcache.get(gameKey)
-        saveInCache = 0            
-        if (game == None):
-            logging.error("getGame: Key {0} not in cache possible loss of game data".format(gameKey))
-            game_k = ndb.Key('Game', gameKey)
-            game = game_k.get()
-            saveInCache = 1
+        """Retrieves the game object"""
+        game_k = ndb.Key('Game', gameKey)
+        game = game_k.get()
 
-        if (game == None):
-            raise ValueError("Game doesn't exist")
+        #game = memcache.get(gameKey)
+        #saveInCache = 0            
+        #if (game == None):
+        #    logging.error("getGame: Key {0} not in cache possible loss of game data".format(gameKey))
+        #    game_k = ndb.Key('Game', gameKey)
+        #    game = game_k.get()
+        #    saveInCache = 1
 
-        if (saveInCache):
-            memcache.add(key=gameKey, value=game)
+        #if (game == None):
+        #    raise ValueError("Game doesn't exist")
+
+        #if (saveInCache):
+        #    memcache.add(key=gameKey, value=game)
 
         return game
 
     
     def info(self, game):                
         if (game == None):
-            self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+            
             self.response.headers["Content-Type"] = "application/json"
             self.response.write("")
             return    
@@ -97,7 +103,7 @@ class GameHandler(webapp2.RequestHandler):
         if jsonstr == None or jsonstr == "":
             jsonstr = "no game in current session"
 
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(jsonstr)    
 
@@ -134,7 +140,7 @@ class GameHandler(webapp2.RequestHandler):
                 
         retstr = playerState(game, playerId)        
                 
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
@@ -178,7 +184,7 @@ class GameHandler(webapp2.RequestHandler):
             return
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
@@ -221,7 +227,7 @@ class GameHandler(webapp2.RequestHandler):
             return
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
@@ -272,7 +278,7 @@ class GameHandler(webapp2.RequestHandler):
             return
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
@@ -324,7 +330,7 @@ class GameHandler(webapp2.RequestHandler):
             return
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
@@ -353,7 +359,7 @@ class GameHandler(webapp2.RequestHandler):
             return
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, iPlayerId)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
@@ -399,7 +405,7 @@ class GameHandler(webapp2.RequestHandler):
             return
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
@@ -442,7 +448,7 @@ class GameHandler(webapp2.RequestHandler):
 
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
@@ -498,7 +504,7 @@ class GameHandler(webapp2.RequestHandler):
         logging.info("Complete event: done")
 
         retstr = playerState(game, iPlayerId)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
 
@@ -542,14 +548,19 @@ class GameHandler(webapp2.RequestHandler):
 
 
         retstr = playerState(game, priorPlayer)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)        
 
+    def clearRefresh(self, game):
+        gameKey = game.gameKey
+        for i in range(game.numPlayers):        
+            key = gameKey + "_refresh_" + iPlayerId
+            memcache.delete(key)
+
     def refresh(self, game):        
         if (game == None):
-            logging.warning("refresh called with null game object")
-            self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+            logging.warning("refresh called with null game object")            
             self.response.headers["Content-Type"] = "application/json"
             self.response.write("") 
 
@@ -565,10 +576,17 @@ class GameHandler(webapp2.RequestHandler):
             self.error(500)
             return
 
-        retstr = playerState(game, iPlayerId)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        gameKey = game.gameKey
+        key = gameKey + "_refresh_" + iPlayerId
+
+        #state = memcache.get(key)
+        #if (state == None):
+        #    state = playerState(game, iPlayerId)
+        #    memcache.add(key=key, value=state)
+        state = playerState(game, iPlayerId)
+
         self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)        
+        self.response.write(state)        
 
     def appendToLog(self, game, iPlayerId):        
         el = PlayerLog(playerId=iPlayerId, event=self.request.url)
@@ -592,7 +610,7 @@ class GameHandler(webapp2.RequestHandler):
         theGame = createNewGame(gameKey, numPlayers, "defaultPlayer0")
 
         # add game to cache
-        memcache.add(key=gameKey, value=theGame)
+        #memcache.add(key=gameKey, value=theGame)
         memcache.add(key=gameKey+"_counter", value=0)
 
 
@@ -648,7 +666,7 @@ class GameHandler(webapp2.RequestHandler):
         thedict = {}
         thedict["gamesAvailable"] = gameInfos
         jsonstr = json.dumps(thedict)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(jsonstr)      
 
@@ -674,7 +692,7 @@ class GameHandler(webapp2.RequestHandler):
         thedict = {}
         thedict["highScoresCreated"] = ct
         jsonstr = json.dumps(thedict)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(jsonstr)  
 
@@ -713,7 +731,7 @@ class GameHandler(webapp2.RequestHandler):
         thedict = {}
         thedict["highScores"] = highScores
         jsonstr = json.dumps(thedict)
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(jsonstr)  
 
@@ -743,7 +761,7 @@ class GameHandler(webapp2.RequestHandler):
 
         
         
-        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(retstr)
         return True    
@@ -752,7 +770,7 @@ class GameHandler(webapp2.RequestHandler):
 
     def get(self):
         """Switchboard for game actions"""
-
+        self.response.headers.add_header('Access-Control-Allow-Origin', "*")
         action = self.request.get('action')
         if action == None:
             self.error(500)
@@ -775,7 +793,7 @@ class GameHandler(webapp2.RequestHandler):
             retval = False
             alsoDatastore = False
             game = self.getGame(gameKey)
-
+            
             if (game.gameMode == "gameOver" and
                 action != "refresh"):
                 logging.error("Cannot execute {0} after the game is over".format(action))
@@ -830,8 +848,9 @@ class GameHandler(webapp2.RequestHandler):
                 self.error(500)
                 return
             
-            if (game.gameMode == "gameOver"):
-                #game over, save highscores
+            if (game.gameMode == "gameOver" and game.highScoresSaved == False):
+                #game over, save highscores                
+                game.highScoresSaved =True                              
                 self.saveHighScores(game)
                 alsoDatastore = True
 

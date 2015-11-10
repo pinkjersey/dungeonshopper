@@ -207,7 +207,7 @@ def removeItems(game, aPlayerId, what, where, addToDiscardPile):
     
     game: the game object
     aPlayerId: the player ID to operate on, only valid when the game is in the event mode
-    what: a string representing the card to remove (1->10)
+    what: a string representing the card(s) to remove (0..9)
     where: hand or cart
     addToDiscardPile: whether or not to add the cards to the discard pile
 
