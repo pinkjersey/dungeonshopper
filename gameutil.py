@@ -1,4 +1,4 @@
-import random
+﻿import random
 import json
 import logging
 from game_model import *
@@ -59,6 +59,7 @@ def playerState(game, playerId):
     thedict["gameMode"] = game.gameMode
     thedict["gameKey"] = game.gameKey
     thedict["bonus"] = calculateBonus(player)
+    thedict["updateDate"] = game.updateDate.strftime("%A, %d. %B %Y %I:%M:%S%p")
 
     eventList = []
     for e in player.curEvent:
@@ -675,32 +676,29 @@ def prepEvents(game, eventId):
         #sandstorm PASS CARDS TO LEFT
         if eventId == 14:
             logging.info("Sandstorm start Event Id:  {0}".format(eventId))
-            currentEvent=Event(eventId = eventId)
             p = len(game.players)
-            if(p==1):
+            if (p == 1):
                 logging.info("only one player, skipping event:  {0}".format(eventId))
-            prevPlayerId = game.numPlayers-1
-            tmp = game.players[0].hand
-            for i in range(p):
-                #logging.info("game.players[i]: {0}".format(i))
-                #logging.info("prevPlayerId before: {0}".format(prevPlayerId))
-                if (prevPlayerId == game.numPlayers):
-                    prevPlayerId = 0
-                    del game.players[i].hand
-                    game.players[i].hand = tmp
-                else:
-                    #logging.info("curPlayer: {0}".format(i))
-                    #logging.info("prevPlayerId after: {0}".format(prevPlayerId))
-                    del game.players[i].hand
-                    game.players[i].hand = game.players[prevPlayerId].hand
-                numItemsInHand = len(game.players[i].hand)
-                if numItemsInHand < game.players[i].maxHand:
-                    diff = game.players[i].maxHand - numItemsInHand
-                    for d in range(diff):
-                        #logging.info("pre dealing card! {0}".format(d))  
-                        dealItemCard(i, game)
-                        game.players[i].hand.sort()
-                prevPlayerId += 1
+            else:                
+                currentEvent=Event(eventId = eventId)                                
+                tmp = game.players[0].hand
+                for i in range(p):
+                    src = i+1                    
+                    if src == p:
+                        srcList = tmp
+                    else:
+                        srcList = game.players[src].hand
+                    game.players[i].hand = srcList
+
+                for i in range(p):
+                    numItemsInHand = len(game.players[i].hand)
+                    if numItemsInHand < game.players[i].maxHand:
+                        diff = game.players[i].maxHand - numItemsInHand
+                        logging.info("Dealing {0} cards to player {1}".format(diff, i+1))
+                        for d in range(diff):                        
+                            dealItemCard(i, game)
+                            game.players[i].hand.sort()
+
         #ThrownInTheDungeon
         if eventId == 15:
             logging.info("Thrown in the dungeon start Event Id:  {0}".format(eventId))
@@ -1137,7 +1135,7 @@ def createNewGame(gameKey, numPlayers, name):
 
     # create new game entity with id "theGame"
     # later each existing game will have their own IDs
-    game = Game(numPlayers=numPlayers, id=gameKey, gameKey=gameKey)
+    game = Game(numPlayers=numPlayers, spaceAvailable=numPlayers, id=gameKey, gameKey=gameKey)
 
     # create decks
     game.questDeck = newQuestDeck(numPlayers)

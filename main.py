@@ -16,30 +16,43 @@ from gameutil import *
 from game_model import *
 from google.appengine.api.logservice import logservice
 
+class GameInfo:
+    def __init__(self):
+        self.gameKey = None
+        self.numPlayers = None
+        self.spaceAvailable = None
+        self.createDate = None
+        self.updateDate = None
+
+    def to_dict(self):
+        dict = {'gameKey': self.gameKey, 'numPlayers': self.numPlayers, 'spaceAvailable': self.spaceAvailable}
+        return dict
+
+
 class GameHandler(webapp2.RequestHandler):
-    def updateGameInfo(self, gameKey):
-        gi = self.getGameInfo(gameKey)
-        gi.put()
+    #def updateGameInfo(self, gameKey):
+    #    gi = self.getGameInfo(gameKey)
+    #    gi.put()
 
-    def getGameInfo(self, gameKey):
-        gameInfoQuery = GameInfo.query(GameInfo.gameKey==gameKey)
-        giList = gameInfoQuery.fetch()
-        if (len(giList) != 1):
-            logging.error("unexpected number of game info items returned")
-            self.error(500)
-            return
+    def getGameInfo(self, gameKey):        
+        game = self.getGame(gameKey)
+        gi = GameInfo()
+        gi.createDate = game.createDate
+        gi.gameKey = game.gameKey
+        gi.numPlayers = game.numPlayers
+        gi.spaceAvailable = game.spaceAvailable
+        gi.updateDate = game.updateDate
 
-        return giList[0]
+        return gi
         
 
-    def reserveID(self, gameKey):
-        ret = memcache.incr(gameKey+"_counter")
-        if (ret == None):
-            gi = self.getGameInfo(gameKey)
-            ret = gi.numPlayers - gi.spaceAvailable
-            memcache.add(key=gameKey+"_counter", value=ret+1)
-            return ret
-        return ret-1    
+    def reserveID(self, game):
+        """Reserves an id from a game
+        
+        ret: id of the player
+        """
+        ret = game.numPlayers - game.spaceAvailable        
+        return ret    
 
     def sanityCheck(self, game):
         ct = 0
@@ -49,12 +62,18 @@ class GameHandler(webapp2.RequestHandler):
         logging.info("Sanity check: mk {0} dp {1} id {2}".format(len(game.market),
                                                        len(game.discardPile),
                                                        len(game.itemDeck)))
+
+        p = 1
         for player in game.players:
             ct += len(player.hand)
-            logging.info("Sanity check: hand {0}".format(len(player.hand)))
+            str = "player {0}: ".format(p)
+            p += 1
+            str += "hand {0}".format(len(player.hand))
+            
             for cart in player.carts:
-                logging.info("Sanity check: cart {0}".format(len(cart.inCart)))
+                str += " cart {0} ".format(len(cart.inCart))                
                 ct += len(cart.inCart)
+            logging.info(str)
 
         if (ct == 75):
             return True
@@ -62,18 +81,18 @@ class GameHandler(webapp2.RequestHandler):
             logging.error("Sanity check: {0}".format(ct))
             return False
 
-    def saveGame(self, game, gameKey, alsoDatastore):
-        """Responsible for saving the game"""
-        #memcache.set(key=gameKey, value=game)
-        #if (alsoDatastore):
-        #    game.put()
-        game.put()
+    def saveGame(self, game):
+        if (self.sanityCheck(game) == False):
+            logging.error("Sanity check failed")
 
+        logging.info("Saving game")
+        game.put()
+        self.updateCache(game)
 
     def getGame(self, gameKey):
-        """Retrieves the game object"""
+        """Retrieves the game object, and updates the cache for each player"""
         game_k = ndb.Key('Game', gameKey)
-        game = game_k.get()
+        game = game_k.get()        
 
         #game = memcache.get(gameKey)
         #saveInCache = 0            
@@ -91,60 +110,60 @@ class GameHandler(webapp2.RequestHandler):
 
         return game
 
-    
-    def info(self, game):                
-        if (game == None):
-            
+    @ndb.transactional(xg=True)
+    def info(self, gameKey):
+        """Dumps the entire game data to JSON format"""                
+        if (game == None):            
             self.response.headers["Content-Type"] = "application/json"
             self.response.write("")
-            return    
+            return None   
 
+        game = self.getGame(gameKey)
         jsonstr = json.dumps([game.to_dict()])
         if jsonstr == None or jsonstr == "":
             jsonstr = "no game in current session"
-
         
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(jsonstr)    
+        return jsonstr
 
-    def join(self, game, gameKey):
-        playerId = self.reserveID(gameKey)
-        if (playerId == -1):
-            logging.error("Failed to reserve player ID: -1")
-            self.error(500)
-            return
-        
+    @ndb.transactional(xg=True)
+    def join(self, gameKey):        
         name = self.request.get("name")
         if (name == None or name == ""):
             logging.error("name not set")
             self.error(500)
-            return
-
-        gi = self.getGameInfo(gameKey)
-        if (gi.spaceAvailable < 1):
+            return None
+        
+        game = self.getGame(gameKey)
+        playerId = self.reserveID(game)
+        if (playerId == -1):
+            logging.error("Failed to reserve player ID: -1")
+            self.error(500)
+            return None
+                
+        if (game.spaceAvailable < 1):
             logging.error("space unavailable")
             self.error(500)
-            return
-
-        minAllowed = gi.numPlayers - gi.spaceAvailable
-        gi.spaceAvailable -= 1
-        gi.put()        
+            return None
+        
+        minAllowed = game.numPlayers - game.spaceAvailable
+        game.spaceAvailable -= 1        
 
         logging.info("player ID: {0} {1}".format(playerId, minAllowed))
-        if (playerId > 3 or playerId != minAllowed):
-            logging.error("Invalid player ID: {0}".format(playerId))
-            self.error(500)
-            return
+        #if (playerId > 3 or playerId != minAllowed):
+        #    logging.error("Invalid player ID: {0}".format(playerId))
+        #    self.error(500)
+        #    return
 
+        
+        self.noActionAfterGameOver(game) # throws exception if game is over
         game.players[playerId].name = name
                 
         retstr = playerState(game, playerId)        
-                
-        
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)
+        self.saveGame(game)        
+        return retstr
 
-    def fish(self, game):
+    @ndb.transactional(xg=True)
+    def fish(self, gameKey):
         """
         USAGE: /game?action=fish&what=<singlecard>&where=<hand,cart0,cart1,etc>
         example: /game?action=fish&what=2&where=cart1
@@ -155,22 +174,22 @@ class GameHandler(webapp2.RequestHandler):
         where = self.request.get('where')
         if (where == None or where == ""):
             self.error(500)
-            return
+            return None
 
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
             self.error(500)
-            return
+            return None
 
         iPlayerId = int(playerId)
         if (iPlayerId < 0 or iPlayerId > 3):
             self.error(500)
-            return
+            return None
 
         what = self.request.get('what')
         if (what == None or what == ""):
             self.error(500)
-            return
+            return None
 
         actionCost = self.request.get('actionCost')
         if (actionCost == None or actionCost == ""):
@@ -178,18 +197,21 @@ class GameHandler(webapp2.RequestHandler):
 
         iActionCost = int(actionCost)
 
+        game = self.getGame(gameKey)
+        self.noActionAfterGameOver(game) # throws exception if game is over
         result = fish(game, iPlayerId, what, where, iActionCost)
         if (result == False):
             self.error(500)
-            return
+            return None
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
         
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)
+        self.saveGame(game)
+        return retstr
 
 
-    def discard(self, game):
+    @ndb.transactional(xg=True)
+    def discard(self, gameKey):
         """
         USAGE: /game?action=discard&what=<item list>&where=<hand,cart0,cart1,etc>
         example: /game?action=discard&what=234&where=hand
@@ -200,39 +222,42 @@ class GameHandler(webapp2.RequestHandler):
         where = self.request.get('where')
         if (where == None or where == ""):
             self.error(500)
-            return
+            return None
 
         what = self.request.get('what')
         if (what == None or what == ""):
             self.error(500)
-            return
+            return None
 
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
             self.error(500)
-            return
+            return None
 
         iPlayerId = int(playerId)
         if (iPlayerId < 0 or iPlayerId > 3):
             self.error(500)
-            return
+            return None
 
         actionCost = self.request.get('actionCost')
         if (actionCost == None or actionCost == ""):
             actionCost = 1
         iActionCost = int(actionCost)
+
+        game = self.getGame(gameKey)
+        self.noActionAfterGameOver(game) # throws exception if game is over
         result = discard(game, iPlayerId, what, where, iActionCost)
         if (result == False):
             self.error(500)
-            return
+            return None
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
         
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)
+        self.saveGame(game)
+        return retstr
 
-
-    def move(self, game):
+    @ndb.transactional(xg=True)
+    def move(self, gameKey):
         """
         USAGE: /game?action=cartCards&what=<item list>&src=<hand,cart0,cart1,etc>&dst=<cart0,cart1,etc>
         example: /game?action=cartCards&what=23&src=hand&dst=cart0
@@ -244,27 +269,27 @@ class GameHandler(webapp2.RequestHandler):
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
             self.error(500)
-            return
+            return None
 
         iPlayerId = int(playerId)
         if (iPlayerId < 0 or iPlayerId > 3):
             self.error(500)
-            return
+            return None
 
         src = self.request.get('src')
         if (src == None or src == ""):
             self.error(500)
-            return
+            return None
 
         dst = self.request.get('dst')
         if (dst == None or dst == ""):
             self.error(500)
-            return
+            return None
 
         what = self.request.get('what')
         if (what == None or what == ""):
             self.error(500)
-            return
+            return None
 
         actionCost = self.request.get('actionCost')
         if (actionCost == None or actionCost == ""):
@@ -272,18 +297,20 @@ class GameHandler(webapp2.RequestHandler):
 
         iActionCost = int(actionCost)
 
+        game = self.getGame(gameKey)
+        self.noActionAfterGameOver(game) # throws exception if game is over
         result = move(game, iPlayerId, what, src, dst, iActionCost)
         if (result == False):
             self.error(500)
-            return
+            return None
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
         
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)
+        self.saveGame(game)
+        return retstr
 
-
-    def buyCart(self, game):
+    @ndb.transactional(xg=True)
+    def buyCart(self, gameKey):
         """
         USAGE: /game?action=buyCart&withGold=<1or0>&items=<blank or itemlist>&cart=<cart0,cart1,etc>
         example: /game?action=buyCart&withGold=0&items=37&cart=cart1
@@ -294,48 +321,51 @@ class GameHandler(webapp2.RequestHandler):
         withGold = self.request.get('withGold')
         if (withGold == None or withGold == ""):
             self.error(500)
-            return
+            return None
 
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
             self.error(500)
-            return
+            return None
 
         iPlayerId = int(playerId)
         if (iPlayerId < 0 or iPlayerId > 3):
             self.error(500)
-            return
+            return None
 
         items = self.request.get('items')
         if (items == None):
             self.error(500)
-            return
+            return None
 
         cartidstr = self.request.get('cart')        
         if (cartidstr == None or cartidstr == ""):
             self.error(500)
-            return
+            return None
 
         if (withGold == 0 and items == ""):
             self.error(500)
-            return
+            return None
 
         actionCost = self.request.get('actionCost')
         if (actionCost == None or actionCost == ""):
             actionCost = 1
         iActionCost = int(actionCost)
+
+        game = self.getGame(gameKey)
+        self.noActionAfterGameOver(game) # throws exception if game is over
         result = buyCart(game, iPlayerId, cartidstr, withGold, items, iActionCost)
         if (result == False):
             self.error(500)
-            return
+            return None
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
         
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)
+        self.saveGame(game)
+        return retstr
 
-
-    def buyAction(self, game):
+    @ndb.transactional(xg=True)
+    def buyAction(self, gameKey):
         """
         USAGE: /game?action=buyAction
         example: /game?action=buyAction
@@ -346,25 +376,28 @@ class GameHandler(webapp2.RequestHandler):
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
             self.error(500)
-            return
+            return None
 
         iPlayerId = int(playerId)
         if (iPlayerId < 0 or iPlayerId > 3):
             self.error(500)
-            return
+            return None
 
         result = buyAction(game, iPlayerId)
         if (result == False):
             self.error(500)
-            return
+            return None
+
+        game = self.getGame(gameKey)
+        self.noActionAfterGameOver(game) # throws exception if game is over
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, iPlayerId)
         
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)
+        self.saveGame(game)
+        return retstr
 
-
-    def marketTrade(self, game):
+    @ndb.transactional(xg=True)
+    def marketTrade(self, gameKey):
         """
         USAGE: /game?action=marketTrade&handItems=<1 or more items>&marketItems=<1 or more items>
         example: /game?action=marketTrade&handItems=23&marketItems=5
@@ -378,39 +411,42 @@ class GameHandler(webapp2.RequestHandler):
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
             self.error(500)
-            return
+            return None
 
         iPlayerId = int(playerId)
         if (iPlayerId < 0 or iPlayerId > 3):
             self.error(500)
-            return
+            return None
 
         handItems = self.request.get('handItems')
         if (handItems == None):
             self.error(500)
-            return
+            return None
 
         marketItems = self.request.get('marketItems')
         if (marketItems == None):
             self.error(500)
-            return        
+            return None        
 
         actionCost = self.request.get('actionCost')
         if (actionCost == None or actionCost == ""):
             actionCost = 1
         iActionCost = int(actionCost)
+
+        game = self.getGame(gameKey)
+        self.noActionAfterGameOver(game) # throws exception if game is over
         result = marketTrade(game, iPlayerId, handItems, marketItems, iActionCost)
         if (result == False):
             self.error(500)
-            return
+            return None
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
         
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)
+        self.saveGame(game)
+        return retstr
 
-
-    def completeQuest(self, game):
+    @ndb.transactional(xg=True)
+    def completeQuest(self, gameKey):
         """
         USAGE: /game?action=completeQuest&what=<itemList>where=<cartID>
         Uses the items in the cart to complete a quest. If a quest with the cards in the cart doesn't exist, it returns an error
@@ -421,38 +457,41 @@ class GameHandler(webapp2.RequestHandler):
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
             self.error(500)
-            return
+            return None
 
         iPlayerId = int(playerId)
         if (iPlayerId < 0 or iPlayerId > 3):
             self.error(500)
-            return
+            return None
 
         where = self.request.get('where')
         if (where == None or where == ""):
             self.error(500)
-            return
+            return None
 
         what = self.request.get('what')
         if (what == None or what == ""):
             self.error(500)
-            return
+            return None
 
         logging.info("Complete quest: running")
+        game = self.getGame(gameKey)
+        self.noActionAfterGameOver(game) # throws exception if game is over
         result = completeQuest(game, iPlayerId, what, where)
         if (result == False):
             self.error(500)
-            return
+            return None
 
         logging.info("Complete quest: done")
 
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, game.curPlayer)
         
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)
+        self.saveGame(game)
+        return retstr
 
-    def completeEvent(self, game):
+    @ndb.transactional(xg=True)
+    def completeEvent(self, gameKey):
         """
         USAGE: /game?action=completeEvent&eventId=<eventId>&cart=<cart0>&gold=<0>&items=<0>&what1=<>&where1=<>&what2=<>&where2=<>&dest1=<>
         Complete an event. 
@@ -463,18 +502,18 @@ class GameHandler(webapp2.RequestHandler):
         eventId = self.request.get('eventId')
         if (eventId == None or eventId == ""):
             self.error(500)
-            return
+            return None
 
 
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
             self.error(500)
-            return
+            return None
 
         iPlayerId = int(playerId)
         if (iPlayerId < 0 or iPlayerId > 3):
             self.error(500)
-            return
+            return None
 
         gold = self.request.get('gold')
         igold = int(gold)
@@ -488,27 +527,23 @@ class GameHandler(webapp2.RequestHandler):
         where2 = self.request.get('where2')
         dest1 = self.request.get('dest1')
         ieventId = int(eventId)
-        logging.info("EventId found:  {0}".format(eventId))
-        logging.info("gold found:  {0}".format(gold))
-        logging.info("items found:  {0}".format(items))
-        logging.info("what1 Items Found:  {0}".format(what1))
-        logging.info("where1 Items Found:  {0}".format(where1))
-        logging.info("what2 Items Found:  {0}".format(what2))
-        logging.info("where2 Items Found:  {0}".format(where2))
-        logging.info("dest1 Items Found:  {0}".format(dest1))
+
+        game = self.getGame(gameKey)
+        self.noActionAfterGameOver(game) # throws exception if game is over
         result = completeEvent(game, ieventId, iPlayerId, igold, iitemsCount, what1, where1, what2, where2, dest1)
         if (result == False):
             self.error(500)
-            return
+            return None
 
         logging.info("Complete event: done")
 
         retstr = playerState(game, iPlayerId)
         
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)
+        self.saveGame(game)
+        return retstr
 
-    def passPlayer(self, game):
+    @ndb.transactional(xg=True)
+    def passPlayer(self, gameKey):
         """
         USAGE: /game?action=passPlayer&items=<items to discard>
         example: /game?action=passPlayer&items=2
@@ -525,18 +560,20 @@ class GameHandler(webapp2.RequestHandler):
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
             self.error(500)
-            return
+            return None
 
         iPlayerId = int(playerId)
         if (iPlayerId < 0 or iPlayerId > 3):
             self.error(500)
-            return
+            return None
 
         items = self.request.get('items')
         if (items == None):
             self.error(500)
-            return
+            return None
 
+        game = self.getGame(gameKey)
+        self.noActionAfterGameOver(game) # throws exception if game is over
         self.appendToLog(game, iPlayerId)
 
         try:
@@ -544,49 +581,58 @@ class GameHandler(webapp2.RequestHandler):
         except ValueError as e:
             logging.error("pass player exception {0}".format(e))
             self.error(500)
-            return
+            return None
 
 
         retstr = playerState(game, priorPlayer)
         
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)        
+        self.saveGame(game)
+        return retstr
 
     def clearRefresh(self, game):
         gameKey = game.gameKey
         for i in range(game.numPlayers):        
-            key = gameKey + "_refresh_" + iPlayerId
+            key = gameKey + "_refresh_" + str(i)
             memcache.delete(key)
 
-    def refresh(self, game):        
-        if (game == None):
-            logging.warning("refresh called with null game object")            
-            self.response.headers["Content-Type"] = "application/json"
-            self.response.write("") 
+    def updateCache(self, game):
+        """Updates the cache for each player"""
+        logging.info("Updating cache")
+        gameKey = game.gameKey
+        state = None
+        for i in range(game.numPlayers):        
+            key = gameKey + "_refresh_" + str(i)
+            state = playerState(game, i)
+            memcache.set(key=key, value=state)            
 
+        obj = json.loads(state)
+        logging.info("Done updating cache {0}".format(obj["updateDate"]))
+
+    def refresh(self, gameKey):        
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
             logging.error("refresh called with bad playerId")
             self.error(500)
-            return
+            return None
 
         iPlayerId = int(playerId)
         if (iPlayerId < 0 or iPlayerId > 3):
             logging.error("refresh called with invalid playerId")
             self.error(500)
-            return
+            return None
+                
+        key = gameKey + "_refresh_" + playerId
 
-        gameKey = game.gameKey
-        key = gameKey + "_refresh_" + iPlayerId
-
-        #state = memcache.get(key)
-        #if (state == None):
+        state = memcache.get(key)
+        if (state == None):
+            raise ValueError("cache doesn't have key {0} refresh failed".format(key)) 
         #    state = playerState(game, iPlayerId)
         #    memcache.add(key=key, value=state)
-        state = playerState(game, iPlayerId)
-
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(state)        
+        #state = playerState(game, iPlayerId)
+        obj = json.loads(state)
+        logging.info("refresh: last update time {0}".format(obj["updateDate"]))
+        return state
+    
 
     def appendToLog(self, game, iPlayerId):        
         el = PlayerLog(playerId=iPlayerId, event=self.request.url)
@@ -600,8 +646,6 @@ class GameHandler(webapp2.RequestHandler):
         gameKey = "game{0}".format(numPlayers)
         randomStr = self.id_generator(6, gameKey)
         gameKey += "_" + randomStr
-        gameInfo = GameInfo(gameKey=gameKey, numPlayers=numPlayers, spaceAvailable=numPlayers)
-        gameInfo.put()
 
         # if the game exists in the datastore ... delete it
         game_k = ndb.Key('Game', gameKey)
@@ -634,20 +678,14 @@ class GameHandler(webapp2.RequestHandler):
 
         # get all games from game info datastore
         gameInfos = []
-        games = GameInfo.query()
-        for gi in games:
-            keyStr = gi.gameKey
-            game = self.getGame(keyStr)          
-            if (game == None):
-                logging.error("Couldn't get the game -- deleting game info")
-                gi.key.delete()
-                continue
+        games = Game.query()
+        for game in games:
+            keyStr = game.gameKey
 
-            if (gi.spaceAvailable > 0):
-                gamesNeeded[gi.numPlayers-1] = 0
+            if (game.spaceAvailable > 0):
+                gamesNeeded[game.numPlayers-1] = 0
+                gi = self.getGameInfo(keyStr)
                 gameDict = gi.to_dict()
-                del gameDict["createDate"]
-                del gameDict["updateDate"]
                 gameInfos.append(gameDict)
 
 
@@ -668,7 +706,7 @@ class GameHandler(webapp2.RequestHandler):
         jsonstr = json.dumps(thedict)
         
         self.response.headers["Content-Type"] = "application/json"
-        self.response.write(jsonstr)      
+        self.response.write(jsonstr)  
 
     def testHighScores(self):
         """Utility function that creates some highscores"""
@@ -735,48 +773,65 @@ class GameHandler(webapp2.RequestHandler):
         self.response.headers["Content-Type"] = "application/json"
         self.response.write(jsonstr)  
 
+    def noActionAfterGameOver(self, game):
+        if (game.gameMode == "gameOver"):
+            raise ValueError("Cannot execute action after the game is over")            
 
-    def setGameOver(self, game):                 
-        retstr = ""       
+    @ndb.transactional(xg=True)
+    def checkGameOver(self, gameKey):
+        game = self.getGame(gameKey)
+        if (game.gameMode == "gameOver" and game.highScoresSaved == False):
+            #game over, save highscores                
+            game.highScoresSaved =True                              
+            self.saveHighScores(game)                
+            self.saveGame(game)
+
+    @ndb.transactional(xg=True)
+    def setGameOver(self, gameKey):
+        game = None                 
+        retstr = ""
+        game = self.getGame(gameKey)       
         if (game == None):
             logging.error("game over called with null game object")
             self.error(500)
-            return
-        else:
-            game.gameMode = "gameOver"
-            playerId = self.request.get("playerId")
+            return None
+                
+        self.noActionAfterGameOver(game) # throws exception if game is over
+        game.gameMode = "gameOver"
+        playerId = self.request.get("playerId")
 
-            iPlayerId = int(playerId)
-            if (iPlayerId < 0 or iPlayerId > 3):
-                logging.error("game over called with invalid playerId")
-                self.error(500)
-                return
-
-
-            retstr = playerState(game, iPlayerId)
-            if (playerId == None or playerId == ""):
-                logging.error("game over called with bad playerId")
-                self.error(500)
-                return
-
+        iPlayerId = int(playerId)
+        if (iPlayerId < 0 or iPlayerId > 3):
+            logging.error("game over called with invalid playerId")
+            self.error(500)
+            return None
+            
+        retstr = playerState(game, iPlayerId)
+        if (playerId == None or playerId == ""):
+            logging.error("game over called with bad playerId")
+            self.error(500)
+            return None
+                
+        self.saveGame(game)
         
-        
-        
-        self.response.headers["Content-Type"] = "application/json"
-        self.response.write(retstr)
-        return True    
+        return retstr          
 
 
 
     def get(self):
         """Switchboard for game actions"""
         self.response.headers.add_header('Access-Control-Allow-Origin', "*")
+        self.response.headers.add_header('cache-control', "no-cache, no-store, must-revalidate")
         action = self.request.get('action')
         if action == None:
             self.error(500)
             return
 
         gameKey = self.request.get('gameKey')
+
+        #
+        # The following actions do not need the game object
+        #
         if gameKey == None or gameKey == "":
             if action == "listGames":                
                 return self.listGames()
@@ -790,87 +845,61 @@ class GameHandler(webapp2.RequestHandler):
                 return
         
         try:
-            retval = False
-            alsoDatastore = False
-            game = self.getGame(gameKey)
-            
-            if (game.gameMode == "gameOver" and
-                action != "refresh"):
-                logging.error("Cannot execute {0} after the game is over".format(action))
-                self.error(500)
-                return
+            retval = False                                    
 
+            # refresh doesn't load the game, it gets it from cache
+            # or returns an error
+            if action == "refresh":
+                retval = self.refresh(gameKey)
+
+            # all of these functions are transactional and get the game and save it in cache
+            # get the game and put it into cache for refresh, modify the game and save it
             if action == "join":
-                retval = self.join(game, gameKey)
+                retval = self.join(gameKey)
 
             if action == "fish":
-                retval = self.fish(game)
+                retval = self.fish(gameKey)
 
             if action == "discard":
-                retval = self.discard(game)
+                retval = self.discard(gameKey)
 
             if action == "move":
-                retval = self.move(game)
+                retval = self.move(gameKey)
 
             if action == "buyCart":
-                retval = self.buyCart(game)
+                retval = self.buyCart(gameKey)
 
             if action == "buyAction":
-                retval = self.buyAction(game)
+                retval = self.buyAction(gameKey)
 
             if action == "pass":
-                retval = self.passPlayer(game)
-                if (retval == True and game.curPlayer == 0):
-                    alsoDatastore = True
+                retval = self.passPlayer(gameKey)
 
             if action == "gameOver":
-                retval = self.setGameOver(game)                
-
+                retval = self.setGameOver(gameKey)                
 
             if action == "marketTrade":
-                retval = self.marketTrade(game)
+                retval = self.marketTrade(gameKey)
 
             if action == "completeQuest":
-                retval = self.completeQuest(game)
-
+                retval = self.completeQuest(gameKey)
 
             if action == "completeEvent":
-                retval = self.completeEvent(game)
-
-            if action == "refresh":
-                retval = self.refresh(game)
+                retval = self.completeEvent(gameKey)
 
             if action == "info":
-                retval = self.info(game)
-
-            if (retval == False):
-                logging.error("Worker function returned an error")
-                self.error(500)
-                return
-            
-            if (game.gameMode == "gameOver" and game.highScoresSaved == False):
-                #game over, save highscores                
-                game.highScoresSaved =True                              
-                self.saveHighScores(game)
-                alsoDatastore = True
-
-            if (self.sanityCheck(game) == False):
-                logging.error("Sanity check failed")
-
-            self.saveGame(game, gameKey, alsoDatastore)
-            if (alsoDatastore):
-                self.updateGameInfo(gameKey)
+                retval = self.info(gameKey)
 
             if (self.response.has_error()):
-                if (game != None):
-                    jsonstr = json.dumps([game.to_dict()])
-                    if jsonstr == None or jsonstr == "":
-                        jsonstr = "no game in current session"
-                    logging.error("game state {0}".format(jsonstr))
-                else:
-                    logging.error("Can't display game state as the game object is invalid")
-
-
+                logging.error("Not outputting anything as the response has an error")
+            else:
+                if (retval != None):
+                    self.response.headers["Content-Type"] = "application/json"
+                    self.response.write(retval)
+            
+            if (action != "refresh"):
+                self.checkGameOver(gameKey)
+            
             return
 
         except ValueError as e:

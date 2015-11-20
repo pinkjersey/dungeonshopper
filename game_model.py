@@ -1,4 +1,4 @@
-import cgi
+﻿import cgi
 import urllib
 
 from google.appengine.api import users
@@ -11,12 +11,12 @@ class HighScore(ndb.Model):
     playerName = ndb.StringProperty(required=True)
     score = ndb.IntegerProperty(required=True, default=0)
 
-class GameInfo(ndb.Model):
-    gameKey = ndb.StringProperty(required=True)
-    numPlayers = ndb.IntegerProperty(required=True)
-    spaceAvailable = ndb.IntegerProperty(required=True)
-    createDate = ndb.DateTimeProperty(required=True, auto_now_add=True)
-    updateDate = ndb.DateTimeProperty(required=True, auto_now=True)
+#class GameInfo(ndb.Model):
+#    gameKey = ndb.StringProperty(required=True)
+#    numPlayers = ndb.IntegerProperty(required=True)
+#    spaceAvailable = ndb.IntegerProperty(required=True)
+#    createDate = ndb.DateTimeProperty(required=True, auto_now_add=True)
+#    updateDate = ndb.DateTimeProperty(required=True, auto_now=True)
 
 class QuestCard(ndb.Model):
     level = ndb.IntegerProperty(required=True)
@@ -78,7 +78,9 @@ class Game(ndb.Model):
     questsInPlay = ndb.LocalStructuredProperty(QuestCard, repeated=True)
     playerLog = ndb.LocalStructuredProperty(PlayerLog, repeated=True)
     highScoresSaved = ndb.BooleanProperty(required=True, default=False)
-
+    spaceAvailable = ndb.IntegerProperty(required=True)
+    createDate = ndb.DateTimeProperty(required=True, auto_now_add=True)
+    updateDate = ndb.DateTimeProperty(required=True, auto_now=True)
 
 
 

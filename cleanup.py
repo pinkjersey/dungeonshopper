@@ -33,15 +33,14 @@ class CleanupHandler(webapp2.RequestHandler):
 
 		twentyFourHours = self.seconds_ago(60 * 60 * 24)
 		fifteenMinutes = self.seconds_ago(60 * 15)
-		gameInfoQuery = GameInfo.query(ndb.OR(GameInfo.createDate < twentyFourHours,
-											  GameInfo.updateDate < fifteenMinutes))
-		giList = gameInfoQuery.fetch()
+		gameQuery = Game.query(ndb.OR(Game.createDate < twentyFourHours,
+									      Game.updateDate < fifteenMinutes))
+		giList = gameQuery.fetch()
 		
 		ct = 0
 		for gi in giList:
 			game_k = ndb.Key('Game', gi.gameKey)
-			game_k.delete()
-			gi.key.delete()
+			game_k.delete()			
 			ct += 1
 			
 		self.response.out.write('Deleted {0} stale games'.format(ct))
