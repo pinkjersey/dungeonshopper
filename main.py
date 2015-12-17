@@ -375,20 +375,22 @@ class GameHandler(webapp2.RequestHandler):
 
         playerId = self.request.get("playerId")
         if (playerId == None or playerId == ""):
+            logging.error("Player ID not set")
             self.error(500)
             return None
 
         iPlayerId = int(playerId)
         if (iPlayerId < 0 or iPlayerId > 3):
-            self.error(500)
-            return None
-
-        result = buyAction(game, iPlayerId)
-        if (result == False):
+            logging.error("Player ID out of range")
             self.error(500)
             return None
 
         game = self.getGame(gameKey)
+        result = buyAction(game, iPlayerId)
+        if (result == False):
+            self.error(500)
+            return None
+        
         self.noActionAfterGameOver(game) # throws exception if game is over
         self.appendToLog(game, iPlayerId)
         retstr = playerState(game, iPlayerId)

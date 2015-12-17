@@ -658,9 +658,14 @@ def prepEvents(game, eventId):
                 prepWhatItems1 = ""
                 cart = game.players[playerId].carts[0]
                 #logging.info("playerId: {0}".format(playerId))
-                sumItems = sum(cart.inCart)
+                foundCard = False
+                for i in cart.inCart:
+                    if (i == 3 or i == 4 or i == 5):
+                        foundCard = True
+                        break
+                
                 #logging.info("sumItems: {0}".format(sumItems))
-                if sumItems < 5:
+                if not foundCard:
                     logging.info("cart has been destroyed")
                     cart.destroyed = True                
                     cart.purchased = False
@@ -1116,7 +1121,8 @@ def fish(game, aPlayerId, what, where, actionCost):
 
     return True
 
-def buyAction(game, aPlayerId):    
+def buyAction(game, aPlayerId):
+    """Reduces the given player's gold by two and adds another action"""    
     buyCost = 2
     if game.gameMode == "game":
         player = game.players[game.curPlayer]
@@ -1390,12 +1396,14 @@ def newQuestDeck(numPlayers):
     level1Cards.append(createQuestCard(1,True,[1,4,6],2,2))
     level1Cards.append(createQuestCard(1,True,[2,3,7],2,2))
     level1Cards.append(createQuestCard(1,True,[1,6,8],3,2))
-    level1Cards.append(createQuestCard(1,True,[2,6,10],3,2))
+    #level1Cards.append(createQuestCard(1,True,[2,6,10],3,2))
+    level1Cards.append(createQuestCard(1,True,[2,6,7],3,2))    
     level1Cards.append(createQuestCard(1,True,[3,5,10],3,2))
     level1Cards.append(createQuestCard(1,False,[4,4,4],4,2))
     level1Cards.append(createQuestCard(1,True,[1,3,10],3,3))
     level1Cards.append(createQuestCard(1,True,[1,5,9],3,3))
-    level1Cards.append(createQuestCard(1,True,[2,2,10],3,3))
+    #level1Cards.append(createQuestCard(1,True,[2,2,10],3,3))
+    level1Cards.append(createQuestCard(1,True,[2,2,7],2,3))
     level1Cards.append(createQuestCard(1,True,[2,5,8],3,3))
     level1Cards.append(createQuestCard(1,True,[3,5,9],3,3))
     level1Cards.append(createQuestCard(1,True,[3,7,8],3,3))
@@ -1411,13 +1419,16 @@ def newQuestDeck(numPlayers):
     level1Cards.append(createQuestCard(1,True,[1,5,5],2,5))
     level1Cards.append(createQuestCard(1,True,[3,3,3],2,5))
     level1Cards.append(createQuestCard(1,True,[1,6,10],3,5))
-    level1Cards.append(createQuestCard(1,True,[2,4,10],3,5))
+    #level1Cards.append(createQuestCard(1,True,[2,4,10],3,5))
+    level1Cards.append(createQuestCard(1,True,[2,4,7],3,5))
     level1Cards.append(createQuestCard(1,True,[3,6,9],3,5))
     level1Cards.append(createQuestCard(1,True,[4,6,6],3,5))
-    level2Cards.append(createQuestCard(2,True,[1,2,6,10],4,1))
+    #level2Cards.append(createQuestCard(2,True,[1,2,6,10],4,1))
+    level2Cards.append(createQuestCard(2,True,[1,2,6,6],4,1))
     level2Cards.append(createQuestCard(2,False,[2,2,6,9],4,1))
     level2Cards.append(createQuestCard(2,True,[2,4,5,5],4,1))
-    level2Cards.append(createQuestCard(2,False,[3,4,5,10],5,1))
+    #level2Cards.append(createQuestCard(2,False,[3,4,5,10],5,1))
+    level2Cards.append(createQuestCard(2,True,[3,4,5,7],4,1))
     level2Cards.append(createQuestCard(2,False,[1,3,7,10],5,1))
     level2Cards.append(createQuestCard(2,True,[1,3,3,8],3,2))
     level2Cards.append(createQuestCard(2,True,[1,1,1,10],4,2))
@@ -1487,17 +1498,15 @@ def newQuestDeck(numPlayers):
     level3Cards = shuffle(level3Cards)
     level4Cards = shuffle(level4Cards)
 
-    #def createQuestStacks(tippytop, top, middle, bottom, level1, level2, level3, level4, l0t, l1t, l1m, l2m, l1b, l2b, l3b, et, em, eb):
+
     if numPlayers == 1:
-        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards, 4,  4,1,2,1,1,2,   1,1,1)
-        #createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,     3,3,3)
+        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards, 4, 4, 1, 2, 1,1,2, 1,1,1)
     elif numPlayers == 2:
-        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  6,1,4,1,2,4,   2,2,2)
-        #createQuestStacks(tippytop,top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  1,1,1,1,1,1,   3,3,3)
+        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards, 4, 6, 1, 4, 2,3,4, 2,2,2)
     elif numPlayers == 3:
-        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  7,3,7,2,3,5,   3,3,3)
+        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards, 4, 7, 3, 7, 2,3,5, 3,3,3)
     elif numPlayers == 4:
-        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards,  4,  10,4,10,2,4,6, 4,4,4)
+        createQuestStacks(tippytop, top, middle, bottom, level1Cards, level2Cards, level3Cards, level4Cards, 4, 10, 2, 8, 2,4,6, 4,4,4)
     else:
         raise ValueError("Invalid number of players")
 
